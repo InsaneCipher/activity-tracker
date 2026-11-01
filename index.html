@@ -48,6 +48,16 @@
           margin:0 0 6px;
         }
         .subtitle{color:var(--muted);font-size:0.92rem;margin-bottom:20px;}
+        .top-row{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;}
+        .page-link{
+          font-family:var(--display);
+          font-size:0.9rem;
+          color:var(--muted);
+          text-decoration:none;
+          border:1px solid var(--line);
+          padding:5px 12px;
+        }
+        .page-link:hover{color:var(--text);border-color:#4a4540;}
 
         /* Signature detail: a single checkered finish-line rule */
         .finish-line{
@@ -373,7 +383,10 @@
 </head>
 <body>
 <div class="wrap">
-    <h1>Ride Log</h1>
+    <div class="top-row">
+        <h1>Ride Log</h1>
+        <a class="page-link" href="walks.html">Walk Log →</a>
+    </div>
     <div class="subtitle">Virtual rides — MyWhoosh</div>
     <div class="finish-line"></div>
 
