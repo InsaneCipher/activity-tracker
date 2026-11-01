@@ -380,10 +380,10 @@
     <div id="status"></div>
 
     <div id="picker-wrap">
-        Couldn't auto-load <code>data.json</code> (browsers block this when a page is opened directly from disk).<br>
-        Pick the file manually instead:
+        Couldn't auto-load the ride data (browsers block this when a page is opened directly from disk).<br>
+        Pick the monthly files from the <code>ride_data</code> folder instead (you can select several at once):
         <br>
-        <input type="file" id="file-input" accept=".json">
+        <input type="file" id="file-input" accept=".json" multiple>
     </div>
 
     <div id="totals" class="totals"></div>
@@ -956,14 +956,21 @@
     }
 
     /* ---------------- Boot ---------------- */
-    function render(data) {
+    // Rides from all monthly files, oldest first.
+    function combineRides(files) {
+      return files
+        .flatMap(d => (d && Array.isArray(d.rides)) ? d.rides : [])
+        .sort((a, b) => `${a.date} ${a.time || ''}`.localeCompare(`${b.date} ${b.time || ''}`));
+    }
+
+    function render(data, sourceText) {
       currentRides = data.rides || [];
       renderTotals(currentRides);
       renderRows();
       if (document.getElementById('graph-view').classList.contains('active')) drawChart();
       if (document.getElementById('records-view').classList.contains('active')) { renderRecords(currentRides); renderZones(currentRides); }
       if (document.getElementById('trends-view').classList.contains('active')) { renderWeekly(currentRides); renderRouteHistory(currentRides); }
-      document.getElementById('status').textContent = `Loaded ${currentRides.length} ride(s) from data.json`;
+      document.getElementById('status').textContent = `Loaded ${currentRides.length} ride(s) from ${sourceText}`;
     }
 
     document.querySelectorAll('thead th[data-key]').forEach(th => {
@@ -982,31 +989,32 @@
     function showPicker() {
       document.getElementById('picker-wrap').classList.add('show');
       document.getElementById('status').textContent = '';
-      document.getElementById('file-input').addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          try {
-            const data = JSON.parse(evt.target.result);
-            render(data);
-            document.getElementById('picker-wrap').classList.remove('show');
-          } catch (err) {
-            document.getElementById('status').textContent = 'Could not parse that file as JSON.';
-          }
-        };
-        reader.readAsText(file);
+      document.getElementById('file-input').addEventListener('change', async (e) => {
+        const files = Array.from(e.target.files).filter(f => f.name !== 'index.json');
+        if (!files.length) return;
+        try {
+          const parsed = await Promise.all(files.map(f => f.text().then(JSON.parse)));
+          render({ rides: combineRides(parsed) }, `${files.length} file(s)`);
+          document.getElementById('picker-wrap').classList.remove('show');
+        } catch (err) {
+          document.getElementById('status').textContent = 'Could not read one of those files as JSON.';
+        }
       });
     }
 
     buildMetricPicker();
 
-    fetch('data.json')
-      .then(res => {
-        if (!res.ok) throw new Error('not found');
+    // ride_data/index.json lists the monthly files written by extract_rides.py.
+    function getJson(url) {
+      return fetch(url).then(res => {
+        if (!res.ok) throw new Error(`${url}: ${res.status}`);
         return res.json();
-      })
-      .then(render)
+      });
+    }
+
+    getJson('ride_data/index.json')
+      .then(index => Promise.all((index.files || []).map(f => getJson(`ride_data/${f}`)))
+        .then(months => render({ rides: combineRides(months) }, `${months.length} monthly file(s)`)))
       .catch(() => showPicker());
 </script>
 </body>

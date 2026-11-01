@@ -1,0 +1,31 @@
+{
+  "19838693870": {
+    "_ride": "2026-08-21 17:09 Indoor cycle",
+    "exclude": true
+  },
+  "19897607932": {
+    "_ride": "2026-08-24 16:27 Indoor cycle",
+    "exclude": true
+  },
+  "19946800354": {
+    "_ride": "2026-08-29 10:48 Capital Circuit",
+    "relative_effort": 37,
+    "heart_rate_avg_bpm": 148,
+    "heart_rate_max_bpm": 164,
+    "map_name": "Capital Circuit (Switzerland)"
+  },
+  "19960230916": {
+    "_ride": "2026-08-30 10:32 Thimphu City",
+    "map_name": "Thimphu City (Bhutan)"
+  },
+  "20002427095": {
+    "_ride": "2026-09-02 09:54 The Muur (Belgium)",
+    "relative_effort": 52,
+    "heart_rate_avg_bpm": 152,
+    "heart_rate_max_bpm": 166
+  },
+  "20xxxxxxxxx": {
+    "_ride": "2026-08-21 Indoor cycle",
+    "exclude": true
+  }
+}
