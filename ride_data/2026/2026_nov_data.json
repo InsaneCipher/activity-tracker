@@ -1,0 +1,40 @@
+{
+  "year": 2026,
+  "month": "nov",
+  "rides": [
+    {
+      "date": "2026-11-04",
+      "time": "18:28",
+      "map_name": "Cobbled Classic (France)",
+      "distance_km": 17.48,
+      "moving_time": "41:35",
+      "elevation_m": 116,
+      "relative_effort": 94,
+      "weighted_avg_power_w": 148,
+      "total_work_kj": 367,
+      "training_load": 59,
+      "intensity_pct": 93,
+      "speed_avg_kmh": 25.2,
+      "speed_max_kmh": 58.0,
+      "heart_rate_avg_bpm": 168,
+      "heart_rate_max_bpm": 185,
+      "cadence_avg": 67,
+      "cadence_max": 94,
+      "power_avg_w": 147,
+      "power_max_w": 277,
+      "calories": 367,
+      "ftp": 160,
+      "url": "https://www.strava.com/activities/20860665599",
+      "elapsed_time": "41:35",
+      "zones": {
+        "recovery_sec": 42,
+        "endurance_sec": 77,
+        "tempo_sec": 917,
+        "threshold_sec": 1294,
+        "vo2max_sec": 83,
+        "anaerobic_sec": 75,
+        "neuromuscular_sec": 8
+      }
+    }
+  ]
+}
