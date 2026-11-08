@@ -344,6 +344,309 @@
           "heart_rate_avg_bpm": 117
         }
       ]
+    },
+    {
+      "id": 20873959962,
+      "url": "https://www.strava.com/activities/20873959962",
+      "name": "Afternoon Walk",
+      "type": "Walk",
+      "date": "2026-11-05",
+      "time": "17:34",
+      "distance_km": 9.51,
+      "moving_time": "1:38:36",
+      "moving_time_sec": 5916,
+      "elapsed_time": "1:43:37",
+      "elapsed_time_sec": 6217,
+      "pace_min_per_km": "10:22",
+      "speed_avg_kmh": 5.8,
+      "speed_max_kmh": 9.6,
+      "elevation_gain_m": 33,
+      "elevation_high_m": 75.8,
+      "elevation_low_m": 54.6,
+      "heart_rate_avg_bpm": 110,
+      "heart_rate_max_bpm": 133,
+      "cadence_avg_spm": 111,
+      "steps_estimated": 10964,
+      "calories": 666,
+      "relative_effort": 16,
+      "device": "Garmin Venu 4",
+      "description": null,
+      "splits": [
+        {
+          "km": 1,
+          "distance_m": 1000,
+          "moving_time": "10:52",
+          "pace_min_per_km": "10:52",
+          "elevation_change_m": 7.0,
+          "heart_rate_avg_bpm": 110
+        },
+        {
+          "km": 2,
+          "distance_m": 1002,
+          "moving_time": "10:09",
+          "pace_min_per_km": "10:08",
+          "elevation_change_m": 1.2,
+          "heart_rate_avg_bpm": 113
+        },
+        {
+          "km": 3,
+          "distance_m": 1000,
+          "moving_time": "10:11",
+          "pace_min_per_km": "10:11",
+          "elevation_change_m": -1.2,
+          "heart_rate_avg_bpm": 110
+        },
+        {
+          "km": 4,
+          "distance_m": 998,
+          "moving_time": "10:17",
+          "pace_min_per_km": "10:18",
+          "elevation_change_m": -0.4,
+          "heart_rate_avg_bpm": 109
+        },
+        {
+          "km": 5,
+          "distance_m": 1002,
+          "moving_time": "10:25",
+          "pace_min_per_km": "10:24",
+          "elevation_change_m": -5.6,
+          "heart_rate_avg_bpm": 110
+        },
+        {
+          "km": 6,
+          "distance_m": 999,
+          "moving_time": "10:13",
+          "pace_min_per_km": "10:14",
+          "elevation_change_m": 5.8,
+          "heart_rate_avg_bpm": 111
+        },
+        {
+          "km": 7,
+          "distance_m": 1002,
+          "moving_time": "10:22",
+          "pace_min_per_km": "10:21",
+          "elevation_change_m": 0.4,
+          "heart_rate_avg_bpm": 109
+        },
+        {
+          "km": 8,
+          "distance_m": 1000,
+          "moving_time": "9:49",
+          "pace_min_per_km": "9:49",
+          "elevation_change_m": 0.0,
+          "heart_rate_avg_bpm": 111
+        },
+        {
+          "km": 9,
+          "distance_m": 999,
+          "moving_time": "10:37",
+          "pace_min_per_km": "10:38",
+          "elevation_change_m": -16.4,
+          "heart_rate_avg_bpm": 107
+        },
+        {
+          "km": 10,
+          "distance_m": 510,
+          "moving_time": "5:42",
+          "pace_min_per_km": "11:10",
+          "elevation_change_m": 4.6,
+          "heart_rate_avg_bpm": 106
+        }
+      ]
+    },
+    {
+      "id": 20885709431,
+      "url": "https://www.strava.com/activities/20885709431",
+      "name": "Afternoon Walk",
+      "type": "Walk",
+      "date": "2026-11-06",
+      "time": "16:49",
+      "distance_km": 10.31,
+      "moving_time": "1:41:23",
+      "moving_time_sec": 6083,
+      "elapsed_time": "1:41:23",
+      "elapsed_time_sec": 6083,
+      "pace_min_per_km": "9:50",
+      "speed_avg_kmh": 6.1,
+      "speed_max_kmh": 8.6,
+      "elevation_gain_m": 40,
+      "elevation_high_m": 74.4,
+      "elevation_low_m": 54.4,
+      "heart_rate_avg_bpm": 116,
+      "heart_rate_max_bpm": 144,
+      "cadence_avg_spm": 113,
+      "steps_estimated": 11456,
+      "calories": 729,
+      "relative_effort": 19,
+      "device": "Garmin Venu 4",
+      "description": null,
+      "splits": [
+        {
+          "km": 1,
+          "distance_m": 1004,
+          "moving_time": "10:35",
+          "pace_min_per_km": "10:33",
+          "elevation_change_m": 11.0,
+          "heart_rate_avg_bpm": 110
+        },
+        {
+          "km": 2,
+          "distance_m": 999,
+          "moving_time": "10:27",
+          "pace_min_per_km": "10:28",
+          "elevation_change_m": -0.6,
+          "heart_rate_avg_bpm": 102
+        },
+        {
+          "km": 3,
+          "distance_m": 1000,
+          "moving_time": "10:09",
+          "pace_min_per_km": "10:09",
+          "elevation_change_m": -0.6,
+          "heart_rate_avg_bpm": 112
+        },
+        {
+          "km": 4,
+          "distance_m": 1003,
+          "moving_time": "10:19",
+          "pace_min_per_km": "10:17",
+          "elevation_change_m": -1.4,
+          "heart_rate_avg_bpm": 111
+        },
+        {
+          "km": 5,
+          "distance_m": 996,
+          "moving_time": "9:15",
+          "pace_min_per_km": "9:17",
+          "elevation_change_m": -6.0,
+          "heart_rate_avg_bpm": 123
+        },
+        {
+          "km": 6,
+          "distance_m": 999,
+          "moving_time": "9:36",
+          "pace_min_per_km": "9:37",
+          "elevation_change_m": 5.8,
+          "heart_rate_avg_bpm": 126
+        },
+        {
+          "km": 7,
+          "distance_m": 1003,
+          "moving_time": "9:57",
+          "pace_min_per_km": "9:55",
+          "elevation_change_m": 1.4,
+          "heart_rate_avg_bpm": 117
+        },
+        {
+          "km": 8,
+          "distance_m": 1001,
+          "moving_time": "9:40",
+          "pace_min_per_km": "9:39",
+          "elevation_change_m": 0.6,
+          "heart_rate_avg_bpm": 116
+        },
+        {
+          "km": 9,
+          "distance_m": 996,
+          "moving_time": "9:03",
+          "pace_min_per_km": "9:05",
+          "elevation_change_m": -0.2,
+          "heart_rate_avg_bpm": 126
+        },
+        {
+          "km": 10,
+          "distance_m": 1002,
+          "moving_time": "9:26",
+          "pace_min_per_km": "9:25",
+          "elevation_change_m": -14.2,
+          "heart_rate_avg_bpm": 122
+        },
+        {
+          "km": 11,
+          "distance_m": 312,
+          "moving_time": "2:56",
+          "pace_min_per_km": "9:24",
+          "elevation_change_m": 2.2,
+          "heart_rate_avg_bpm": 128
+        }
+      ]
+    },
+    {
+      "id": 20899357297,
+      "url": "https://www.strava.com/activities/20899357297",
+      "name": "Evening Walk",
+      "type": "Walk",
+      "date": "2026-11-07",
+      "time": "18:01",
+      "distance_km": 5.47,
+      "moving_time": "1:04:34",
+      "moving_time_sec": 3874,
+      "elapsed_time": "1:05:47",
+      "elapsed_time_sec": 3947,
+      "pace_min_per_km": "11:48",
+      "speed_avg_kmh": 5.1,
+      "speed_max_kmh": 13.1,
+      "elevation_gain_m": 10,
+      "elevation_high_m": 79.0,
+      "elevation_low_m": 56.4,
+      "heart_rate_avg_bpm": 120,
+      "heart_rate_max_bpm": 144,
+      "cadence_avg_spm": 108,
+      "steps_estimated": 6986,
+      "calories": 394,
+      "relative_effort": 13,
+      "device": "Garmin Venu 4",
+      "description": null,
+      "splits": [
+        {
+          "km": 1,
+          "distance_m": 1002,
+          "moving_time": "13:12",
+          "pace_min_per_km": "13:10",
+          "elevation_change_m": 4.6,
+          "heart_rate_avg_bpm": 121
+        },
+        {
+          "km": 2,
+          "distance_m": 1000,
+          "moving_time": "12:38",
+          "pace_min_per_km": "12:38",
+          "elevation_change_m": -0.4,
+          "heart_rate_avg_bpm": 115
+        },
+        {
+          "km": 3,
+          "distance_m": 1001,
+          "moving_time": "12:37",
+          "pace_min_per_km": "12:36",
+          "elevation_change_m": -1.2,
+          "heart_rate_avg_bpm": 114
+        },
+        {
+          "km": 4,
+          "distance_m": 1000,
+          "moving_time": "11:54",
+          "pace_min_per_km": "11:54",
+          "elevation_change_m": -12.6,
+          "heart_rate_avg_bpm": 118
+        },
+        {
+          "km": 5,
+          "distance_m": 999,
+          "moving_time": "10:22",
+          "pace_min_per_km": "10:23",
+          "elevation_change_m": -3.8,
+          "heart_rate_avg_bpm": 129
+        },
+        {
+          "km": 6,
+          "distance_m": 473,
+          "moving_time": "5:03",
+          "pace_min_per_km": "10:41",
+          "elevation_change_m": 3.0,
+          "heart_rate_avg_bpm": 132
+        }
+      ]
     }
   ]
 }

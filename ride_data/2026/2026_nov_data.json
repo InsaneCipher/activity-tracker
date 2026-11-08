@@ -35,6 +35,40 @@
         "anaerobic_sec": 75,
         "neuromuscular_sec": 8
       }
+    },
+    {
+      "date": "2026-11-07",
+      "time": "11:58",
+      "map_name": "Heart of Switzerland (Switzerland)",
+      "distance_km": 25.65,
+      "moving_time": "1:00:21",
+      "elevation_m": 118,
+      "relative_effort": 160,
+      "weighted_avg_power_w": 140,
+      "total_work_kj": 504,
+      "training_load": 77,
+      "intensity_pct": 88,
+      "speed_avg_kmh": 25.5,
+      "speed_max_kmh": 54.1,
+      "heart_rate_avg_bpm": 173,
+      "heart_rate_max_bpm": 184,
+      "cadence_avg": 66,
+      "cadence_max": 89,
+      "power_avg_w": 139,
+      "power_max_w": 242,
+      "calories": 504,
+      "ftp": 160,
+      "url": "https://www.strava.com/activities/20894719778",
+      "elapsed_time": "1:00:21",
+      "zones": {
+        "recovery_sec": 98,
+        "endurance_sec": 148,
+        "tempo_sec": 2067,
+        "threshold_sec": 1210,
+        "vo2max_sec": 46,
+        "anaerobic_sec": 51,
+        "neuromuscular_sec": 2
+      }
     }
   ]
 }
