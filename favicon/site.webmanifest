@@ -1,0 +1,14 @@
+{
+  "name": "Activity Log",
+  "short_name": "Activity Log",
+  "description": "Rides & walks, synced from Strava",
+  "icons": [
+    { "src": "android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "start_url": "../",
+  "scope": "../",
+  "theme_color": "#1C1B19",
+  "background_color": "#1C1B19",
+  "display": "standalone"
+}
