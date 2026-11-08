@@ -58,6 +58,7 @@
           padding:5px 12px;
         }
         .page-link:hover{color:var(--text);border-color:#4a4540;}
+        .page-links{display:flex;gap:8px;}
         .subtitle{color:var(--muted);font-size:0.92rem;margin-bottom:20px;}
 
         /* Signature detail: a trail of footsteps */
@@ -376,7 +377,10 @@
 <div class="wrap">
     <div class="top-row">
         <h1>Walk Log</h1>
-        <a class="page-link" href="index.html">Ride Log →</a>
+        <div class="page-links">
+            <a class="page-link" href="index.html">← Home</a>
+            <a class="page-link" href="rides.html">Ride Log →</a>
+        </div>
     </div>
     <div class="subtitle">Walks &amp; hikes — Strava</div>
     <div class="trail-line"></div>

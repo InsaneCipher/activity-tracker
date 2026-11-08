@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ride Log</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="icon" type="image/png" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+          rel="stylesheet">
+    <style>
+        :root{
+          --bg:#1C1B19;
+          --bg-deep:#141312;
+          --panel:#242220;
+          --line:#3A3733;
+          --text:#EEEAE3;
+          --muted:#9A9186;
+          --power:#E8B93F;
+          --hr:#C1523B;
+          --speed:#4FB6A8;
+          --best:#49fc03;
+          --display:'Oswald', sans-serif;
+          --mono:'IBM Plex Mono', monospace;
+        }
+        *{box-sizing:border-box;}
+        body{
+          margin:0;
+          min-height:100vh;
+          color:var(--text);
+          font-family:var(--mono);
+          padding:48px 24px 80px;
+          background-color:var(--bg);
+          background-image:
+            radial-gradient(1000px 560px at 8% -12%, rgba(232,185,63,0.05), transparent 60%),
+            radial-gradient(900px 500px at 100% 0%, rgba(79,182,168,0.045), transparent 55%),
+            linear-gradient(180deg, #1E1D1B 0%, var(--bg-deep) 100%);
+          background-repeat:no-repeat;
+          background-attachment:fixed;
+        }
+        .wrap{max-width:1200px;margin:0 auto;}
+
+        h1{
+          font-family:var(--display);
+          font-weight:700;
+          font-size:2.4rem;
+          letter-spacing:0.01em;
+          margin:0 0 6px;
+        }
+        .subtitle{color:var(--muted);font-size:0.92rem;margin-bottom:20px;}
+        .top-row{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;}
+        .page-link{
+          font-family:var(--display);
+          font-size:0.9rem;
+          color:var(--muted);
+          text-decoration:none;
+          border:1px solid var(--line);
+          padding:5px 12px;
+        }
+        .page-link:hover{color:var(--text);border-color:#4a4540;}
+        .page-links{display:flex;gap:8px;}
+
+        /* Signature detail: a single checkered finish-line rule */
+        .finish-line{
+          height:9px;
+          background-image: conic-gradient(var(--muted) 90deg, transparent 90deg 180deg, var(--muted) 180deg 270deg, transparent 270deg 360deg);
+          background-size:18px 18px;
+          opacity:0.5;
+          margin-bottom:28px;
+        }
+
+        .totals{
+          display:flex;
+          flex-wrap:wrap;
+          border:1px solid var(--line);
+          background:var(--panel);
+          margin-bottom:36px;
+        }
+        .total-cell{
+          flex:1 1 0;
+          min-width:120px;
+          padding:18px 22px;
+          border-right:1px solid var(--line);
+        }
+        .total-cell:last-child{border-right:none;}
+        .total-cell .num{
+          font-family:var(--mono);
+          font-size:1.55rem;
+          font-weight:600;
+        }
+        .total-cell .label{
+          font-family:var(--display);
+          font-weight:400;
+          font-size:0.8rem;
+          color:var(--muted);
+          margin-top:3px;
+          letter-spacing:0.01em;
+        }
+
+        /* Tabs */
+        .tabs{
+          display:flex;
+          gap:4px;
+          border-bottom:1px solid var(--line);
+          margin-bottom:22px;
+        }
+        .tab-btn{
+          background:none;
+          border:none;
+          color:var(--muted);
+          font-family:var(--display);
+          font-weight:500;
+          font-size:0.95rem;
+          padding:10px 16px;
+          cursor:pointer;
+          border-bottom:2px solid transparent;
+          margin-bottom:-1px;
+        }
+        .tab-btn:hover{color:var(--text);}
+        .tab-btn.active{color:var(--power);border-bottom-color:var(--power);}
+
+        .view{display:none;}
+        .view.active{display:block;}
+
+        .table-wrap{
+          border:1px solid var(--line);
+          overflow-x:auto;
+        }
+          table{
+          width:100%;
+          min-width:1130px;
+          table-layout:fixed;
+          border-collapse:collapse;
+          font-size:0.74rem;
+          white-space:nowrap;
+        }
+        col.idx{width:3%;}
+        col.name{width:16%;}
+        col.date{width:12%;}
+        col.sm{width:7%;}
+        col.xs{width:4%;}
+        col.pair{width:8%;}
+        col.zonecol{width:6%;}
+        thead th{
+          text-align:left;
+          font-family:var(--display);
+          font-weight:500;
+          color:var(--muted);
+          font-size:0.72rem;
+          padding:8px 10px;
+          background:var(--panel);
+          border-bottom:1px solid var(--line);
+          position:sticky;
+          top:0;
+          cursor:pointer;
+          user-select:none;
+        }
+        thead th:hover{color:var(--text);}
+        thead th.sorted{color:var(--power);}
+        tbody td{
+          padding:6px 10px;
+          border-bottom:1px solid var(--line);
+          line-height:1.4;
+          overflow:hidden;
+          text-overflow:ellipsis;
+        }
+        tbody tr:nth-child(even){background:rgba(255,255,255,0.015);}
+        tbody tr:hover{background:rgba(232,185,63,0.05);}
+        tbody tr:last-child td{border-bottom:none;}
+        td.idx{color:var(--muted);}
+        td.date-cell .ride-time{
+          color:var(--muted);
+          font-size:0.85em;
+          margin-left:6px;
+        }
+        td.name{
+          font-family:var(--display);
+          font-weight:400;
+          overflow:hidden;
+          text-overflow:ellipsis;
+        }
+          td.name a,
+          td.name a:visited,
+          td.name a:hover,
+          td.name a:active{
+            color:inherit;
+            text-decoration:none;
+          }
+        td.num{text-align:left;font-variant-numeric:tabular-nums;}
+        td.power{color:var(--power);}
+        td.hr{color:var(--hr);}
+        td.speed{color:var(--speed);}
+        td.muted{color:var(--muted);}
+        .pair-max{color:var(--muted);font-size:0.9em;}
+        .best-val{
+          color:var(--best);
+        }
+
+        /* Graph view */
+        .metric-picker{
+          display:flex;
+          flex-wrap:wrap;
+          gap:6px;
+          margin-bottom:22px;
+        }
+        .metric-btn{
+          background:var(--panel);
+          border:1px solid var(--line);
+          color:var(--muted);
+          font-family:var(--display);
+          font-weight:500;
+          font-size:0.82rem;
+          padding:6px 14px;
+          cursor:pointer;
+        }
+        .metric-btn:hover{color:var(--text);border-color:#4a4540;}
+        .metric-btn.active{font-weight:600;}
+
+        .chart-wrap{
+          border:1px solid var(--line);
+          background:var(--panel);
+          padding:22px;
+          position:relative;
+        }
+        .chart-wrap svg{display:block;width:100%;height:auto;}
+        .chart-empty{color:var(--muted);font-size:0.9rem;text-align:center;padding:60px 0;font-family:var(--display);}
+
+        #tooltip{
+          position:absolute;
+          display:none;
+          background:var(--bg-deep);
+          border:1px solid var(--line);
+          padding:6px 10px;
+          font-size:0.72rem;
+          pointer-events:none;
+          white-space:nowrap;
+          z-index:10;
+        }
+        #tooltip .t-date{color:var(--muted);}
+        #tooltip .t-val{font-family:var(--mono);font-weight:700;}
+
+        #picker-wrap{
+          display:none;
+          border:1px dashed var(--line);
+          padding:28px;
+          text-align:center;
+          color:var(--muted);
+          margin-bottom:32px;
+          font-size:0.85rem;
+        }
+        #picker-wrap.show{display:block;}
+        #picker-wrap button{
+          background:var(--power);
+          color:var(--bg-deep);
+          border:none;
+          padding:8px 18px;
+          font-family:var(--display);
+          font-weight:600;
+          font-size:0.85rem;
+          cursor:pointer;
+          margin-top:10px;
+        }
+        #status{color:var(--muted);font-size:0.82rem;margin-bottom:22px;}
+
+        @media (max-width: 640px){
+          body{padding:28px 14px 60px;}
+          h1{font-size:1.7rem;}
+          .subtitle{margin-bottom:16px;}
+          .finish-line{margin-bottom:20px;}
+          .totals{margin-bottom:24px;}
+          .total-cell{flex:1 1 45%;border-right:none;border-bottom:1px solid var(--line);padding:14px 16px;}
+          .total-cell .num{font-size:1.3rem;}
+          .total-cell .label{font-size:0.72rem;}
+          .tabs{margin-bottom:16px;}
+          .tab-btn{padding:8px 12px;font-size:0.85rem;}
+          .metric-btn{padding:5px 11px;font-size:0.76rem;}
+          .chart-wrap{padding:12px;}
+        }
+
+        /* ===== New: Records view ===== */
+        .section-title{
+          font-family:var(--display);
+          font-weight:500;
+          font-size:1.05rem;
+          color:var(--text);
+          margin:36px 0 14px;
+        }
+        .section-title:first-child{margin-top:0;}
+        .records-grid{
+          display:grid;
+          grid-template-columns:repeat(5, 1fr);
+          gap:1px;
+          background:var(--line);
+          border:1px solid var(--line);
+        }
+        .record-card{
+          background:var(--panel);
+          padding:16px 18px;
+          min-width:0;
+          overflow:hidden;
+        }
+        .record-value{
+          font-family:var(--mono);
+          font-size:1.3rem;
+          font-weight:600;
+          color:var(--best);
+        }
+        .record-label{
+          font-family:var(--display);
+          font-size:0.78rem;
+          color:var(--text);
+          margin-top:4px;
+        }
+        .record-meta{
+          font-size:0.68rem;
+          color:var(--muted);
+          margin-top:4px;
+          overflow:hidden;
+          text-overflow:ellipsis;
+          white-space:nowrap;
+          position:relative;
+        }
+        .record-meta-track{
+          display:inline-block;
+        }
+        .record-meta.scrolling{text-overflow:clip;}
+        .record-meta.scrolling .record-meta-track{
+          animation:marquee-scroll linear infinite;
+        }
+        @keyframes marquee-scroll{
+          from{transform:translateX(0);}
+          to{transform:translateX(-50%);}
+        }
+        .zone-bar{
+          display:flex;
+          height:26px;
+          border:1px solid var(--line);
+          overflow:hidden;
+        }
+        .zone-seg{height:100%;}
+        .mini-zone-bar{
+          display:flex;
+          height:14px;
+          width:100%;
+          border:1px solid var(--line);
+          overflow:hidden;
+        }
+        .mini-zone-seg{height:100%;}
+        .zone-legend{
+          display:flex;
+          flex-wrap:wrap;
+          gap:14px;
+          margin-top:12px;
+          font-size:0.78rem;
+          color:var(--muted);
+        }
+        .zone-legend-item{display:flex;align-items:center;gap:6px;}
+        .zone-dot{
+          width:9px;
+          height:9px;
+          display:inline-block;
+        }
+
+        /* ===== New: Trends view ===== */
+        .simple-table{
+          table-layout:auto !important;
+          min-width:auto !important;
+          white-space:normal !important;
+        }
+        .simple-table th, .simple-table td{
+          white-space:nowrap;
+        }
+
+        /* Mobile overrides for Records view — placed after the rules above on purpose,
+           so they win the cascade at narrow widths instead of being overridden by them. */
+        @media (max-width: 640px){
+          .records-grid{grid-template-columns:repeat(2, 1fr);}
+          .record-card{padding:12px 14px;}
+          .record-value{font-size:1rem;}
+          .record-label{font-size:0.68rem;}
+          .record-meta{font-size:0.6rem;}
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="top-row">
+        <h1>Ride Log</h1>
+        <div class="page-links">
+            <a class="page-link" href="index.html">← Home</a>
+            <a class="page-link" href="walks.html">Walk Log →</a>
+        </div>
+    </div>
+    <div class="subtitle">Virtual rides — MyWhoosh</div>
+    <div class="finish-line"></div>
+
+    <div id="status"></div>
+
+    <div id="picker-wrap">
+        Couldn't auto-load the ride data (browsers block this when a page is opened directly from disk).<br>
+        Pick the monthly files from the <code>ride_data</code> folder instead (you can select several at once):
+        <br>
+        <input type="file" id="file-input" accept=".json" multiple>
+    </div>
+
+    <div id="totals" class="totals"></div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-view="table-view">Table</button>
+        <button class="tab-btn" data-view="graph-view">Graphs</button>
+        <button class="tab-btn" data-view="records-view">Records</button>
+        <button class="tab-btn" data-view="trends-view">Trends</button>
+    </div>
+
+    <div id="table-view" class="view active">
+        <div class="table-wrap">
+            <table id="ride-table">
+                <colgroup>
+                    <col class="idx">
+                    <col class="date">
+                    <col class="name">
+                    <col class="sm">
+                    <col class="sm">
+                    <col class="sm">
+                    <col class="pair">
+                    <col class="sm">
+                    <col class="pair">
+                    <col class="pair">
+                    <col class="xs">
+                    <col class="xs">
+                    <col class="xs">
+                    <col class="zonecol">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th class="idx">#</th>
+                    <th data-key="date">Date</th>
+                    <th data-key="map_name">Route</th>
+                    <th data-key="distance_km" class="num">Km</th>
+                    <th data-key="moving_time" class="num">Time</th>
+                    <th data-key="elevation_m" class="num">Elev</th>
+                    <th data-key="power_avg_w" class="num power">Watts (avg/max)</th>
+                    <th data-key="ftp" class="num power">FTP</th>
+                    <th data-key="speed_avg_kmh" class="num speed">km/h (avg/max)</th>
+                    <th data-key="heart_rate_avg_bpm" class="num hr">HR (avg/max)</th>
+                    <th data-key="cadence_avg" class="num">Cad</th>
+                    <th data-key="calories" class="num">Cal</th>
+                    <th data-key="relative_effort" class="num">Effort</th>
+                    <th>Zones</th>
+                </tr>
+                </thead>
+                <tbody id="rides"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="graph-view" class="view">
+        <div class="metric-picker" id="metric-picker"></div>
+        <div class="chart-wrap">
+            <div id="chart-container"></div>
+            <div id="tooltip"></div>
+        </div>
+    </div>
+
+    <div id="records-view" class="view">
+        <div class="section-title">Personal records</div>
+        <div class="records-grid" id="records-grid"></div>
+
+        <div class="section-title">Training zones</div>
+        <div id="zones-chart"></div>
+    </div>
+
+    <div id="trends-view" class="view">
+        <div class="section-title">Weekly totals</div>
+        <div class="table-wrap">
+            <table class="simple-table">
+                <thead>
+                <tr>
+                    <th>Week of</th>
+                    <th class="num">Rides</th>
+                    <th class="num">Km</th>
+                    <th class="num">Time</th>
+                </tr>
+                </thead>
+                <tbody id="weekly-body"></tbody>
+            </table>
+        </div>
+
+        <div class="section-title">By route</div>
+        <div class="table-wrap">
+            <table class="simple-table">
+                <thead>
+                <tr>
+                    <th>Route</th>
+                    <th class="num">Times ridden</th>
+                    <th class="num">Best avg speed</th>
+                    <th>Last ridden</th>
+                </tr>
+                </thead>
+                <tbody id="route-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentRides = [];
+    let sortKey = 'date';
+    let sortAsc = true;
+    let activeMetric = 'power';
+
+    const fmt = (v, unit = '') => (v === null || v === undefined) ? '—' : `${v}${unit}`;
+
+    function parseDuration(str) {
+      if (!str) return 0;
+      const parts = str.split(':').map(Number);
+      if (parts.some(isNaN)) return 0;
+      return parts.reduce((acc, p) => acc * 60 + p, 0);
+    }
+
+    function formatDuration(totalSeconds) {
+      const h = Math.floor(totalSeconds / 3600);
+      const m = Math.round((totalSeconds % 3600) / 60);
+      if (h === 0) return `${m}m`;
+      return `${h}h ${m}m`;
+    }
+
+    function renderTotals(rides) {
+      const totalDist = rides.reduce((s, r) => s + (r.distance_km || 0), 0);
+      const totalCals = rides.reduce((s, r) => s + (r.calories || 0), 0);
+      const totalKj = rides.reduce((s, r) => s + (r.total_work_kj || 0), 0);
+      const totalTime = rides.reduce((s, r) => s + parseDuration(r.moving_time), 0);
+      const totalElevation = rides.reduce((s, r) => s + (r.elevation_m || 0), 0);
+
+      document.getElementById('totals').innerHTML = `
+        <div class="total-cell"><div class="num">${rides.length}</div><div class="label">Rides logged</div></div>
+        <div class="total-cell"><div class="num">${totalDist.toFixed(1)}</div><div class="label">Total distance (km)</div></div>
+        <div class="total-cell"><div class="num">${formatDuration(totalTime)}</div><div class="label">Time in the saddle</div></div>
+        <div class="total-cell"><div class="num">${totalElevation}</div><div class="label">Total elevation (m)</div></div>
+        <div class="total-cell"><div class="num">${totalCals}</div><div class="label">Calories burned</div></div>
+        <div class="total-cell"><div class="num">${totalKj}</div><div class="label">Total work (kJ)</div></div>
+      `;
+    }
+
+    function computeBestValues(rides) {
+      const maxFields = ['distance_km', 'elevation_m', 'power_avg_w', 'power_max_w', 'ftp', 'speed_avg_kmh', 'speed_max_kmh', 'cadence_avg', 'calories', 'relative_effort'];
+      const best = {};
+      maxFields.forEach(f => {
+        const vals = rides.map(r => r[f]).filter(v => v !== null && v !== undefined && !isNaN(v));
+        best[f] = vals.length ? Math.max(...vals) : null;
+      });
+      const times = rides.map(r => parseDuration(r.moving_time)).filter(v => v > 0);
+      best.moving_time_seconds = times.length ? Math.max(...times) : null;
+      return best;
+    }
+
+    function isBest(best, field, value) {
+      if (value === null || value === undefined) return false;
+      const b = best[field];
+      if (b === null || b === undefined) return false;
+      return value === b;
+    }
+
+    // Hand-picked colors rather than a computed gradient — each zone is a genuinely different
+    // hue so adjacent zones stay visually distinct even at small sizes, instead of blurring
+    // together the way a smooth interpolation tends to. The top zone matches --hr exactly.
+    const ZONE_DEFS = [
+      { key: 'recovery_sec',      name: 'Recovery',      color: '#99ff66' }, // muted grey (--muted)
+      { key: 'endurance_sec',     name: 'Endurance',     color: '#ffff66' }, // teal (--speed)
+      { key: 'tempo_sec',         name: 'Tempo',         color: '#ffaa80' }, // yellow (--power)
+      { key: 'threshold_sec',     name: 'Threshold',     color: '#ff884d' }, // orange
+      { key: 'vo2max_sec',        name: 'VO2 max',       color: '#C1523B' }, // deep orange-red
+      { key: 'anaerobic_sec',     name: 'Anaerobic',     color: '#e60000' }, // purple
+      { key: 'neuromuscular_sec', name: 'Neuromuscular', color: '#800000' }, // matches --hr (avg heart rate)
+    ];
+
+    function zoneColor(c) {
+      return c;
+    }
+
+    function miniZoneBar(zones) {
+      if (!zones) return '<span class="muted">—</span>';
+      const total = ZONE_DEFS.reduce((s, z) => s + (zones[z.key] || 0), 0);
+      if (!total) return '<span class="muted">—</span>';
+      const segs = ZONE_DEFS
+        .filter(z => zones[z.key] > 0)
+        .map(z => `<div class="mini-zone-seg" style="width:${(zones[z.key] / total) * 100}%;background:${zoneColor(z.color)}" title="${z.name}: ${formatDuration(zones[z.key])}"></div>`)
+        .join('');
+      return `<div class="mini-zone-bar">${segs}</div>`;
+    }
+
+    function renderRows() {
+      const best = computeBestValues(currentRides);
+
+      const sorted = currentRides.slice().sort((a, b) => {
+        let av = a[sortKey], bv = b[sortKey];
+        if (av === null || av === undefined) av = sortAsc ? Infinity : -Infinity;
+        if (bv === null || bv === undefined) bv = sortAsc ? Infinity : -Infinity;
+        if (typeof av === 'string') return sortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+        return sortAsc ? av - bv : bv - av;
+      });
+
+      const val = (value, unit, highlight) => {
+        const text = fmt(value, unit);
+        return highlight ? `<span class="best-val">${text}</span>` : text;
+      };
+
+      const pair = (a, b, highlightA, highlightB) => `${val(a, '', highlightA)}<span class="pair-max${highlightB ? ' best-val' : ''}">/${fmt(b)}</span>`;
+
+      document.getElementById('rides').innerHTML = sorted.map((r, i) => `
+        <tr>
+          <td class="idx">${i + 1}</td>
+          <td class="muted date-cell">${fmt(r.date)}${r.time ? `<span class="ride-time">${r.time}</span>` : ''}</td>
+          <td class="name" title="${r.map_name || ''}">${r.url ? `<a href="${r.url}" target="_blank" rel="noopener">${r.map_name || '—'}</a>` : (r.map_name || '—')}</td>
+          <td class="num">${val(r.distance_km, '', isBest(best, 'distance_km', r.distance_km))}</td>
+          <td class="num muted">${val(r.moving_time, '', isBest(best, 'moving_time_seconds', parseDuration(r.moving_time)))}</td>
+          <td class="num muted">${val(r.elevation_m, '', isBest(best, 'elevation_m', r.elevation_m))}</td>
+          <td class="num power">${pair(r.power_avg_w, r.power_max_w, isBest(best, 'power_avg_w', r.power_avg_w), isBest(best, 'power_max_w', r.power_max_w))}</td>
+          <td class="num power">${val(r.ftp, ' W', isBest(best, 'ftp', r.ftp))}</td>
+          <td class="num speed">${pair(r.speed_avg_kmh, r.speed_max_kmh, isBest(best, 'speed_avg_kmh', r.speed_avg_kmh), isBest(best, 'speed_max_kmh', r.speed_max_kmh))}</td>
+          <td class="num hr">${pair(r.heart_rate_avg_bpm, r.heart_rate_max_bpm, isBest(best, 'heart_rate_avg_bpm', r.heart_rate_avg_bpm))}</td>
+          <td class="num muted">${val(r.cadence_avg, '', isBest(best, 'cadence_avg', r.cadence_avg))}</td>
+          <td class="num muted">${val(r.calories, '', isBest(best, 'calories', r.calories))}</td>
+          <td class="num muted">${val(r.relative_effort, '', isBest(best, 'relative_effort', r.relative_effort))}</td>
+          <td class="zones-cell">${miniZoneBar(r.zones)}</td>
+        </tr>
+      `).join('');
+
+      document.querySelectorAll('thead th[data-key]').forEach(th => {
+        th.classList.toggle('sorted', th.dataset.key === sortKey);
+      });
+    }
+
+    /* ---------------- Tabs ---------------- */
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.view).classList.add('active');
+        if (btn.dataset.view === 'graph-view') drawChart();
+        if (btn.dataset.view === 'records-view') { renderRecords(currentRides); renderZones(currentRides); }
+        if (btn.dataset.view === 'trends-view') { renderWeekly(currentRides); renderRouteHistory(currentRides); }
+      });
+    });
+
+    /* ---------------- Graphs ---------------- */
+    function timeToMinutes(t) {
+      if (!t) return null;
+      const parts = t.split(':').map(Number);
+      if (parts.some(isNaN)) return null;
+      const [h, m] = parts;
+      return h * 60 + m;
+    }
+    function minutesToTime(mins) {
+      mins = Math.round(mins);
+      const h = Math.floor(mins / 60) % 24;
+      const m = ((mins % 60) + 60) % 60;
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    }
+
+    const METRICS = [
+      { id: 'power',      label: 'Power',      unit: 'W',     color: '--power', get: r => r.power_avg_w },
+      { id: 'ftp',        label: 'FTP',        unit: 'W',     color: '--power', get: r => r.ftp },
+      { id: 'speed',      label: 'Speed',      unit: 'km/h',  color: '--speed', get: r => r.speed_avg_kmh },
+      { id: 'hr',         label: 'Heart rate', unit: 'bpm',   color: '--hr',    get: r => r.heart_rate_avg_bpm },
+      { id: 'distance',   label: 'Distance',   unit: 'km',    color: '--text',  get: r => r.distance_km },
+      { id: 'time',       label: 'Time',       unit: 'min',   color: '--text',  get: r => Math.round(parseDuration(r.moving_time) / 60) },
+      { id: 'elevation',  label: 'Elevation',  unit: 'm',     color: '--text',  get: r => r.elevation_m },
+      { id: 'cadence',    label: 'Cadence',    unit: 'rpm',   color: '--text',  get: r => r.cadence_avg },
+      { id: 'calories',   label: 'Calories',   unit: 'kcal',  color: '--text',  get: r => r.calories },
+      { id: 'effort',     label: 'Effort',     unit: '',      color: '--text',  get: r => r.relative_effort },
+      { id: 'start_time', label: 'Start time', unit: '',      color: '--text',  get: r => timeToMinutes(r.time), format: v => minutesToTime(v) },
+      { id: 'cum_distance', label: 'Total distance', unit: 'km', color: '--speed', get: r => r.distance_km, cumulative: true },
+    ];
+
+    function cssVar(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    function buildMetricPicker() {
+      const wrap = document.getElementById('metric-picker');
+      wrap.innerHTML = METRICS.map(m => `<button class="metric-btn" data-metric="${m.id}">${m.label}</button>`).join('');
+      wrap.querySelectorAll('.metric-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          activeMetric = btn.dataset.metric;
+          drawChart();
+        });
+      });
+    }
+
+    function formatAxisDate(d, showYear) {
+      const opts = showYear ? { day: 'numeric', month: 'short', year: '2-digit' } : { day: 'numeric', month: 'short' };
+      return d.toLocaleDateString('en-GB', opts);
+    }
+
+    function drawChart() {
+      const wrap = document.getElementById('metric-picker');
+      wrap.querySelectorAll('.metric-btn').forEach(btn => {
+        const m = METRICS.find(mm => mm.id === btn.dataset.metric);
+        const active = btn.dataset.metric === activeMetric;
+        btn.classList.toggle('active', active);
+        btn.style.borderColor = active ? cssVar(m.color) : '';
+        btn.style.color = active ? cssVar(m.color) : '';
+        btn.style.background = active ? 'rgba(255,255,255,0.03)' : '';
+      });
+
+      const metric = METRICS.find(m => m.id === activeMetric);
+      const container = document.getElementById('chart-container');
+
+      const points = currentRides
+        .map(r => ({ date: new Date(r.date), value: metric.get(r), ride: r }))
+        .filter(p => p.value !== null && p.value !== undefined && !isNaN(p.date.getTime()))
+        .sort((a, b) => a.date - b.date);
+
+      if (metric.cumulative) {
+        let running = 0;
+        points.forEach(p => { running = Math.round((running + p.value) * 100) / 100; p.value = running; });
+      }
+
+      if (points.length === 0) {
+        container.innerHTML = `<div class="chart-empty">No data for ${metric.label} yet.</div>`;
+        return;
+      }
+
+      const W = 900, H = 340;
+      const padL = 46, padR = 20, padT = 20, padB = 36;
+      const plotW = W - padL - padR;
+      const plotH = H - padT - padB;
+
+      let xMin = points[0].date.getTime();
+      let xMax = points[points.length - 1].date.getTime();
+      if (xMin === xMax) { xMin -= 86400000; xMax += 86400000; }
+
+      let values = points.map(p => p.value);
+      let yMin = Math.min(...values);
+      let yMax = Math.max(...values);
+      if (yMin === yMax) { yMin -= 1; yMax += 1; }
+      const yPad = (yMax - yMin) * 0.15;
+      yMin -= yPad; yMax += yPad;
+      if (metric.id !== 'elevation' && metric.id !== 'start_time' && yMin > 0 && (yMin / (yMax - yMin)) < 0.3) yMin = 0;
+      if (metric.cumulative) yMin = 0;
+
+      const xScale = t => padL + ((t - xMin) / (xMax - xMin)) * plotW;
+      const yScale = v => padT + plotH - ((v - yMin) / (yMax - yMin)) * plotH;
+
+      const color = cssVar(metric.color) || cssVar('--text');
+      const lineColor = metric.color === '--text' ? cssVar('--muted') : color;
+
+      const linePoints = points.map(p => `${xScale(p.date.getTime())},${yScale(p.value)}`).join(' ');
+      const areaPoints = `${xScale(points[0].date.getTime())},${padT + plotH} ` + linePoints +
+        ` ${xScale(points[points.length - 1].date.getTime())},${padT + plotH}`;
+
+      const tickCount = 4;
+      let yTicks = [];
+      for (let i = 0; i <= tickCount; i++) yTicks.push(yMin + (i * (yMax - yMin) / tickCount));
+
+      const maxXTicks = 7;
+      const step = Math.max(1, Math.ceil(points.length / maxXTicks));
+      const spansMultipleYears = points[0].date.getFullYear() !== points[points.length - 1].date.getFullYear();
+      let xTicks = [];
+      for (let i = 0; i < points.length; i += step) xTicks.push(points[i]);
+      if (xTicks[xTicks.length - 1] !== points[points.length - 1]) xTicks.push(points[points.length - 1]);
+
+      const gridLines = yTicks.map(v => `
+        <line x1="${padL}" y1="${yScale(v)}" x2="${W - padR}" y2="${yScale(v)}" stroke="${cssVar('--line')}" stroke-width="1" />
+        <text x="${padL - 8}" y="${yScale(v) + 3}" text-anchor="end" font-size="10" fill="${cssVar('--muted')}" font-family="IBM Plex Mono, monospace">${metric.format ? metric.format(v) : Math.round(v)}</text>
+      `).join('');
+
+      const xLabels = xTicks.map(p => `
+        <text x="${xScale(p.date.getTime())}" y="${H - 12}" text-anchor="middle" font-size="10" fill="${cssVar('--muted')}" font-family="IBM Plex Mono, monospace">${formatAxisDate(p.date, spansMultipleYears)}</text>
+      `).join('');
+
+      const dots = points.map((p, i) => `
+        <circle class="pt" data-i="${i}" cx="${xScale(p.date.getTime())}" cy="${yScale(p.value)}" r="3.5" fill="${lineColor}" stroke="${cssVar('--panel')}" stroke-width="1.5" />
+      `).join('');
+
+      container.innerHTML = `
+        <svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+          ${gridLines}
+          <polygon points="${areaPoints}" fill="${lineColor}" opacity="0.08" />
+          <polyline points="${linePoints}" fill="none" stroke="${lineColor}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+          ${dots}
+          ${xLabels}
+          <line x1="${padL}" y1="${padT + plotH}" x2="${W - padR}" y2="${padT + plotH}" stroke="${cssVar('--line')}" stroke-width="1" />
+        </svg>
+      `;
+
+      const tooltip = document.getElementById('tooltip');
+      container.querySelectorAll('.pt').forEach(circle => {
+        circle.addEventListener('mouseenter', () => {
+          const p = points[+circle.dataset.i];
+          tooltip.innerHTML = `<span class="t-date">${p.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span><br><span class="t-val">${metric.format ? metric.format(p.value) : p.value}${metric.unit ? ' ' + metric.unit : ''}</span>`;
+          tooltip.style.display = 'block';
+        });
+        circle.addEventListener('mousemove', (e) => {
+          const rect = container.getBoundingClientRect();
+          tooltip.style.left = (e.clientX - rect.left + 12) + 'px';
+          tooltip.style.top = (e.clientY - rect.top - 30) + 'px';
+        });
+        circle.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+      });
+    }
+
+    /* ---------------- New: Records view ---------------- */
+    function computeRecords(rides) {
+      const specs = [
+        { field: 'distance_km',     label: 'Longest ride',        unit: ' km' },
+        { field: 'elevation_m',     label: 'Most elevation',      unit: ' m' },
+        { field: 'power_avg_w',     label: 'Highest avg power',   unit: ' W' },
+        { field: 'power_max_w',     label: 'Highest max power',   unit: ' W' },
+        { field: 'ftp',             label: 'Highest FTP',         unit: ' W' },
+        { field: 'speed_avg_kmh',   label: 'Highest avg speed',   unit: ' km/h' },
+        { field: 'speed_max_kmh',   label: 'Highest max speed',   unit: ' km/h' },
+        { field: 'calories',        label: 'Most calories burned',unit: ' kcal' },
+        { field: 'relative_effort', label: 'Toughest effort',     unit: '' },
+      ];
+
+      const results = specs.map(spec => {
+        const vals = rides
+          .map(r => ({ r, v: r[spec.field] }))
+          .filter(x => x.v !== null && x.v !== undefined && !isNaN(x.v));
+        if (!vals.length) return null;
+        const top = vals.reduce((a, b) => (b.v > a.v ? b : a));
+        return { label: spec.label, value: top.v, unit: spec.unit, rideName: top.r.map_name, rideDate: top.r.date };
+      }).filter(Boolean);
+
+      const moving = rides
+        .map(r => ({ r, secs: parseDuration(r.moving_time) }))
+        .filter(x => x.secs > 0);
+      if (moving.length) {
+        const top = moving.reduce((a, b) => (b.secs > a.secs ? b : a));
+        results.splice(1, 0, {
+          label: 'Longest time in the saddle',
+          value: formatDuration(top.secs),
+          unit: '',
+          rideName: top.r.map_name,
+          rideDate: top.r.date,
+        });
+      }
+
+      return results;
+    }
+
+    function applyMarquee(selector) {
+      document.querySelectorAll(selector).forEach(el => {
+        const text = el.textContent;
+        if (el.scrollWidth > el.clientWidth + 2) {
+          const duration = Math.max(6, text.length * 0.18).toFixed(1);
+          el.innerHTML = `<span class="record-meta-track" style="animation-duration:${duration}s">${text}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${text}</span>`;
+          el.classList.add('scrolling');
+        }
+      });
+    }
+
+    function renderRecords(rides) {
+      const records = computeRecords(rides);
+      const grid = document.getElementById('records-grid');
+      if (!records.length) {
+        grid.innerHTML = `<div class="chart-empty">No data yet.</div>`;
+        return;
+      }
+      grid.innerHTML = records.map(rec => `
+        <div class="record-card">
+          <div class="record-value">${rec.value}${rec.unit}</div>
+          <div class="record-label">${rec.label}</div>
+          <div class="record-meta">${rec.rideName || ''}${rec.rideDate ? ' · ' + rec.rideDate : ''}</div>
+        </div>
+      `).join('');
+      applyMarquee('#records-grid .record-meta');
+    }
+
+    function renderZones(rides) {
+      // Uses real per-ride time-in-zone data (seconds) recorded in each ride's "zones" object,
+      // summed across all rides — not an estimate from average power.
+      const withZones = rides.filter(r => r.zones);
+
+      const container = document.getElementById('zones-chart');
+      if (!withZones.length) {
+        container.innerHTML = `<div class="chart-empty">No zone data yet.</div>`;
+        return;
+      }
+
+      const totals = ZONE_DEFS.map(z => ({
+        ...z,
+        color: zoneColor(z.color),
+        seconds: withZones.reduce((s, r) => s + (r.zones[z.key] || 0), 0),
+      }));
+      const totalSeconds = totals.reduce((s, z) => s + z.seconds, 0);
+
+      const bar = totals
+        .filter(z => z.seconds > 0)
+        .map(z => `<div class="zone-seg" style="width:${(z.seconds / totalSeconds) * 100}%;background:${z.color}" title="${z.name}: ${formatDuration(z.seconds)}"></div>`)
+        .join('');
+      const legend = totals
+        .map(z => `<div class="zone-legend-item"><span class="zone-dot" style="background:${z.color}"></span>${z.name} (${formatDuration(z.seconds)})</div>`)
+        .join('');
+
+      container.innerHTML = `<div class="zone-bar">${bar}</div><div class="zone-legend">${legend}</div>`;
+    }
+
+    /* ---------------- New: Trends view ---------------- */
+    function getWeekStart(dateStr) {
+      const d = new Date(dateStr);
+      const day = (d.getDay() + 6) % 7; // Monday = 0
+      d.setDate(d.getDate() - day);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    }
+
+    function computeWeeklyTotals(rides) {
+      const map = new Map();
+      rides.forEach(r => {
+        if (!r.date) return;
+        const start = getWeekStart(r.date);
+        const key = start.toISOString().slice(0, 10);
+        if (!map.has(key)) map.set(key, { start, rides: 0, km: 0, secs: 0 });
+        const entry = map.get(key);
+        entry.rides++;
+        entry.km += r.distance_km || 0;
+        entry.secs += parseDuration(r.moving_time);
+      });
+      return Array.from(map.values()).sort((a, b) => b.start - a.start);
+    }
+
+    function renderWeekly(rides) {
+      const weeks = computeWeeklyTotals(rides);
+      const body = document.getElementById('weekly-body');
+      if (!weeks.length) {
+        body.innerHTML = `<tr><td colspan="4" class="chart-empty">No data yet.</td></tr>`;
+        return;
+      }
+      body.innerHTML = weeks.map(w => `
+        <tr>
+          <td>${w.start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+          <td class="num">${w.rides}</td>
+          <td class="num">${w.km.toFixed(1)}</td>
+          <td class="num">${formatDuration(w.secs)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function computeRouteHistory(rides) {
+      const map = new Map();
+      rides.forEach(r => {
+        const key = r.map_name || 'Unknown';
+        if (!map.has(key)) map.set(key, { name: key, count: 0, bestSpeed: null, lastDate: null });
+        const entry = map.get(key);
+        entry.count++;
+        if (r.speed_avg_kmh != null && (entry.bestSpeed === null || r.speed_avg_kmh > entry.bestSpeed)) {
+          entry.bestSpeed = r.speed_avg_kmh;
+        }
+        if (r.date && (!entry.lastDate || r.date > entry.lastDate)) entry.lastDate = r.date;
+      });
+      return Array.from(map.values()).sort((a, b) => b.count - a.count);
+    }
+
+    function renderRouteHistory(rides) {
+      const routes = computeRouteHistory(rides);
+      const body = document.getElementById('route-body');
+      if (!routes.length) {
+        body.innerHTML = `<tr><td colspan="4" class="chart-empty">No data yet.</td></tr>`;
+        return;
+      }
+      body.innerHTML = routes.map(rt => `
+        <tr>
+          <td class="name">${rt.name}</td>
+          <td class="num">${rt.count}</td>
+          <td class="num">${rt.bestSpeed != null ? rt.bestSpeed.toFixed(1) + ' km/h' : '—'}</td>
+          <td class="muted">${rt.lastDate || '—'}</td>
+        </tr>
+      `).join('');
+    }
+
+    /* ---------------- Boot ---------------- */
+    // Rides from all monthly files, oldest first.
+    function combineRides(files) {
+      return files
+        .flatMap(d => (d && Array.isArray(d.rides)) ? d.rides : [])
+        .sort((a, b) => `${a.date} ${a.time || ''}`.localeCompare(`${b.date} ${b.time || ''}`));
+    }
+
+    function render(data, sourceText) {
+      currentRides = data.rides || [];
+      renderTotals(currentRides);
+      renderRows();
+      if (document.getElementById('graph-view').classList.contains('active')) drawChart();
+      if (document.getElementById('records-view').classList.contains('active')) { renderRecords(currentRides); renderZones(currentRides); }
+      if (document.getElementById('trends-view').classList.contains('active')) { renderWeekly(currentRides); renderRouteHistory(currentRides); }
+      document.getElementById('status').textContent = `Loaded ${currentRides.length} ride(s) from ${sourceText}`;
+    }
+
+    document.querySelectorAll('thead th[data-key]').forEach(th => {
+      th.addEventListener('click', () => {
+        const key = th.dataset.key;
+        if (sortKey === key) {
+          sortAsc = !sortAsc;
+        } else {
+          sortKey = key;
+          sortAsc = true;
+        }
+        renderRows();
+      });
+    });
+
+    function showPicker() {
+      document.getElementById('picker-wrap').classList.add('show');
+      document.getElementById('status').textContent = '';
+      document.getElementById('file-input').addEventListener('change', async (e) => {
+        const files = Array.from(e.target.files).filter(f => f.name !== 'index.json');
+        if (!files.length) return;
+        try {
+          const parsed = await Promise.all(files.map(f => f.text().then(JSON.parse)));
+          render({ rides: combineRides(parsed) }, `${files.length} file(s)`);
+          document.getElementById('picker-wrap').classList.remove('show');
+        } catch (err) {
+          document.getElementById('status').textContent = 'Could not read one of those files as JSON.';
+        }
+      });
+    }
+
+    buildMetricPicker();
+
+    // ride_data/index.json lists the monthly files written by extract_rides.py.
+    function getJson(url) {
+      return fetch(url).then(res => {
+        if (!res.ok) throw new Error(`${url}: ${res.status}`);
+        return res.json();
+      });
+    }
+
+    getJson('ride_data/index.json')
+      .then(index => Promise.all((index.files || []).map(f => getJson(`ride_data/${f}`)))
+        .then(months => render({ rides: combineRides(months) }, `${months.length} monthly file(s)`)))
+      .catch(() => showPicker());
+</script>
+</body>
+</html>
