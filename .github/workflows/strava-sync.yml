@@ -1,11 +1,6 @@
 # Every 15 minutes: download new activities from Strava, rebuild ride_data and
 # walk_data, and commit them so GitHub Pages shows the latest data.
 #
-# raw_data and the Strava login live in the strava/ folder of a PRIVATE repo
-# (set in the DATA_REPO variable), because this repo is public and raw_data
-# contains GPS tracks. Other folders in that repo belong to other workflows
-# and are never checked out or changed here.
-#
 # Needs these repository settings (Settings > Secrets and variables > Actions):
 #   Secrets:   STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET, DATA_REPO_TOKEN
 #   Variables: DATA_REPO   e.g. InsaneCipher/private-data
@@ -14,7 +9,7 @@ name: Strava sync
 
 on:
   schedule:
-    - cron: "*/15 * * * *"   # GitHub may start scheduled runs a few minutes late
+    - cron: "*/15 * * * *" 
   workflow_dispatch:          # adds a "Run workflow" button on the Actions tab
 
 permissions:
