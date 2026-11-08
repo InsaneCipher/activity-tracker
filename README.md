@@ -1,5 +1,7 @@
 # Activity Tracker
 
+[![Strava sync](https://github.com/InsaneCipher/activity-tracker/actions/workflows/strava-sync.yml/badge.svg)](https://github.com/InsaneCipher/activity-tracker/actions/workflows/strava-sync.yml)
+
 Personal activity tracker for my rides and walks. Activities sync automatically
 from Strava every 15 minutes and are shown on a site hosted with GitHub Pages.
 
