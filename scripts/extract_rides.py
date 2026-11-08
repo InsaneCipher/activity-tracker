@@ -27,6 +27,7 @@ Run:
 from __future__ import annotations
 
 import json
+import os
 import math
 import re
 import sys
@@ -35,7 +36,9 @@ from pathlib import Path
 
 SCRIPTS_DIR = Path(__file__).resolve().parent      # scripts/
 PROJECT_DIR = SCRIPTS_DIR.parent                   # folder containing scripts/
-RAW_DIR = PROJECT_DIR / "raw_data"
+# STRAVA_RAW_DIR lets the GitHub Actions workflow keep raw_data outside this
+# (public) repo; locally it defaults to raw_data in the project folder.
+RAW_DIR = Path(os.environ.get("STRAVA_RAW_DIR") or PROJECT_DIR / "raw_data").resolve()
 STREAMS_DIR = RAW_DIR / "streams"
 OUT_DIR = PROJECT_DIR / "ride_data"
 FTP_FILE = PROJECT_DIR / "ftp_history.json"

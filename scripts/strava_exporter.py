@@ -66,10 +66,13 @@ except ImportError:
 
 SCRIPTS_DIR = Path(__file__).resolve().parent      # scripts/
 PROJECT_DIR = SCRIPTS_DIR.parent                   # folder containing scripts/
-RAW_DIR = PROJECT_DIR / "raw_data"
+# STRAVA_RAW_DIR lets the GitHub Actions workflow keep raw_data outside this
+# (public) repo; locally it defaults to raw_data in the project folder.
+RAW_DIR = Path(os.environ.get("STRAVA_RAW_DIR") or PROJECT_DIR / "raw_data").resolve()
 STREAMS_DIR = RAW_DIR / "streams"
 CONFIG_FILE = SCRIPTS_DIR / "strava_config.json"
-TOKEN_FILE = SCRIPTS_DIR / "strava_tokens.json"
+# STRAVA_TOKEN_FILE lets the GitHub Actions workflow keep tokens in a private repo.
+TOKEN_FILE = Path(os.environ.get("STRAVA_TOKEN_FILE") or SCRIPTS_DIR / "strava_tokens.json").resolve()
 
 AUTH_URL = "https://www.strava.com/oauth/authorize"
 TOKEN_URL = "https://www.strava.com/oauth/token"
@@ -153,6 +156,9 @@ def get_client_credentials() -> tuple[str, str]:
     if config.get("client_id") and config.get("client_secret"):
         return str(config["client_id"]), config["client_secret"]
 
+    if os.environ.get("CI"):
+        raise SystemExit("STRAVA_CLIENT_ID / STRAVA_CLIENT_SECRET are not set - "
+                         "add them as repository secrets.")
     print("Strava API credentials not found.")
     print("Create an app at https://www.strava.com/settings/api "
           "(set Authorization Callback Domain to 'localhost').")
@@ -215,6 +221,9 @@ def get_tokens() -> dict:
     tokens = load_json(TOKEN_FILE)
 
     if tokens is None:
+        if os.environ.get("CI"):
+            raise SystemExit(f"No Strava tokens found at {TOKEN_FILE}. Log in once on "
+                             "your PC and copy strava_tokens.json to strava/ in the private data repo.")
         code = authorize(client_id)
         tokens = http_request(TOKEN_URL, "POST", {
             "client_id": client_id,

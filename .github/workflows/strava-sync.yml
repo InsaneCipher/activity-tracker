@@ -1,0 +1,94 @@
+# Every 15 minutes: download new activities from Strava, rebuild ride_data and
+# walk_data, and commit them so GitHub Pages shows the latest data.
+#
+# raw_data and the Strava login live in the strava/ folder of a PRIVATE repo
+# (set in the DATA_REPO variable), because this repo is public and raw_data
+# contains GPS tracks. Other folders in that repo belong to other workflows
+# and are never checked out or changed here.
+#
+# Needs these repository settings (Settings > Secrets and variables > Actions):
+#   Secrets:   STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET, DATA_REPO_TOKEN
+#   Variables: DATA_REPO   e.g. InsaneCipher/private-data
+
+name: Strava sync
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # GitHub may start scheduled runs a few minutes late
+  workflow_dispatch:          # adds a "Run workflow" button on the Actions tab
+
+permissions:
+  contents: write   # commit ride_data / walk_data to this repo
+  pages: write      # ask GitHub Pages to rebuild after a commit
+
+concurrency:
+  group: strava-sync          # never run two syncs at once
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45       # long enough to wait out a Strava rate limit
+    steps:
+      - name: Check out website repo
+        uses: actions/checkout@v4
+
+      - name: Check out private data repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.DATA_REPO }}
+          token: ${{ secrets.DATA_REPO_TOKEN }}
+          path: data-repo
+          sparse-checkout: strava   # only this workflow's folder (plus top-level files)
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Download from Strava and rebuild ride/walk data
+        env:
+          STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
+          STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
+          STRAVA_RAW_DIR: data-repo/strava/raw_data
+          STRAVA_TOKEN_FILE: data-repo/strava/strava_tokens.json
+        run: python scripts/strava_exporter.py
+
+      # Runs even if the step above failed, because Strava may already have
+      # issued a new refresh token that must not be lost.
+      - name: Save raw data and Strava login to the private repo
+        if: ${{ !cancelled() && hashFiles('data-repo/strava/strava_tokens.json') != '' }}
+        working-directory: data-repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A strava
+          if ! git diff --cached --quiet; then
+            git commit -m "strava: sync $(date -u +'%Y-%m-%d %H:%M')"
+            git pull --rebase
+            git push
+          fi
+
+      - name: Publish updated ride/walk data
+        id: publish
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A ride_data walk_data
+          if git diff --cached --quiet; then
+            echo "No new activity data."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "Update activity data from Strava"
+            git pull --rebase
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Commits made by a workflow don't always trigger a Pages rebuild, so
+      # request one explicitly (works with "Deploy from a branch" Pages).
+      - name: Rebuild GitHub Pages
+        if: steps.publish.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" || echo "Pages rebuild request skipped"

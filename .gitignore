@@ -3,3 +3,4 @@ scripts/strava_config.json
 scripts/strava_tokens.json
 __pycache__/
 raw_data/
+data-repo/
