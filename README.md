@@ -1,7 +1,7 @@
 # Activity Tracker
 
 Personal activity tracker for my rides and walks. Activities sync automatically
-from Strava every 15 minutes and are shown on a static site hosted with GitHub Pages.
+from Strava every 15 minutes and are shown on a site hosted with GitHub Pages.
 
 **Live site:** https://insanecipher.github.io/activity-tracker/
 
