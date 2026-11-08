@@ -31,10 +31,10 @@ jobs:
     timeout-minutes: 45       # long enough to wait out a Strava rate limit
     steps:
       - name: Check out website repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Check out private data repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ vars.DATA_REPO }}
           token: ${{ secrets.DATA_REPO_TOKEN }}
@@ -42,7 +42,7 @@ jobs:
           sparse-checkout: strava   # only this workflow's folder (plus top-level files)
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
