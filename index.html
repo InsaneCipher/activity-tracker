@@ -11,17 +11,19 @@
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png?v=3">
     <link rel="manifest" href="favicon/site.webmanifest?v=3">
     <meta name="apple-mobile-web-app-title" content="Activity Log">
-    <meta name="theme-color" content="#1C1B19">
+    <meta name="theme-color" content="#1C314A">
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
           rel="stylesheet">
     <style>
         :root{
-          --bg:#1C1B19;
-          --bg-deep:#141312;
-          --panel:#242220;
-          --line:#3A3733;
-          --text:#EEEAE3;
-          --muted:#9A9186;
+          --bg:#1C314A;
+          --bg-deep:#172536;
+          --panel:#121921;
+          --panel-hover:#18212A;
+          --line:#2E3F52;
+          --line-strong:#465A72;
+          --text:#E8ECEF;
+          --muted:#8A97A5;
           --ride:#E8B93F;
           --walk:#4FB6A8;
           --hike:#9DB86A;
@@ -37,12 +39,6 @@
           font-family:var(--mono);
           padding:48px 24px 80px;
           background-color:var(--bg);
-          background-image:
-            radial-gradient(1000px 560px at 8% -12%, rgba(232,185,63,0.05), transparent 60%),
-            radial-gradient(900px 500px at 100% 0%, rgba(79,182,168,0.05), transparent 55%),
-            linear-gradient(180deg, #1E1D1B 0%, var(--bg-deep) 100%);
-          background-repeat:no-repeat;
-          background-attachment:fixed;
         }
         .wrap{max-width:1200px;margin:0 auto;}
         a{color:inherit;}
@@ -135,7 +131,7 @@
         }
         .type-card:hover{
           border-color:var(--accent);
-          background:#282624;
+          background:var(--panel-hover);
           transform:translateY(-2px);
         }
         .type-card.ride{--accent:var(--ride);}
@@ -189,7 +185,7 @@
         .dot{width:10px;height:10px;display:inline-block;}
 
         /* Recent activities */
-        .table-wrap{border:1px solid var(--line);overflow-x:auto;}
+        .table-wrap{background:var(--panel);border:1px solid var(--line);overflow-x:auto;}
         table{
           width:100%;
           min-width:860px;

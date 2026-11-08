@@ -11,17 +11,19 @@
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png?v=3">
     <link rel="manifest" href="favicon/site.webmanifest?v=3">
     <meta name="apple-mobile-web-app-title" content="Activity Log">
-    <meta name="theme-color" content="#1C1B19">
+    <meta name="theme-color" content="#1C4A39">
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
           rel="stylesheet">
     <style>
         :root{
-          --bg:#1C1B19;
-          --bg-deep:#141312;
-          --panel:#242220;
-          --line:#3A3733;
-          --text:#EEEAE3;
-          --muted:#9A9186;
+          --bg:#1C4A39;
+          --bg-deep:#17362A;
+          --panel:#12211C;
+          --panel-hover:#182A24;
+          --line:#2E5245;
+          --line-strong:#467262;
+          --text:#E6EEEA;
+          --muted:#87A096;
           --pace:#4FB6A8;
           --hr:#C1523B;
           --speed:#E8B93F;
@@ -38,12 +40,6 @@
           font-family:var(--mono);
           padding:48px 24px 80px;
           background-color:var(--bg);
-          background-image:
-            radial-gradient(1000px 560px at 8% -12%, rgba(79,182,168,0.05), transparent 60%),
-            radial-gradient(900px 500px at 100% 0%, rgba(157,184,106,0.045), transparent 55%),
-            linear-gradient(180deg, #1E1D1B 0%, var(--bg-deep) 100%);
-          background-repeat:no-repeat;
-          background-attachment:fixed;
         }
         .wrap{max-width:1200px;margin:0 auto;}
 
@@ -61,9 +57,10 @@
           color:var(--muted);
           text-decoration:none;
           border:1px solid var(--line);
-          padding:5px 12px;
+          border-radius:6px;
+          padding:2px 9px;
         }
-        .page-link:hover{color:var(--text);border-color:#4a4540;}
+        .page-link:hover{color:var(--text);border-color:var(--line-strong);}
         .page-links{display:flex;gap:8px;}
         .subtitle{color:var(--muted);font-size:0.92rem;margin-bottom:20px;}
 
@@ -131,6 +128,7 @@
         .view.active{display:block;}
 
         .table-wrap{
+          background:var(--panel);
           border:1px solid var(--line);
           overflow-x:auto;
         }
@@ -240,7 +238,7 @@
           padding:6px 14px;
           cursor:pointer;
         }
-        .metric-btn:hover{color:var(--text);border-color:#4a4540;}
+        .metric-btn:hover{color:var(--text);border-color:var(--line-strong);}
         .metric-btn.active{font-weight:600;}
 
         .chart-wrap{
@@ -384,8 +382,8 @@
     <div class="top-row">
         <h1>Walk Log</h1>
         <div class="page-links">
-            <a class="page-link" href="index.html">← Home</a>
-            <a class="page-link" href="rides.html">Ride Log →</a>
+            <a class="page-link" href="index.html">Home</a>
+            <a class="page-link" href="rides.html">Ride Log</a>
         </div>
     </div>
     <div class="subtitle">Walks &amp; hikes — Strava</div>
@@ -717,7 +715,7 @@
         btn.classList.toggle('active', active);
         btn.style.borderColor = active ? cssVar(m.color) : '';
         btn.style.color = active ? cssVar(m.color) : '';
-        btn.style.background = active ? 'rgba(255,255,255,0.03)' : '';
+        btn.style.background = active ? cssVar('--panel-hover') : '';
       });
 
       const metric = METRICS.find(m => m.id === activeMetric);
