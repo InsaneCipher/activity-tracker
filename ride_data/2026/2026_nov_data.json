@@ -69,6 +69,40 @@
         "anaerobic_sec": 51,
         "neuromuscular_sec": 2
       }
+    },
+    {
+      "date": "2026-11-10",
+      "time": "17:55",
+      "map_name": "Al Wathba-L (Arabia)",
+      "distance_km": 22.61,
+      "moving_time": "48:21",
+      "elevation_m": 45,
+      "relative_effort": 96,
+      "weighted_avg_power_w": 156,
+      "total_work_kj": 444,
+      "training_load": 76,
+      "intensity_pct": 98,
+      "speed_avg_kmh": 28.1,
+      "speed_max_kmh": 40.5,
+      "heart_rate_avg_bpm": 165,
+      "heart_rate_max_bpm": 183,
+      "cadence_avg": 69,
+      "cadence_max": 96,
+      "power_avg_w": 153,
+      "power_max_w": 301,
+      "calories": 444,
+      "ftp": 160,
+      "url": "https://www.strava.com/activities/20936849590",
+      "elapsed_time": "48:21",
+      "zones": {
+        "recovery_sec": 79,
+        "endurance_sec": 46,
+        "tempo_sec": 880,
+        "threshold_sec": 1352,
+        "vo2max_sec": 351,
+        "anaerobic_sec": 182,
+        "neuromuscular_sec": 12
+      }
     }
   ]
 }
