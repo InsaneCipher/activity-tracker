@@ -90,6 +90,18 @@ STREAM_KEYS = ("time,distance,latlng,altitude,velocity_smooth,heartrate,"
 
 SAVE_EVERY = 10  # save progress after this many newly downloaded activities
 
+# Every run, the activity list from Strava is compared with what's saved:
+# - fields you can edit on Strava (title, sport type, gear, ...) are copied over
+#   from the list, so edits show up without downloading anything again;
+# - if one of these changes (e.g. you cropped the activity), the full details
+#   and streams are downloaded again.
+REDOWNLOAD_IF_CHANGED = ("distance", "moving_time", "elapsed_time", "start_date")
+# Fields shown in the log when they change.
+EDITABLE_FIELDS = ("name", "sport_type", "gear_id", "commute", "trainer",
+                   "private", "visibility", "workout_type")
+# The list only has a simplified route line, so keep the detailed one.
+KEEP_FROM_DETAILS = ("map", "resource_state")
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -357,18 +369,37 @@ def main() -> None:
 
     summaries = fetch_activity_list(headers)
     existing = load_existing()
+    if not summaries and existing:
+        # Never wipe everything because Strava returned an empty list.
+        raise SystemExit("Strava returned no activities - leaving raw_data unchanged.")
 
     # Start from the activity list (so activities deleted on Strava drop out),
     # reusing full details already downloaded.
     activities = []
     to_fetch = []
+    edited = []
     for summary in summaries:
         saved = existing.get(summary["id"])
         if saved and saved.get("resource_state") == 3 and not refresh:
-            activities.append(saved)
+            if any(saved.get(f) != summary.get(f) for f in REDOWNLOAD_IF_CHANGED):
+                activities.append(summary)  # changed on Strava - download again
+                to_fetch.append(len(activities) - 1)
+                continue
+            changes = [f for f in EDITABLE_FIELDS
+                       if f in summary and saved.get(f) != summary.get(f)]
+            if changes:
+                edited.append((saved, summary, changes))
+            activities.append({**saved, **{k: v for k, v in summary.items()
+                                           if k not in KEEP_FROM_DETAILS}})
         else:
             activities.append(summary)
             to_fetch.append(len(activities) - 1)
+
+    for saved, summary, changes in edited:
+        if "name" in changes:
+            print(f"Renamed: \"{saved.get('name')}\" -> \"{summary.get('name')}\"")
+        else:
+            print(f"Updated {', '.join(changes)}: {summary.get('name')}")
 
     missing_streams = [
         i for i, a in enumerate(activities)

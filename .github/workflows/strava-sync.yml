@@ -3,9 +3,10 @@
 name: Strava sync
 
 on:
-  schedule:
-    - cron: "4,19,34,49 * * * *"   # every 15 min, avoiding :00 when GitHub is busiest
-  workflow_dispatch:          # adds a "Run workflow" button on the Actions tab
+  # Runs are started every 15 minutes by cron-job.org through GitHub's API
+  # (workflow_dispatch), because GitHub's own scheduler was unreliable here.
+  #   - cron: "4,19,34,49 * * * *"   # every 15 min, avoiding :00 when GitHub is busiest
+  workflow_dispatch:          # the "Run workflow" button, and what cron-job.org calls
 
 permissions:
   contents: write   # commit ride_data / walk_data to this repo
