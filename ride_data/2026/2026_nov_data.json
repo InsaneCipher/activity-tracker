@@ -103,6 +103,40 @@
         "anaerobic_sec": 182,
         "neuromuscular_sec": 12
       }
+    },
+    {
+      "date": "2026-11-12",
+      "time": "17:32",
+      "map_name": "Paris Classic (France)",
+      "distance_km": 18.66,
+      "moving_time": "46:47",
+      "elevation_m": 168,
+      "relative_effort": 82,
+      "weighted_avg_power_w": 145,
+      "total_work_kj": 401,
+      "training_load": 64,
+      "intensity_pct": 91,
+      "speed_avg_kmh": 23.9,
+      "speed_max_kmh": 52.3,
+      "heart_rate_avg_bpm": 162,
+      "heart_rate_max_bpm": 179,
+      "cadence_avg": 65,
+      "cadence_max": 89,
+      "power_avg_w": 143,
+      "power_max_w": 270,
+      "calories": 401,
+      "ftp": 160,
+      "url": "https://www.strava.com/activities/20962876323",
+      "elapsed_time": "46:47",
+      "zones": {
+        "recovery_sec": 69,
+        "endurance_sec": 112,
+        "tempo_sec": 1486,
+        "threshold_sec": 887,
+        "vo2max_sec": 134,
+        "anaerobic_sec": 111,
+        "neuromuscular_sec": 9
+      }
     }
   ]
 }
