@@ -20,6 +20,11 @@ activity id. Values there replace what comes from Strava; keys starting with
 "_" are notes and are ignored. Add "exclude": true to leave a ride out of
 ride_data (and so off the website) completely.
 
+To join a ride that was split in two (e.g. the app crashed mid-ride), add
+"merge_with": ["<other activity id>", ...] to the first part. The parts become
+one ride: distances, times and totals are added up, averages are weighted by
+time, and power zones and max cadence come from all parts' data.
+
 Run:
   python scripts/extract_rides.py
 """
@@ -147,6 +152,51 @@ def load_streams(activity_id: int) -> dict:
             for k, v in streams.items()}
 
 
+def load_merged_streams(activity_ids: list) -> dict:
+    """Streams of several activities joined end to end."""
+    joined: dict[str, list] = defaultdict(list)
+    offset = 0
+    for act_id in activity_ids:
+        streams = load_streams(act_id)
+        times = streams.get("time", [])
+        for key, data in streams.items():
+            joined[key].extend([t + offset for t in data] if key == "time" else data)
+        if times:
+            offset += times[-1] + 1
+    return dict(joined)
+
+
+def merge_activities(parts: list[dict]) -> dict:
+    """Combine the parts of a split ride into one activity."""
+    parts = sorted(parts, key=lambda a: a.get("start_date_local") or "")
+    merged = dict(parts[0])
+    merged["_merged_ids"] = [a["id"] for a in parts]
+
+    def values(field):
+        return [(a.get(field), a.get("moving_time") or 0) for a in parts
+                if a.get(field) is not None]
+
+    for field in ("distance", "moving_time", "elapsed_time", "total_elevation_gain",
+                  "kilojoules", "calories", "suffer_score"):
+        vals = [v for v, _ in values(field)]
+        merged[field] = sum(vals) if vals else None
+    for field in ("max_speed", "max_watts", "max_heartrate"):
+        vals = [v for v, _ in values(field)]
+        merged[field] = max(vals) if vals else None
+    for field in ("average_watts", "average_heartrate", "average_cadence"):
+        vals = values(field)
+        secs = sum(t for _, t in vals)
+        merged[field] = sum(v * t for v, t in vals) / secs if secs else None
+    # Weighted (normalised) power combines as a time-weighted 4th-power mean.
+    vals = values("weighted_average_watts")
+    secs = sum(t for _, t in vals)
+    merged["weighted_average_watts"] = (round((sum(v ** 4 * t for v, t in vals) / secs) ** 0.25)
+                                        if secs else None)
+    if merged.get("distance") and merged.get("moving_time"):
+        merged["average_speed"] = merged["distance"] / merged["moving_time"]
+    return merged
+
+
 def power_zones(times: list, watts: list, ftp) -> dict | None:
     if not watts or not ftp:
         return None
@@ -178,7 +228,8 @@ def build_ride(act: dict, ftp) -> dict:
     # or "MyWhoosh - <route>"; keep just the route.
     map_name = re.sub(r"^\s*(Bike Ride|MyWhoosh)[^-]*-\s*", "", name, flags=re.I).strip()
 
-    streams = load_streams(act["id"])
+    merged_ids = act.get("_merged_ids")
+    streams = load_merged_streams(merged_ids) if merged_ids else load_streams(act["id"])
     cadence = [c for c in streams.get("cadence", []) if c]
 
     moving = act.get("moving_time")
@@ -220,6 +271,8 @@ def build_ride(act: dict, ftp) -> dict:
         "url": f"https://www.strava.com/activities/{act['id']}",
         "elapsed_time": format_duration(act.get("elapsed_time")),
         "zones": power_zones(streams.get("time", []), streams.get("watts", []), ftp),
+        **({"merged_urls": [f"https://www.strava.com/activities/{i}" for i in merged_ids]}
+           if merged_ids else {}),
     }
 
 
@@ -242,17 +295,29 @@ def main() -> None:
     applied = 0
     excluded = 0
 
+    # Rides that are joined onto another ride with "merge_with".
+    by_id = {str(a["id"]): a for a in rides}
+    merge_parts = {}
+    for main_id, fixes in overrides.items():
+        if main_id in by_id and isinstance(fixes, dict) and fixes.get("merge_with"):
+            merge_parts[main_id] = [str(i) for i in fixes["merge_with"] if str(i) in by_id]
+    merged_away = {i for ids in merge_parts.values() for i in ids}
+
     by_month: dict[tuple[str, int], list[dict]] = defaultdict(list)
     for act in rides:
-        date = (act.get("start_date_local") or "")[:10]
+        if str(act["id"]) in merged_away:
+            continue
         fixes = overrides.get(str(act["id"]))
         if fixes and fixes.get("exclude"):
             excluded += 1
             continue
+        if merge_parts.get(str(act["id"])):
+            act = merge_activities([act] + [by_id[i] for i in merge_parts[str(act["id"])]])
+        date = (act.get("start_date_local") or "")[:10]
         ride = build_ride(act, ftp_for_date(ftp_history, date))
         if fixes:
             ride.update({k: v for k, v in fixes.items()
-                         if not k.startswith("_") and k != "exclude"})
+                         if not k.startswith("_") and k not in ("exclude", "merge_with")})
             applied += 1
         by_month[(date[:4], int(date[5:7]))].append(ride)
 
@@ -282,7 +347,9 @@ def main() -> None:
         print(f"Applied {OVERRIDES_FILE.name} to {applied} ride(s)")
     if excluded:
         print(f"Excluded {excluded} ride(s) marked in {OVERRIDES_FILE.name}")
-    print(f"\nDone - {len(rides) - excluded} rides written to ride_data.")
+    if merged_away:
+        print(f"Merged {len(merged_away)} ride part(s) into {len(merge_parts)} ride(s)")
+    print(f"\nDone - {len(rides) - excluded - len(merged_away)} rides written to ride_data.")
 
 
 if __name__ == "__main__":

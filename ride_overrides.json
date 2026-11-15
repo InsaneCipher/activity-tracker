@@ -24,8 +24,14 @@
     "heart_rate_avg_bpm": 152,
     "heart_rate_max_bpm": 166
   },
-  "20xxxxxxxxx": {
-    "_ride": "2026-08-21 Indoor cycle",
+  "21000727404": {
+    "_ride": "2026-11-15 13:37 Afternoon Ride (4h watch recording, hidden)",
     "exclude": true
+  },
+  "21000715979": {
+    "_ride": "2026-11-15 Al Wathba-L, split in two when MyWhoosh closed",
+    "merge_with": [
+      "21000732589"
+    ]
   }
 }
