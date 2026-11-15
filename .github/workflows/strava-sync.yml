@@ -9,8 +9,7 @@ on:
   workflow_dispatch:          # the "Run workflow" button, and what cron-job.org calls
 
 permissions:
-  contents: write   # commit ride_data / walk_data to this repo
-  pages: write      # ask GitHub Pages to rebuild after a commit
+  contents: write   # commit ride_data / walk_data (GitHub Pages rebuilds on each commit)
 
 concurrency:
   group: strava-sync          # never run two syncs at once
@@ -75,11 +74,3 @@ jobs:
             git push
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
-
-      # Commits made by a workflow don't always trigger a Pages rebuild, so
-      # request one explicitly (works with "Deploy from a branch" Pages).
-      - name: Rebuild GitHub Pages
-        if: steps.publish.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" || echo "Pages rebuild request skipped"
