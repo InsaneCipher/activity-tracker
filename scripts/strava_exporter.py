@@ -70,6 +70,8 @@ PROJECT_DIR = SCRIPTS_DIR.parent                   # folder containing scripts/
 # (public) repo; locally it defaults to raw_data in the project folder.
 RAW_DIR = Path(os.environ.get("STRAVA_RAW_DIR") or PROJECT_DIR / "raw_data").resolve()
 STREAMS_DIR = RAW_DIR / "streams"
+GEAR_FILE = RAW_DIR / "gear.json"   # current bike/shoe names, by gear id
+GEAR_REFRESH_MINUTES = 60           # how often to re-check names (renames on Strava)
 CONFIG_FILE = SCRIPTS_DIR / "strava_config.json"
 # STRAVA_TOKEN_FILE lets the GitHub Actions workflow keep tokens in a private repo.
 TOKEN_FILE = Path(os.environ.get("STRAVA_TOKEN_FILE") or SCRIPTS_DIR / "strava_tokens.json").resolve()
@@ -316,9 +318,40 @@ def remove_file(path: Path) -> None:
         save_json(path, [] if path.parent == RAW_DIR else {})
 
 
+def update_gear(activities: list[dict], headers: dict) -> None:
+    """Keep raw_data/gear.json up to date with each bike's (or shoe's) current
+    name. Renaming gear on Strava doesn't change the activities, so the names are
+    asked for directly: for new gear straight away, otherwise once an hour."""
+    saved = load_json(GEAR_FILE, {}) or {}
+    gear = saved.get("gear", {})
+    checked = saved.get("checked_at", 0)
+    in_use = sorted({a["gear_id"] for a in activities if a.get("gear_id")})
+    due = time.time() - checked >= GEAR_REFRESH_MINUTES * 60
+    to_check = in_use if due else [g for g in in_use if g not in gear]
+    if not to_check:
+        return
+    for gear_id in to_check:
+        try:
+            info = http_request(f"{API_URL}/gear/{gear_id}", headers=headers, allow_404=True)
+        except SystemExit as e:  # never fail the whole sync over a gear name
+            print(f"Couldn't look up gear {gear_id}: {e}")
+            continue
+        if not info:
+            continue
+        old = (gear.get(gear_id) or {}).get("name")
+        gear[gear_id] = info
+        if old and old != info.get("name"):
+            print(f"Gear renamed: \"{old}\" -> \"{info.get('name')}\"")
+    if due:
+        checked = time.time()
+    save_json(GEAR_FILE, {"checked_at": checked, "gear": gear})
+
+
 def remove_deleted(activities: list[dict], counts: dict[str, int]) -> None:
     """Remove local data for activities that no longer exist on Strava."""
     for path in RAW_DIR.glob("*.json"):
+        if path == GEAR_FILE:
+            continue
         if path.stem not in counts:  # every activity from that year is gone
             remove_file(path)
             print(f"Removed raw_data/{path.name} (no activities left)")
@@ -437,6 +470,7 @@ def main() -> None:
         save_json(STREAMS_DIR / f"{act_id}.json", fetch_streams(act_id, headers), compact=True)
 
     counts = save_by_year(activities)
+    update_gear(activities, headers)
     removed = len(existing.keys() - {a["id"] for a in activities})
     if removed:
         print(f"{removed} activity(s) were deleted on Strava and removed locally")

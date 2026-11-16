@@ -222,14 +222,18 @@ def power_zones(times: list, watts: list, ftp) -> dict | None:
 # ---------------------------------------------------------------------------
 
 def gear_names(activities: list[dict]) -> dict:
-    """Gear id -> name, from the full details Strava gives for each activity.
-    The newest activity wins, so a bike renamed on Strava picks up its new name
-    from the next ride on it."""
+    """Gear id -> current name. Uses raw_data/gear.json (kept up to date by
+    strava_exporter.py, including renames on Strava), falling back to the name
+    saved in each activity's details."""
     names = {}
     for act in sorted(activities, key=lambda a: a.get("start_date_local") or ""):
         gear = act.get("gear") or {}
         if gear.get("id") and gear.get("name"):
             names[gear["id"]] = gear["name"]
+    current = (load_json(RAW_DIR / "gear.json", {}) or {}).get("gear", {})
+    for gear_id, info in current.items():
+        if isinstance(info, dict) and info.get("name"):
+            names[gear_id] = info["name"]
     return names
 
 
