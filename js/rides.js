@@ -122,10 +122,94 @@ function renderBikeKey(rides) {
   `).join('');
 }
 
-function renderRows() {
-  const best = computeBestValues(currentRides);
+/* ---------------- Filters ---------------- */
+// Route names look like "Al Wathba-L (Arabia)": the route is the part before
+// the brackets and the country is the part inside them.
+const countryOf = r => ((r.map_name || '').match(/\(([^()]+)\)\s*$/) || [])[1] || '';
+const routeOf = r => (r.map_name || '').replace(/\s*\([^()]*\)\s*$/, '').trim() || '—';
 
-  const sorted = currentRides.slice().sort((a, b) => {
+const FILTER_INPUTS = ['f-search', 'f-route', 'f-country', 'f-bike', 'f-km-min', 'f-km-max',
+                       'f-min-min', 'f-min-max', 'f-from', 'f-to'];
+const filterValue = id => document.getElementById(id).value.trim();
+const filterNumber = id => { const v = filterValue(id); return v === '' ? null : Number(v); };
+
+function filteredRides() {
+  const search = filterValue('f-search').toLowerCase();
+  const route = filterValue('f-route');
+  const country = filterValue('f-country');
+  const bike = filterValue('f-bike');
+  const kmMin = filterNumber('f-km-min'), kmMax = filterNumber('f-km-max');
+  const minMin = filterNumber('f-min-min'), minMax = filterNumber('f-min-max');
+  const from = filterValue('f-from'), to = filterValue('f-to');
+
+  return currentRides.filter(r => {
+    const km = r.distance_km || 0;
+    const mins = parseDuration(r.moving_time) / 60;
+    if (search && !(r.map_name || '').toLowerCase().includes(search)) return false;
+    if (route && routeOf(r) !== route) return false;
+    if (country && countryOf(r) !== country) return false;
+    if (bike === '__none' ? r.bike_id : (bike && r.bike_id !== bike)) return false;
+    if (kmMin !== null && km < kmMin) return false;
+    if (kmMax !== null && km > kmMax) return false;
+    if (minMin !== null && mins < minMin) return false;
+    if (minMax !== null && mins > minMax) return false;
+    if (from && r.date < from) return false;
+    if (to && r.date > to) return false;
+    return true;
+  });
+}
+
+// Fill a dropdown with "Name (count)" options, keeping the current choice if it still exists.
+function fillSelect(id, allLabel, entries) {
+  const select = document.getElementById(id);
+  const current = select.value;
+  select.innerHTML = `<option value="">${allLabel}</option>` + entries
+    .map(([value, label, count]) => `<option value="${escapeHtml(value)}">${escapeHtml(label)} (${count})</option>`)
+    .join('');
+  if ([...select.options].some(o => o.value === current)) select.value = current;
+}
+
+function countBy(rides, keyOf) {
+  const counts = new Map();
+  rides.forEach(r => { const k = keyOf(r); if (k) counts.set(k, (counts.get(k) || 0) + 1); });
+  return [...counts.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+}
+
+function buildFilterOptions(rides) {
+  fillSelect('f-route', 'All routes', countBy(rides, routeOf).map(([k, n]) => [k, k, n]));
+  fillSelect('f-country', 'All countries', countBy(rides, countryOf).map(([k, n]) => [k, k, n]));
+  const bikes = [...bikeColors.keys()].map(id => {
+    const ride = rides.find(r => r.bike_id === id);
+    return [id, bikeLabel(ride), rides.filter(r => r.bike_id === id).length];
+  });
+  const noBike = rides.filter(r => !r.bike_id).length;
+  if (noBike) bikes.push(['__none', 'No bike set', noBike]);
+  fillSelect('f-bike', 'All bikes', bikes);
+}
+
+function updateFilterCount(shown) {
+  const active = FILTER_INPUTS.some(id => filterValue(id) !== '');
+  const km = shown.reduce((s, r) => s + (r.distance_km || 0), 0);
+  const secs = shown.reduce((s, r) => s + parseDuration(r.moving_time), 0);
+  document.getElementById('f-count').innerHTML = active
+    ? `Showing <b>${shown.length}</b> of ${currentRides.length} rides · ${km.toFixed(1)} km · ${formatDuration(secs)}`
+    : `${currentRides.length} rides`;
+  document.getElementById('filter-bar').classList.toggle('filtering', active);
+}
+
+FILTER_INPUTS.forEach(id => document.getElementById(id).addEventListener('input', () => renderRows()));
+document.getElementById('f-reset').addEventListener('click', () => {
+  FILTER_INPUTS.forEach(id => { document.getElementById(id).value = ''; });
+  renderRows();
+});
+
+function renderRows() {
+  // Best values stay based on all rides, so a highlight always means an all-time best.
+  const best = computeBestValues(currentRides);
+  const shown = filteredRides();
+  updateFilterCount(shown);
+
+  const sorted = shown.slice().sort((a, b) => {
     let av = a[sortKey], bv = b[sortKey];
     if (av === null || av === undefined) av = sortAsc ? Infinity : -Infinity;
     if (bv === null || bv === undefined) bv = sortAsc ? Infinity : -Infinity;
@@ -158,6 +242,10 @@ function renderRows() {
       <td class="zones-cell">${miniZoneBar(r.zones)}</td>
     </tr>
   `).join('');
+  if (!sorted.length) {
+    document.getElementById('rides').innerHTML =
+      `<tr><td colspan="14" class="no-match">No rides match these filters.</td></tr>`;
+  }
 
   document.querySelectorAll('thead th[data-key]').forEach(th => {
     th.classList.toggle('sorted', th.dataset.key === sortKey);
@@ -517,6 +605,7 @@ function render(data, sourceText) {
   currentRides = data.rides || [];
   assignBikeColors(currentRides);
   renderBikeKey(currentRides);
+  buildFilterOptions(currentRides);
   renderTotals(currentRides);
   renderRows();
   if (document.getElementById('graph-view').classList.contains('active')) drawChart();

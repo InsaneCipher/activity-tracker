@@ -399,3 +399,77 @@ td.muted{color:var(--muted);}
 .bike-key:empty{display:none;}
 .bike-key-item{display:inline-flex;align-items:center;}
 .bike-key-count{opacity:0.6;margin-left:4px;}
+
+/* Filter bar above the ride table */
+.filter-bar{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  gap:12px 16px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-top:2px solid var(--line-strong);
+  padding:14px 16px;
+  margin-bottom:18px;
+}
+.filter-bar.filtering{border-top-color:var(--power);}
+.f-group{display:flex;flex-direction:column;gap:5px;min-width:0;}
+.f-grow{flex:1 1 170px;}
+.f-group label{
+  font-family:var(--display);
+  font-size:0.72rem;
+  color:var(--muted);
+  letter-spacing:0.02em;
+}
+.filter-bar input,
+.filter-bar select{
+  font-family:var(--mono);
+  font-size:0.74rem;
+  color:var(--text);
+  background:var(--bg-deep);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:5px 8px;
+  height:30px;
+  min-width:0;
+  color-scheme:dark;
+}
+.filter-bar select{padding-right:4px;max-width:200px;cursor:pointer;}
+.filter-bar input:focus,
+.filter-bar select:focus{outline:none;border-color:var(--power);}
+.filter-bar input::placeholder{color:var(--muted);opacity:0.7;}
+.f-range{display:flex;align-items:center;gap:5px;}
+.f-range span{color:var(--muted);font-size:0.75rem;}
+.f-range input[type="number"]{width:64px;}
+.f-range input[type="date"]{width:128px;}
+.f-footer{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-left:auto;
+  height:30px;
+}
+.f-count{font-size:0.72rem;color:var(--muted);white-space:nowrap;}
+.f-count b{color:var(--power);font-weight:600;}
+.f-reset{
+  font-family:var(--display);
+  font-size:0.8rem;
+  color:var(--muted);
+  background:none;
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:3px 12px;
+  height:30px;
+  cursor:pointer;
+}
+.f-reset:hover{color:var(--text);border-color:var(--line-strong);}
+td.no-match{text-align:center;color:var(--muted);padding:28px 10px;font-family:var(--display);}
+
+@media (max-width: 640px){
+  .filter-bar{padding:12px;gap:10px 12px;}
+  .f-group{flex:1 1 45%;}
+  .filter-bar select{max-width:none;}
+  .f-range input[type="number"],
+  .f-range input[type="date"]{flex:1;width:auto;}
+  .f-footer{margin-left:0;width:100%;justify-content:space-between;}
+}

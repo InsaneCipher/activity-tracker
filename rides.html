@@ -47,6 +47,52 @@
     </div>
 
     <div id="table-view" class="view active">
+        <div class="filter-bar" id="filter-bar">
+            <div class="f-group f-grow">
+                <label for="f-search">Search</label>
+                <input type="search" id="f-search" placeholder="Route name">
+            </div>
+            <div class="f-group">
+                <label for="f-route">Route</label>
+                <select id="f-route"><option value="">All routes</option></select>
+            </div>
+            <div class="f-group">
+                <label for="f-country">Country</label>
+                <select id="f-country"><option value="">All countries</option></select>
+            </div>
+            <div class="f-group">
+                <label for="f-bike">Bike</label>
+                <select id="f-bike"><option value="">All bikes</option></select>
+            </div>
+            <div class="f-group">
+                <label for="f-km-min">Distance (km)</label>
+                <div class="f-range">
+                    <input type="number" id="f-km-min" placeholder="min" min="0" step="1" inputmode="decimal">
+                    <span>–</span>
+                    <input type="number" id="f-km-max" placeholder="max" min="0" step="1" inputmode="decimal">
+                </div>
+            </div>
+            <div class="f-group">
+                <label for="f-min-min">Time (min)</label>
+                <div class="f-range">
+                    <input type="number" id="f-min-min" placeholder="min" min="0" step="5" inputmode="numeric">
+                    <span>–</span>
+                    <input type="number" id="f-min-max" placeholder="max" min="0" step="5" inputmode="numeric">
+                </div>
+            </div>
+            <div class="f-group">
+                <label for="f-from">Date</label>
+                <div class="f-range">
+                    <input type="date" id="f-from">
+                    <span>–</span>
+                    <input type="date" id="f-to">
+                </div>
+            </div>
+            <div class="f-footer">
+                <span class="f-count" id="f-count"></span>
+                <button type="button" class="f-reset" id="f-reset">Reset</button>
+            </div>
+        </div>
         <div class="bike-key" id="bike-key"></div>
         <div class="table-wrap">
             <table id="ride-table">
