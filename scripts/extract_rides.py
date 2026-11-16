@@ -221,6 +221,18 @@ def power_zones(times: list, watts: list, ftp) -> dict | None:
 # Conversion
 # ---------------------------------------------------------------------------
 
+def gear_names(activities: list[dict]) -> dict:
+    """Gear id -> name, from the full details Strava gives for each activity.
+    The newest activity wins, so a bike renamed on Strava picks up its new name
+    from the next ride on it."""
+    names = {}
+    for act in sorted(activities, key=lambda a: a.get("start_date_local") or ""):
+        gear = act.get("gear") or {}
+        if gear.get("id") and gear.get("name"):
+            names[gear["id"]] = gear["name"]
+    return names
+
+
 def build_ride(act: dict, ftp) -> dict:
     start = act.get("start_date_local") or act.get("start_date") or ""
     name = act.get("name") or ""
@@ -291,6 +303,7 @@ def main() -> None:
              if (a.get("sport_type") or a.get("type")) in RIDE_TYPES]
     rides.sort(key=lambda a: a.get("start_date_local") or "")
     ftp_history = load_ftp_history()
+    bikes = gear_names(activities)
     overrides = load_json(OVERRIDES_FILE, {}) or {}
     applied = 0
     excluded = 0
@@ -315,6 +328,9 @@ def main() -> None:
             act = merge_activities([act] + [by_id[i] for i in merge_parts[str(act["id"])]])
         date = (act.get("start_date_local") or "")[:10]
         ride = build_ride(act, ftp_for_date(ftp_history, date))
+        gear_id = act.get("gear_id")
+        ride["bike_id"] = gear_id
+        ride["bike"] = bikes.get(gear_id) if gear_id else None
         if fixes:
             ride.update({k: v for k, v in fixes.items()
                          if not k.startswith("_") and k not in ("exclude", "merge_with")})

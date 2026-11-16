@@ -1,0 +1,401 @@
+:root{
+  --bg:#281C4A;
+  --bg-deep:#1F1736;
+  --panel:#161221;
+  --panel-hover:#1D182A;
+  --line:#372E52;
+  --line-strong:#524672;
+  --text:#ECEAF2;
+  --muted:#9590AB;
+  --power:#E8B93F;
+  --hr:#C1523B;
+  --speed:#4FB6A8;
+  --best:#49fc03;
+  --display:'Oswald', sans-serif;
+  --mono:'IBM Plex Mono', monospace;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  font-family:var(--mono);
+  padding:48px 24px 80px;
+  background-color:var(--bg);
+}
+.wrap{max-width:1200px;margin:0 auto;}
+
+h1{
+  font-family:var(--display);
+  font-weight:700;
+  font-size:2.4rem;
+  letter-spacing:0.01em;
+  margin:0 0 6px;
+}
+.subtitle{color:var(--muted);font-size:0.92rem;margin-bottom:20px;}
+.top-row{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;}
+.page-link{
+  font-family:var(--display);
+  font-size:0.9rem;
+  color:var(--muted);
+  text-decoration:none;
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:2px 9px;
+}
+.page-link:hover{color:var(--text);border-color:var(--line-strong);}
+.page-links{display:flex;gap:8px;}
+
+/* Signature detail: a single checkered finish-line rule */
+.finish-line{
+  height:9px;
+  background-image: conic-gradient(var(--muted) 90deg, transparent 90deg 180deg, var(--muted) 180deg 270deg, transparent 270deg 360deg);
+  background-size:18px 18px;
+  opacity:0.5;
+  margin-bottom:28px;
+}
+
+.totals{
+  display:flex;
+  flex-wrap:wrap;
+  border:1px solid var(--line);
+  background:var(--panel);
+  margin-bottom:36px;
+}
+.total-cell{
+  flex:1 1 0;
+  min-width:120px;
+  padding:18px 22px;
+  border-right:1px solid var(--line);
+}
+.total-cell:last-child{border-right:none;}
+.total-cell .num{
+  font-family:var(--mono);
+  font-size:1.55rem;
+  font-weight:600;
+}
+.total-cell .label{
+  font-family:var(--display);
+  font-weight:400;
+  font-size:0.8rem;
+  color:var(--muted);
+  margin-top:3px;
+  letter-spacing:0.01em;
+}
+
+/* Tabs */
+.tabs{
+  display:flex;
+  gap:4px;
+  border-bottom:1px solid var(--line);
+  margin-bottom:22px;
+}
+.tab-btn{
+  background:none;
+  border:none;
+  color:var(--muted);
+  font-family:var(--display);
+  font-weight:500;
+  font-size:0.95rem;
+  padding:10px 16px;
+  cursor:pointer;
+  border-bottom:2px solid transparent;
+  margin-bottom:-1px;
+}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--power);border-bottom-color:var(--power);}
+
+.view{display:none;}
+.view.active{display:block;}
+
+.table-wrap{
+  background:var(--panel);
+  border:1px solid var(--line);
+  overflow-x:auto;
+}
+  table{
+  width:100%;
+  min-width:1130px;
+  table-layout:fixed;
+  border-collapse:collapse;
+  font-size:0.74rem;
+  white-space:nowrap;
+}
+/* Ride table column widths - one per column, in table order */
+col.col-idx{width:3%;}
+col.col-date{width:11%;}
+col.col-route{width:16%;}
+col.col-km{width:7%;}
+col.col-time{width:7%;}
+col.col-elev{width:4%;}
+col.col-watts{width:7%;}
+col.col-ftp{width:5%;}
+col.col-speed{width:8%;}
+col.col-hr{width:7%;}
+col.col-cad{width:4%;}
+col.col-cal{width:4%;}
+col.col-effort{width:4%;}
+col.col-zones{width:6%;}
+thead th{
+  text-align:left;
+  font-family:var(--display);
+  font-weight:500;
+  color:var(--muted);
+  font-size:0.72rem;
+  padding:8px 10px;
+  background:var(--panel);
+  border-bottom:1px solid var(--line);
+  position:sticky;
+  top:0;
+  cursor:pointer;
+  user-select:none;
+}
+thead th:hover{color:var(--text);}
+thead th.sorted{color:var(--power);}
+tbody td{
+  padding:6px 10px;
+  border-bottom:1px solid var(--line);
+  line-height:1.4;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+tbody tr:nth-child(even){background:rgba(255,255,255,0.015);}
+tbody tr:hover{background:rgba(232,185,63,0.05);}
+tbody tr:last-child td{border-bottom:none;}
+td.idx{color:var(--muted);}
+td.date-cell .ride-time{
+  color:var(--muted);
+  font-size:0.85em;
+  margin-left:6px;
+}
+td.name{
+  font-family:var(--display);
+  font-weight:400;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+  td.name a,
+  td.name a:visited,
+  td.name a:hover,
+  td.name a:active{
+    color:inherit;
+    text-decoration:none;
+  }
+td.num{text-align:left;font-variant-numeric:tabular-nums;}
+td.power{color:var(--power);}
+td.hr{color:var(--hr);}
+td.speed{color:var(--speed);}
+td.muted{color:var(--muted);}
+.pair-max{color:var(--muted);font-size:0.9em;}
+.best-val{
+  color:var(--best);
+}
+
+/* Graph view */
+.metric-picker{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:22px;
+}
+.metric-btn{
+  background:var(--panel);
+  border:1px solid var(--line);
+  color:var(--muted);
+  font-family:var(--display);
+  font-weight:500;
+  font-size:0.82rem;
+  padding:6px 14px;
+  cursor:pointer;
+}
+.metric-btn:hover{color:var(--text);border-color:var(--line-strong);}
+.metric-btn.active{font-weight:600;}
+
+.chart-wrap{
+  border:1px solid var(--line);
+  background:var(--panel);
+  padding:22px;
+  position:relative;
+}
+.chart-wrap svg{display:block;width:100%;height:auto;}
+.chart-empty{color:var(--muted);font-size:0.9rem;text-align:center;padding:60px 0;font-family:var(--display);}
+
+#tooltip{
+  position:absolute;
+  display:none;
+  background:var(--bg-deep);
+  border:1px solid var(--line);
+  padding:6px 10px;
+  font-size:0.72rem;
+  pointer-events:none;
+  white-space:nowrap;
+  z-index:10;
+}
+#tooltip .t-date{color:var(--muted);}
+#tooltip .t-val{font-family:var(--mono);font-weight:700;}
+
+#picker-wrap{
+  display:none;
+  border:1px dashed var(--line);
+  padding:28px;
+  text-align:center;
+  color:var(--muted);
+  margin-bottom:32px;
+  font-size:0.85rem;
+}
+#picker-wrap.show{display:block;}
+#picker-wrap button{
+  background:var(--power);
+  color:var(--bg-deep);
+  border:none;
+  padding:8px 18px;
+  font-family:var(--display);
+  font-weight:600;
+  font-size:0.85rem;
+  cursor:pointer;
+  margin-top:10px;
+}
+#status{color:var(--muted);font-size:0.82rem;margin-bottom:22px;}
+
+@media (max-width: 640px){
+  body{padding:28px 14px 60px;}
+  h1{font-size:1.7rem;}
+  .subtitle{margin-bottom:16px;}
+  .finish-line{margin-bottom:20px;}
+  .totals{margin-bottom:24px;}
+  .total-cell{flex:1 1 45%;border-right:none;border-bottom:1px solid var(--line);padding:14px 16px;}
+  .total-cell .num{font-size:1.3rem;}
+  .total-cell .label{font-size:0.72rem;}
+  .tabs{margin-bottom:16px;}
+  .tab-btn{padding:8px 12px;font-size:0.85rem;}
+  .metric-btn{padding:5px 11px;font-size:0.76rem;}
+  .chart-wrap{padding:12px;}
+}
+
+/* ===== New: Records view ===== */
+.section-title{
+  font-family:var(--display);
+  font-weight:500;
+  font-size:1.05rem;
+  color:var(--text);
+  margin:36px 0 14px;
+}
+.section-title:first-child{margin-top:0;}
+.records-grid{
+  display:grid;
+  grid-template-columns:repeat(5, 1fr);
+  gap:1px;
+  background:var(--line);
+  border:1px solid var(--line);
+}
+.record-card{
+  background:var(--panel);
+  padding:16px 18px;
+  min-width:0;
+  overflow:hidden;
+}
+.record-value{
+  font-family:var(--mono);
+  font-size:1.3rem;
+  font-weight:600;
+  color:var(--best);
+}
+.record-label{
+  font-family:var(--display);
+  font-size:0.78rem;
+  color:var(--text);
+  margin-top:4px;
+}
+.record-meta{
+  font-size:0.68rem;
+  color:var(--muted);
+  margin-top:4px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  position:relative;
+}
+.record-meta-track{
+  display:inline-block;
+}
+.record-meta.scrolling{text-overflow:clip;}
+.record-meta.scrolling .record-meta-track{
+  animation:marquee-scroll linear infinite;
+}
+@keyframes marquee-scroll{
+  from{transform:translateX(0);}
+  to{transform:translateX(-50%);}
+}
+.zone-bar{
+  display:flex;
+  height:26px;
+  border:1px solid var(--line);
+  overflow:hidden;
+}
+.zone-seg{height:100%;}
+.mini-zone-bar{
+  display:flex;
+  height:14px;
+  width:100%;
+  border:1px solid var(--line);
+  overflow:hidden;
+}
+.mini-zone-seg{height:100%;}
+.zone-legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+  margin-top:12px;
+  font-size:0.78rem;
+  color:var(--muted);
+}
+.zone-legend-item{display:flex;align-items:center;gap:6px;}
+.zone-dot{
+  width:9px;
+  height:9px;
+  display:inline-block;
+}
+
+/* ===== New: Trends view ===== */
+.simple-table{
+  table-layout:auto !important;
+  min-width:auto !important;
+  white-space:normal !important;
+}
+.simple-table th, .simple-table td{
+  white-space:nowrap;
+}
+
+/* Mobile overrides for Records view — placed after the rules above on purpose,
+   so they win the cascade at narrow widths instead of being overridden by them. */
+@media (max-width: 640px){
+  .records-grid{grid-template-columns:repeat(2, 1fr);}
+  .record-card{padding:12px 14px;}
+  .record-value{font-size:1rem;}
+  .record-label{font-size:0.68rem;}
+  .record-meta{font-size:0.6rem;}
+}
+
+/* Bike dots: one colour per bike, next to the route name */
+.bike-dot{
+  display:inline-block;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  margin-right:7px;
+  vertical-align:1px;
+}
+.bike-dot.none{background:transparent;border:1px solid var(--line-strong);}
+.bike-key{
+  display:flex;
+  flex-wrap:wrap;
+  gap:16px;
+  justify-content:flex-end;
+  font-size:0.7rem;
+  color:var(--muted);
+  margin:-10px 0 8px;
+  min-height:1em;
+}
+.bike-key:empty{display:none;}
+.bike-key-item{display:inline-flex;align-items:center;}
+.bike-key-count{opacity:0.6;margin-left:4px;}

@@ -101,6 +101,9 @@ EDITABLE_FIELDS = ("name", "sport_type", "gear_id", "commute", "trainer",
                    "private", "visibility", "workout_type")
 # The list only has a simplified route line, so keep the detailed one.
 KEEP_FROM_DETAILS = ("map", "resource_state")
+# If one of these changes, only the full details are downloaded again (not the
+# streams) - e.g. a new bike, whose name is only in the full details.
+REFRESH_DETAILS_IF_CHANGED = ("gear_id",)
 
 
 # ---------------------------------------------------------------------------
@@ -377,6 +380,7 @@ def main() -> None:
     # reusing full details already downloaded.
     activities = []
     to_fetch = []
+    refresh_details = []
     edited = []
     for summary in summaries:
         saved = existing.get(summary["id"])
@@ -391,6 +395,8 @@ def main() -> None:
                 edited.append((saved, summary, changes))
             activities.append({**saved, **{k: v for k, v in summary.items()
                                            if k not in KEEP_FROM_DETAILS}})
+            if any(f in changes for f in REFRESH_DETAILS_IF_CHANGED):
+                refresh_details.append(len(activities) - 1)
         else:
             activities.append(summary)
             to_fetch.append(len(activities) - 1)
@@ -419,6 +425,12 @@ def main() -> None:
               f"{detail.get('sport_type', '')}: {detail.get('name', '')}")
         if n % SAVE_EVERY == 0:
             save_by_year(activities)
+
+    for i in refresh_details:
+        act_id = activities[i]["id"]
+        activities[i] = http_request(f"{API_URL}/activities/{act_id}", headers=headers)
+        gear = activities[i].get("gear") or {}
+        print(f"Refreshed details: {activities[i].get('name')} (gear: {gear.get('name') or 'none'})")
 
     for i in missing_streams:
         act_id = activities[i]["id"]
