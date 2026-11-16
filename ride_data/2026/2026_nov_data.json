@@ -34,7 +34,9 @@
         "vo2max_sec": 83,
         "anaerobic_sec": 75,
         "neuromuscular_sec": 8
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-11-07",
@@ -68,7 +70,9 @@
         "vo2max_sec": 46,
         "anaerobic_sec": 51,
         "neuromuscular_sec": 2
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-11-10",
@@ -102,7 +106,9 @@
         "vo2max_sec": 351,
         "anaerobic_sec": 182,
         "neuromuscular_sec": 12
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-11-12",
@@ -136,7 +142,9 @@
         "vo2max_sec": 134,
         "anaerobic_sec": 111,
         "neuromuscular_sec": 9
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-11-15",
@@ -174,7 +182,9 @@
       "merged_urls": [
         "https://www.strava.com/activities/21000715979",
         "https://www.strava.com/activities/21000732589"
-      ]
+      ],
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     }
   ]
 }

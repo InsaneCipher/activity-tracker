@@ -34,7 +34,9 @@
         "vo2max_sec": 5,
         "anaerobic_sec": 0,
         "neuromuscular_sec": 0
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-08-30",
@@ -68,7 +70,9 @@
         "vo2max_sec": 9,
         "anaerobic_sec": 5,
         "neuromuscular_sec": 18
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-08-31",
@@ -102,7 +106,9 @@
         "vo2max_sec": 36,
         "anaerobic_sec": 28,
         "neuromuscular_sec": 0
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     }
   ]
 }

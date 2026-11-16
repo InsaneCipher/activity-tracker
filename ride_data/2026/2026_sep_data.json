@@ -34,7 +34,9 @@
         "vo2max_sec": 57,
         "anaerobic_sec": 28,
         "neuromuscular_sec": 31
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-09-02",
@@ -68,7 +70,9 @@
         "vo2max_sec": 48,
         "anaerobic_sec": 29,
         "neuromuscular_sec": 0
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-09-04",
@@ -102,7 +106,9 @@
         "vo2max_sec": 33,
         "anaerobic_sec": 12,
         "neuromuscular_sec": 0
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-09-05",
@@ -136,7 +142,9 @@
         "vo2max_sec": 26,
         "anaerobic_sec": 41,
         "neuromuscular_sec": 12
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-09-06",
@@ -170,7 +178,9 @@
         "vo2max_sec": 42,
         "anaerobic_sec": 92,
         "neuromuscular_sec": 10
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-09-08",
@@ -204,7 +214,9 @@
         "vo2max_sec": 48,
         "anaerobic_sec": 68,
         "neuromuscular_sec": 6
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-09-10",
@@ -238,7 +250,9 @@
         "vo2max_sec": 43,
         "anaerobic_sec": 56,
         "neuromuscular_sec": 12
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-09-12",
@@ -272,7 +286,9 @@
         "vo2max_sec": 158,
         "anaerobic_sec": 47,
         "neuromuscular_sec": 11
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-09-13",
@@ -306,7 +322,9 @@
         "vo2max_sec": 16,
         "anaerobic_sec": 10,
         "neuromuscular_sec": 20
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-09-16",
@@ -340,7 +358,9 @@
         "vo2max_sec": 225,
         "anaerobic_sec": 67,
         "neuromuscular_sec": 20
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-09-17",
@@ -374,7 +394,9 @@
         "vo2max_sec": 69,
         "anaerobic_sec": 27,
         "neuromuscular_sec": 22
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-09-19",
@@ -408,7 +430,9 @@
         "vo2max_sec": 104,
         "anaerobic_sec": 0,
         "neuromuscular_sec": 0
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-09-19",
@@ -442,7 +466,9 @@
         "vo2max_sec": 587,
         "anaerobic_sec": 134,
         "neuromuscular_sec": 27
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-09-21",
@@ -476,7 +502,9 @@
         "vo2max_sec": 254,
         "anaerobic_sec": 77,
         "neuromuscular_sec": 23
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-09-24",
@@ -510,7 +538,9 @@
         "vo2max_sec": 253,
         "anaerobic_sec": 64,
         "neuromuscular_sec": 10
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-09-27",
@@ -544,7 +574,9 @@
         "vo2max_sec": 91,
         "anaerobic_sec": 58,
         "neuromuscular_sec": 17
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     },
     {
       "date": "2026-09-29",
@@ -578,7 +610,9 @@
         "vo2max_sec": 135,
         "anaerobic_sec": 89,
         "neuromuscular_sec": 2
-      }
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Bike"
     }
   ]
 }
