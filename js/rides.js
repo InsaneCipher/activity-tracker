@@ -83,41 +83,49 @@ function miniZoneBar(zones) {
   return `<div class="mini-zone-bar">${segs}</div>`;
 }
 
-/* ---------------- Bikes ---------------- */
-// One colour per bike, given in the order the bikes were first ridden, so a
-// bike keeps its colour as new rides are added.
-const BIKE_COLORS = ['#7FB3FF', '#FF8FB1', '#B8E986', '#FFB86B', '#C3A6FF', '#5CE1E6', '#F7E36D', '#FF7A6B'];
-let bikeColors = new Map();
+/* ---------------- Bikes and apps ---------------- */
+// Each ride gets a small icon from images/bike-icons/: the centre colour is the
+// bike and the ring is the app the ride came from.
+const ICON_DIR = 'images/bike-icons/';
+const BIKE_SLOT_COUNT = 3;   // bike1, bike2, bike3 icon colours
 
-function assignBikeColors(rides) {
-  bikeColors = new Map();
+// Pin a bike to a colour by its Strava gear id (1 = blue, 2 = pink, 3 = lavender).
+// Bikes not listed here take the next free colour, in the order first ridden.
+const BIKE_SLOTS = {
+  'b18660663': 1,   // Renpho Smart S
+};
+
+const APP_ICONS = { 'MyWhoosh': 'mywhoosh', 'Rouvy': 'rouvy', 'Outdoor': 'outdoor' };
+const APP_ORDER = ['MyWhoosh', 'Rouvy', 'Zwift', 'Outdoor', 'Indoor', 'Other app'];
+const appIcon = app => app ? (APP_ICONS[app] || 'other') : 'none';
+
+let bikeSlots = new Map();   // gear id -> 1..3
+
+function assignBikeSlots(rides) {
+  bikeSlots = new Map(Object.entries(BIKE_SLOTS));
+  const used = new Set(bikeSlots.values());
   rides.slice()
     .sort((a, b) => `${a.date} ${a.time || ''}`.localeCompare(`${b.date} ${b.time || ''}`))
     .forEach(r => {
-      if (r.bike_id && !bikeColors.has(r.bike_id)) {
-        bikeColors.set(r.bike_id, BIKE_COLORS[bikeColors.size % BIKE_COLORS.length]);
-      }
+      if (!r.bike_id || bikeSlots.has(r.bike_id)) return;
+      let slot = 1;
+      while (used.has(slot) && slot <= BIKE_SLOT_COUNT) slot++;
+      if (slot > BIKE_SLOT_COUNT) slot = (bikeSlots.size % BIKE_SLOT_COUNT) + 1;  // more bikes than colours
+      bikeSlots.set(r.bike_id, slot);
+      used.add(slot);
     });
 }
 
-// Ring colour around the bike dot = the app the ride came from.
-const APP_COLORS = { 'MyWhoosh': '#FFD60A', 'Rouvy': '#FF6A3D', 'Zwift': '#FF4FD8', 'Outdoor': '#FFFFFF' };
-const APP_ORDER = ['MyWhoosh', 'Rouvy', 'Zwift', 'Outdoor', 'Indoor', 'Other app'];
-const appColor = app => APP_COLORS[app] || '#7D7D8C';
-const appRing = app => app ? `box-shadow:0 0 0 1.5px var(--panel),0 0 0 3px ${appColor(app)};` : '';
-
 const escapeHtml = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const bikeLabel = r => r.bike || (r.bike_id ? 'Unnamed bike' : 'No bike set');
+const bikeFile = id => bikeSlots.has(id) ? `bike${bikeSlots.get(id)}` : 'nobike';
 
-function bikeDot(r) {
-  const color = bikeColors.get(r.bike_id);
+function bikeIcon(r) {
   const title = `Bike: ${bikeLabel(r)}${r.app ? ` · App: ${r.app}` : ''}${r.device ? ` (${r.device})` : ''}`;
-  return color
-    ? `<span class="bike-dot" style="background:${color};${appRing(r.app)}" title="${escapeHtml(title)}"></span>`
-    : `<span class="bike-dot none" style="${appRing(r.app)}" title="${escapeHtml(title)}"></span>`;
+  return `<img class="bike-icon" src="${ICON_DIR}${bikeFile(r.bike_id)}-${appIcon(r.app)}.svg" alt="" title="${escapeHtml(title)}">`;
 }
 
-// Small key above the table: a dot, name and ride count per bike.
+// Small key above the table: an icon, name and ride count per bike and per app.
 function renderBikeKey(rides) {
   const key = document.getElementById('bike-key');
   const counts = new Map();
@@ -126,11 +134,11 @@ function renderBikeKey(rides) {
   rides.forEach(r => { if (r.app) apps.set(r.app, (apps.get(r.app) || 0) + 1); });
   if (!counts.size && !apps.size) { key.innerHTML = ''; return; }
   const names = new Map(rides.filter(r => r.bike_id).map(r => [r.bike_id, bikeLabel(r)]));
-  const bikeItems = [...bikeColors.keys()].filter(id => counts.has(id)).map(id => `
-    <span class="bike-key-item"><span class="bike-dot" style="background:${bikeColors.get(id)}"></span>${escapeHtml(names.get(id))} <span class="bike-key-count">${counts.get(id)}</span></span>
+  const bikeItems = [...counts.keys()].sort((a, b) => bikeSlots.get(a) - bikeSlots.get(b)).map(id => `
+    <span class="bike-key-item"><img class="bike-icon" src="${ICON_DIR}${bikeFile(id)}-none.svg" alt="">${escapeHtml(names.get(id))} <span class="bike-key-count">${counts.get(id)}</span></span>
   `);
   const appItems = [...apps.keys()].sort((a, b) => APP_ORDER.indexOf(a) - APP_ORDER.indexOf(b)).map(app => `
-    <span class="bike-key-item"><span class="bike-dot ring-only" style="${appRing(app)}"></span>${escapeHtml(app)} <span class="bike-key-count">${apps.get(app)}</span></span>
+    <span class="bike-key-item"><img class="bike-icon" src="${ICON_DIR}ring-${appIcon(app)}.svg" alt="">${escapeHtml(app)} <span class="bike-key-count">${apps.get(app)}</span></span>
   `);
   key.innerHTML = bikeItems.join('') + (bikeItems.length && appItems.length ? '<span class="bike-key-sep"></span>' : '') + appItems.join('');
 }
@@ -193,7 +201,7 @@ function countBy(rides, keyOf) {
 function buildFilterOptions(rides) {
   fillSelect('f-route', 'All routes', countBy(rides, routeOf).map(([k, n]) => [k, k, n]));
   fillSelect('f-country', 'All countries', countBy(rides, countryOf).map(([k, n]) => [k, k, n]));
-  const bikes = [...bikeColors.keys()].map(id => {
+  const bikes = [...bikeSlots.keys()].filter(id => rides.some(r => r.bike_id === id)).map(id => {
     const ride = rides.find(r => r.bike_id === id);
     return [id, bikeLabel(ride), rides.filter(r => r.bike_id === id).length];
   });
@@ -246,7 +254,7 @@ function renderRows() {
     <tr>
       <td class="idx">${i + 1}</td>
       <td class="muted date-cell">${fmt(r.date)}${r.time ? `<span class="ride-time">${r.time}</span>` : ''}</td>
-      <td class="name" title="${escapeHtml(r.map_name)}${r.bike_id ? ' · ' + escapeHtml(bikeLabel(r)) : ''}">${bikeDot(r)}${r.url ? `<a href="${r.url}" target="_blank" rel="noopener">${r.map_name || '—'}</a>` : (r.map_name || '—')}</td>
+      <td class="name" title="${escapeHtml(r.map_name)}${r.bike_id ? ' · ' + escapeHtml(bikeLabel(r)) : ''}">${bikeIcon(r)}${r.url ? `<a href="${r.url}" target="_blank" rel="noopener">${r.map_name || '—'}</a>` : (r.map_name || '—')}</td>
       <td class="num">${val(r.distance_km, '', isBest(best, 'distance_km', r.distance_km))}</td>
       <td class="num muted">${val(r.moving_time, '', isBest(best, 'moving_time_seconds', parseDuration(r.moving_time)))}</td>
       <td class="num muted">${val(r.elevation_m, '', isBest(best, 'elevation_m', r.elevation_m))}</td>
@@ -621,7 +629,7 @@ function combineRides(files) {
 
 function render(data, sourceText) {
   currentRides = data.rides || [];
-  assignBikeColors(currentRides);
+  assignBikeSlots(currentRides);
   renderBikeKey(currentRides);
   buildFilterOptions(currentRides);
   renderTotals(currentRides);

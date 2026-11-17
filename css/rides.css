@@ -376,18 +376,14 @@ td.muted{color:var(--muted);}
   .record-meta{font-size:0.6rem;}
 }
 
-/* Bike dots: one colour per bike, next to the route name */
-.bike-dot{
-  display:inline-block;
-  width:7px;
-  height:7px;
-  border-radius:50%;
-  margin:0 9px 0 3px;   /* room for the app ring */
-  vertical-align:1px;
+/* Bike/app icon next to the route name (images/bike-icons/) */
+.bike-icon{
+  width:16px;
+  height:16px;
+  vertical-align:-3px;
+  margin-right:6px;
 }
-.bike-dot.ring-only{background:transparent;}
 .bike-key-sep{width:1px;align-self:stretch;background:var(--line);}
-.bike-dot.none{background:transparent;border:1px solid var(--line-strong);}
 .bike-key{
   display:flex;
   flex-wrap:wrap;
