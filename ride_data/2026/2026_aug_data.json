@@ -36,7 +36,9 @@
         "neuromuscular_sec": 0
       },
       "bike_id": "b18660663",
-      "bike": "Renpho Smart S"
+      "bike": "Renpho Smart S",
+      "app": "MyWhoosh",
+      "device": "MyWhoosh"
     },
     {
       "date": "2026-08-30",
@@ -72,7 +74,9 @@
         "neuromuscular_sec": 18
       },
       "bike_id": "b18660663",
-      "bike": "Renpho Smart S"
+      "bike": "Renpho Smart S",
+      "app": "MyWhoosh",
+      "device": "MyWhoosh"
     },
     {
       "date": "2026-08-31",
@@ -108,7 +112,9 @@
         "neuromuscular_sec": 0
       },
       "bike_id": "b18660663",
-      "bike": "Renpho Smart S"
+      "bike": "Renpho Smart S",
+      "app": "MyWhoosh",
+      "device": "MyWhoosh"
     }
   ]
 }

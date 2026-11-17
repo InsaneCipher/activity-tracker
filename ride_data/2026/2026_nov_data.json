@@ -36,7 +36,9 @@
         "neuromuscular_sec": 8
       },
       "bike_id": "b18660663",
-      "bike": "Renpho Smart S"
+      "bike": "Renpho Smart S",
+      "app": "MyWhoosh",
+      "device": "MyWhoosh"
     },
     {
       "date": "2026-11-07",
@@ -72,7 +74,9 @@
         "neuromuscular_sec": 2
       },
       "bike_id": "b18660663",
-      "bike": "Renpho Smart S"
+      "bike": "Renpho Smart S",
+      "app": "MyWhoosh",
+      "device": "MyWhoosh"
     },
     {
       "date": "2026-11-10",
@@ -108,7 +112,9 @@
         "neuromuscular_sec": 12
       },
       "bike_id": "b18660663",
-      "bike": "Renpho Smart S"
+      "bike": "Renpho Smart S",
+      "app": "MyWhoosh",
+      "device": "MyWhoosh"
     },
     {
       "date": "2026-11-12",
@@ -144,7 +150,9 @@
         "neuromuscular_sec": 9
       },
       "bike_id": "b18660663",
-      "bike": "Renpho Smart S"
+      "bike": "Renpho Smart S",
+      "app": "MyWhoosh",
+      "device": "MyWhoosh"
     },
     {
       "date": "2026-11-15",
@@ -184,7 +192,9 @@
         "https://www.strava.com/activities/21000732589"
       ],
       "bike_id": "b18660663",
-      "bike": "Renpho Smart S"
+      "bike": "Renpho Smart S",
+      "app": "MyWhoosh",
+      "device": "MyWhoosh"
     },
     {
       "date": "2026-11-17",
@@ -220,7 +230,9 @@
         "neuromuscular_sec": 0
       },
       "bike_id": "b18660663",
-      "bike": "Renpho Smart S"
+      "bike": "Renpho Smart S",
+      "app": "Rouvy",
+      "device": "Rouvy"
     },
     {
       "date": "2026-11-17",
@@ -256,7 +268,9 @@
         "neuromuscular_sec": 13
       },
       "bike_id": "b18660663",
-      "bike": "Renpho Smart S"
+      "bike": "Renpho Smart S",
+      "app": "Rouvy",
+      "device": "Rouvy"
     }
   ]
 }
