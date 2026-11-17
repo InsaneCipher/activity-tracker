@@ -221,6 +221,42 @@
       },
       "bike_id": "b18660663",
       "bike": "Renpho Smart S"
+    },
+    {
+      "date": "2026-11-17",
+      "time": "18:58",
+      "map_name": "Back Roads to Ballinspittle (Ireland)",
+      "distance_km": 10.01,
+      "moving_time": "25:57",
+      "elevation_m": 116,
+      "relative_effort": 45,
+      "weighted_avg_power_w": 145,
+      "total_work_kj": 231,
+      "training_load": 35,
+      "intensity_pct": 91,
+      "speed_avg_kmh": 23.2,
+      "speed_max_kmh": 65.6,
+      "heart_rate_avg_bpm": 163,
+      "heart_rate_max_bpm": 174,
+      "cadence_avg": 67,
+      "cadence_max": 90,
+      "power_avg_w": 148,
+      "power_max_w": 274,
+      "calories": 221,
+      "ftp": 160,
+      "url": "https://www.strava.com/activities/21025469418",
+      "elapsed_time": "27:17",
+      "zones": {
+        "recovery_sec": 35,
+        "endurance_sec": 41,
+        "tempo_sec": 411,
+        "threshold_sec": 977,
+        "vo2max_sec": 69,
+        "anaerobic_sec": 14,
+        "neuromuscular_sec": 13
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Smart S"
     }
   ]
 }
