@@ -221,6 +221,24 @@ def power_zones(times: list, watts: list, ftp) -> dict | None:
 # Conversion
 # ---------------------------------------------------------------------------
 
+# Which app a ride came from, by words in Strava's "device_name" field.
+APPS = (("MyWhoosh", ("mywhoosh",)), ("Rouvy", ("rouvy",)), ("Zwift", ("zwift",)))
+
+
+def app_for(act: dict) -> str:
+    """MyWhoosh / Rouvy / Zwift from the device name; otherwise Outdoor for a
+    real-world ride with GPS, or Indoor for a trainer ride without an app."""
+    device = (act.get("device_name") or "").lower()
+    for app, words in APPS:
+        if any(w in device for w in words):
+            return app
+    if (act.get("sport_type") or act.get("type")) == "VirtualRide":
+        return "Other app"
+    if act.get("trainer") or not act.get("start_latlng"):
+        return "Indoor"
+    return "Outdoor"
+
+
 def gear_names(activities: list[dict]) -> dict:
     """Gear id -> current name. Uses raw_data/gear.json (kept up to date by
     strava_exporter.py, including renames on Strava), falling back to the name
@@ -335,6 +353,8 @@ def main() -> None:
         gear_id = act.get("gear_id")
         ride["bike_id"] = gear_id
         ride["bike"] = bikes.get(gear_id) if gear_id else None
+        ride["app"] = app_for(act)
+        ride["device"] = act.get("device_name")
         if fixes:
             ride.update({k: v for k, v in fixes.items()
                          if not k.startswith("_") and k not in ("exclude", "merge_with")})

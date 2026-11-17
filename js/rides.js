@@ -100,14 +100,21 @@ function assignBikeColors(rides) {
     });
 }
 
+// Ring colour around the bike dot = the app the ride came from.
+const APP_COLORS = { 'MyWhoosh': '#FFD60A', 'Rouvy': '#FF6A3D', 'Zwift': '#FF4FD8', 'Outdoor': '#FFFFFF' };
+const APP_ORDER = ['MyWhoosh', 'Rouvy', 'Zwift', 'Outdoor', 'Indoor', 'Other app'];
+const appColor = app => APP_COLORS[app] || '#7D7D8C';
+const appRing = app => app ? `box-shadow:0 0 0 1.5px var(--panel),0 0 0 3px ${appColor(app)};` : '';
+
 const escapeHtml = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const bikeLabel = r => r.bike || (r.bike_id ? 'Unnamed bike' : 'No bike set');
 
 function bikeDot(r) {
   const color = bikeColors.get(r.bike_id);
+  const title = `Bike: ${bikeLabel(r)}${r.app ? ` · App: ${r.app}` : ''}${r.device ? ` (${r.device})` : ''}`;
   return color
-    ? `<span class="bike-dot" style="background:${color}" title="Bike: ${escapeHtml(bikeLabel(r))}"></span>`
-    : `<span class="bike-dot none" title="No bike set"></span>`;
+    ? `<span class="bike-dot" style="background:${color};${appRing(r.app)}" title="${escapeHtml(title)}"></span>`
+    : `<span class="bike-dot none" style="${appRing(r.app)}" title="${escapeHtml(title)}"></span>`;
 }
 
 // Small key above the table: a dot, name and ride count per bike.
@@ -115,11 +122,17 @@ function renderBikeKey(rides) {
   const key = document.getElementById('bike-key');
   const counts = new Map();
   rides.forEach(r => { if (r.bike_id) counts.set(r.bike_id, (counts.get(r.bike_id) || 0) + 1); });
-  if (!counts.size) { key.innerHTML = ''; return; }
+  const apps = new Map();
+  rides.forEach(r => { if (r.app) apps.set(r.app, (apps.get(r.app) || 0) + 1); });
+  if (!counts.size && !apps.size) { key.innerHTML = ''; return; }
   const names = new Map(rides.filter(r => r.bike_id).map(r => [r.bike_id, bikeLabel(r)]));
-  key.innerHTML = [...bikeColors.keys()].filter(id => counts.has(id)).map(id => `
+  const bikeItems = [...bikeColors.keys()].filter(id => counts.has(id)).map(id => `
     <span class="bike-key-item"><span class="bike-dot" style="background:${bikeColors.get(id)}"></span>${escapeHtml(names.get(id))} <span class="bike-key-count">${counts.get(id)}</span></span>
-  `).join('');
+  `);
+  const appItems = [...apps.keys()].sort((a, b) => APP_ORDER.indexOf(a) - APP_ORDER.indexOf(b)).map(app => `
+    <span class="bike-key-item"><span class="bike-dot ring-only" style="${appRing(app)}"></span>${escapeHtml(app)} <span class="bike-key-count">${apps.get(app)}</span></span>
+  `);
+  key.innerHTML = bikeItems.join('') + (bikeItems.length && appItems.length ? '<span class="bike-key-sep"></span>' : '') + appItems.join('');
 }
 
 /* ---------------- Filters ---------------- */
@@ -128,7 +141,7 @@ function renderBikeKey(rides) {
 const countryOf = r => ((r.map_name || '').match(/\(([^()]+)\)\s*$/) || [])[1] || '';
 const routeOf = r => (r.map_name || '').replace(/\s*\([^()]*\)\s*$/, '').trim() || '—';
 
-const FILTER_INPUTS = ['f-search', 'f-route', 'f-country', 'f-bike', 'f-km-min', 'f-km-max',
+const FILTER_INPUTS = ['f-search', 'f-route', 'f-country', 'f-bike', 'f-app', 'f-km-min', 'f-km-max',
                        'f-min-min', 'f-min-max', 'f-from', 'f-to'];
 const filterValue = id => document.getElementById(id).value.trim();
 const filterNumber = id => { const v = filterValue(id); return v === '' ? null : Number(v); };
@@ -138,6 +151,7 @@ function filteredRides() {
   const route = filterValue('f-route');
   const country = filterValue('f-country');
   const bike = filterValue('f-bike');
+  const app = filterValue('f-app');
   const kmMin = filterNumber('f-km-min'), kmMax = filterNumber('f-km-max');
   const minMin = filterNumber('f-min-min'), minMax = filterNumber('f-min-max');
   const from = filterValue('f-from'), to = filterValue('f-to');
@@ -149,6 +163,7 @@ function filteredRides() {
     if (route && routeOf(r) !== route) return false;
     if (country && countryOf(r) !== country) return false;
     if (bike === '__none' ? r.bike_id : (bike && r.bike_id !== bike)) return false;
+    if (app && r.app !== app) return false;
     if (kmMin !== null && km < kmMin) return false;
     if (kmMax !== null && km > kmMax) return false;
     if (minMin !== null && mins < minMin) return false;
@@ -185,6 +200,9 @@ function buildFilterOptions(rides) {
   const noBike = rides.filter(r => !r.bike_id).length;
   if (noBike) bikes.push(['__none', 'No bike set', noBike]);
   fillSelect('f-bike', 'All bikes', bikes);
+  fillSelect('f-app', 'All apps', countBy(rides, r => r.app)
+    .sort((a, b) => APP_ORDER.indexOf(a[0]) - APP_ORDER.indexOf(b[0]))
+    .map(([k, n]) => [k, k, n]));
 }
 
 function updateFilterCount(shown) {

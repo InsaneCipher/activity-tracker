@@ -124,7 +124,7 @@ h1{
 /* Ride table column widths - one per column, in table order */
 col.col-idx{width:3%;}
 col.col-date{width:11%;}
-col.col-route{width:16%;}
+col.col-route{width:18%;}
 col.col-km{width:7%;}
 col.col-time{width:7%;}
 col.col-elev{width:4%;}
@@ -382,9 +382,11 @@ td.muted{color:var(--muted);}
   width:7px;
   height:7px;
   border-radius:50%;
-  margin-right:7px;
+  margin:0 9px 0 3px;   /* room for the app ring */
   vertical-align:1px;
 }
+.bike-dot.ring-only{background:transparent;}
+.bike-key-sep{width:1px;align-self:stretch;background:var(--line);}
 .bike-dot.none{background:transparent;border:1px solid var(--line-strong);}
 .bike-key{
   display:flex;
