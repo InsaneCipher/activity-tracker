@@ -161,7 +161,9 @@ tbody td{
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 tbody tr:last-child td{border-bottom:none;}
-tbody tr:hover{background:#FAFBFD;}
+/* Every other row gets a faint tint, so a row is easy to follow across a wide table */
+tbody tr:nth-child(even){background:#F6F8FB;}
+tbody tr:hover{background:#EEF2F8;}
 td.idx{color:var(--muted);text-overflow:clip;}
 td.date-cell{color:var(--ink-2);}
 td.name{font-weight:600;}
@@ -289,7 +291,7 @@ td.no-match{text-align:center;color:var(--muted);padding:32px 12px;}
 /* ---------------- Trends ---------------- */
 .trend-head{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:4px 0 14px;}
 .trend-head .section-title{margin:0 auto 0 0;}
-.group-picker{display:flex;gap:2px;flex-wrap:wrap;background:#E3E7EE;padding:4px;border-radius:999px;}
+.group-picker{display:flex;gap:2px;flex-wrap:wrap;background:#E3E7EE;padding:4px;border-radius:16px;}
 .group-btn{
   cursor:pointer;border:0;background:none;
   font:600 0.84rem var(--font);color:var(--ink-2);
@@ -297,9 +299,16 @@ td.no-match{text-align:center;color:var(--muted);padding:32px 12px;}
 }
 .group-btn:hover{color:var(--ink);}
 .group-btn.active{background:var(--ink);color:#fff;}
-.group-sep{width:1px;background:var(--line-strong);margin:4px 4px;}
-.group-btn.toggle.active{background:var(--jersey);color:var(--ink);}
-.group-btn.toggle:not(.active){text-decoration:line-through;}
+/* % change sits on its own, beside the Show menu */
+.trend-controls{display:flex;align-items:center;gap:12px;}
+.delta-btn{
+  cursor:pointer;height:34px;padding:0 14px;
+  font:600 0.84rem var(--font);color:var(--ink-2);
+  background:#E3E7EE;border:1px solid transparent;border-radius:999px;
+}
+.delta-btn:hover{border-color:var(--line-strong);}
+.delta-btn.active{background:var(--jersey);color:var(--ink);}
+.delta-btn:not(.active){text-decoration:line-through;}
 .trend-show{display:inline-flex;align-items:center;gap:7px;font-size:0.84rem;font-weight:600;color:var(--ink-2);}
 .trend-show select{
   height:34px;padding:0 8px;cursor:pointer;
@@ -328,6 +337,9 @@ td.no-match{text-align:center;color:var(--muted);padding:32px 12px;}
   .totals{grid-template-columns:repeat(3, minmax(0, 1fr));}
 }
 @media (max-width: 640px){
+  .group-picker{width:100%;}
+  .group-btn{flex:1 1 auto;padding:6px 6px;white-space:nowrap;}
+  .trend-controls{width:100%;justify-content:space-between;}
   .hero-inner{padding:14px 16px 0;}
   .hero-text{padding-top:34px;}
   .wrap{padding:0 14px 48px;}

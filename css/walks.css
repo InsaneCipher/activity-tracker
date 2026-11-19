@@ -10,7 +10,7 @@
 .hero-profile .ridge{stroke:#3DDC97;}
 
 /* ---------------- Walk table ---------------- */
-#walk-table{min-width:1300px;table-layout:fixed;}
+#walk-table{min-width:1200px;table-layout:fixed;}
 /* Column widths, one per column in table order. Keep the total at 100%:
    if it goes over, the browser shrinks every column to fit. */
 col.idx{width:3%;}
@@ -51,7 +51,7 @@ td.steps{color:var(--steps);}
 /* Longest walk in trail green, most elevation in polka dots, pace and
    fastest km in blue (order follows computeRecords in walks.js) */
 .record-card:nth-child(1)::before{background:var(--pace);}
-.record-card:nth-child(3)::before{background:radial-gradient(circle, var(--kom) 1.6px, #fff 1.8px) 0 0 / 7px 5px;}
+.record-card:nth-child(3)::before{background:var(--kom);}
 .record-card:nth-child(4)::before,
 .record-card:nth-child(5)::before{background:var(--speed);}
 

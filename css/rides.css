@@ -4,6 +4,7 @@
   --accent:var(--jersey);
   --power:#5B45E0;        /* indigo: watts and FTP */
   --speed:#1E9E77;
+  --burn:#F07A1F;         /* orange: calories and effort records */
 }
 
 /* ---------------- Bike and app key ---------------- */
@@ -15,7 +16,7 @@
 .bike-icon{width:16px;height:16px;vertical-align:-3px;margin-right:7px;}
 
 /* ---------------- Ride table ---------------- */
-#ride-table{min-width:1300px;table-layout:fixed;}
+#ride-table{min-width:1200px;table-layout:fixed;}
 /* Column widths, one per column in table order. Keep the total at 100%:
    if it goes over, the browser shrinks every column to fit. */
 col.idx{width:3%;}
@@ -39,12 +40,19 @@ td.speed{color:#127A5C;}
 .mini-zone-seg{height:100%;}
 
 /* ---------------- Records: the classification jerseys ---------------- */
-/* Longest ride = yellow jersey, most elevation = polka-dot jersey,
-   speed records = green jersey (order follows computeRecords in rides.js) */
-.record-card:nth-child(1)::before{background:var(--jersey);}
-.record-card:nth-child(3)::before{background:radial-gradient(circle, var(--kom) 1.6px, #fff 1.8px) 0 0 / 7px 5px;}
+/* Card order follows computeRecords in rides.js:
+   1 longest ride, 2 longest time, 3 most elevation, 4 avg power, 5 max power,
+   6 FTP, 7 avg speed, 8 max speed, 9 calories, 10 effort */
+.record-card:nth-child(1)::before,
+.record-card:nth-child(2)::before{background:var(--jersey);}
+.record-card:nth-child(3)::before{background:var(--kom);}
+.record-card:nth-child(4)::before,
+.record-card:nth-child(5)::before,
+.record-card:nth-child(6)::before{background:var(--power);}
 .record-card:nth-child(7)::before,
 .record-card:nth-child(8)::before{background:var(--sprint);}
+.record-card:nth-child(9)::before,
+.record-card:nth-child(10)::before{background:var(--burn);}
 
 @media (max-width: 640px){
   .bike-key{justify-content:flex-start;}

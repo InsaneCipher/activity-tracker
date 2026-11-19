@@ -25,6 +25,7 @@ PROJECT_DIR = SCRIPTS_DIR.parent                   # folder containing scripts/
 # STRAVA_RAW_DIR lets the GitHub Actions workflow keep raw_data outside this
 # (public) repo; locally it defaults to raw_data in the project folder.
 RAW_DIR = Path(os.environ.get("STRAVA_RAW_DIR") or PROJECT_DIR / "raw_data").resolve()
+STREAMS_DIR = RAW_DIR / "streams"                  # second-by-second data per activity
 OUT_DIR = PROJECT_DIR / "walk_data"
 
 WALK_TYPES = {"Walk", "Hike"}
@@ -36,6 +37,15 @@ MONTHS = ["jan", "feb", "mar", "apr", "may", "jun",
 # default because walk_data may be published, and routes usually start and
 # end at home.
 INCLUDE_ROUTE = False
+
+# Max speed. Strava's max_speed is the single fastest moment, so one GPS jump
+# (the watch loses signal and snaps back) can turn a walk into "44 km/h".
+# Instead, max speed is the fastest average held for MAX_SPEED_WINDOW_SEC,
+# worked out from the GPS track. While doing that, each second-to-second step
+# is capped at MAX_STEP_SPEED_KMH, so a jump adds very little.
+# Walks without a GPS track (e.g. entered by hand) keep Strava's value.
+MAX_SPEED_WINDOW_SEC = 30
+MAX_STEP_SPEED_KMH = 25
 
 
 # ---------------------------------------------------------------------------
@@ -81,6 +91,44 @@ def speed_kmh(ms):
     return rnd(ms * 3.6, 1) if ms is not None else None
 
 
+def load_streams(act_id) -> dict:
+    data = load_json(STREAMS_DIR / f"{act_id}.json", {}) or {}
+    if isinstance(data, list):  # older response style
+        data = {s.get("type"): s for s in data}
+    return data
+
+
+def held_max_speed(streams: dict) -> float | None:
+    """Fastest average speed (km/h) held for MAX_SPEED_WINDOW_SEC, or None
+    when there isn't a usable GPS track."""
+    times = (streams.get("time") or {}).get("data") or []
+    dists = (streams.get("distance") or {}).get("data") or []
+    n = min(len(times), len(dists))
+    if n < 2 or times[n - 1] - times[0] < MAX_SPEED_WINDOW_SEC:
+        return None
+
+    # Distance along the track with each step's speed capped.
+    cap = MAX_STEP_SPEED_KMH / 3.6  # m/s
+    clean = [0.0]
+    for k in range(1, n):
+        dt = max(times[k] - times[k - 1], 0)
+        step = max(dists[k] - dists[k - 1], 0)
+        clean.append(clean[-1] + min(step, cap * dt))
+
+    best = 0.0
+    i = 0
+    for j in range(1, n):
+        # Move the window's start up as far as it can go while still
+        # covering at least MAX_SPEED_WINDOW_SEC.
+        while i + 1 < j and times[j] - times[i + 1] >= MAX_SPEED_WINDOW_SEC:
+            i += 1
+        span = times[j] - times[i]
+        # Skip windows over a long recording gap (e.g. a pause).
+        if MAX_SPEED_WINDOW_SEC <= span <= 2 * MAX_SPEED_WINDOW_SEC:
+            best = max(best, (clean[j] - clean[i]) / span)
+    return round(best * 3.6, 1) if best else None
+
+
 def steps_per_min(cadence):
     # Strava stores walking cadence per foot; double it for steps per minute.
     return rnd(cadence * 2) if cadence else None
@@ -95,6 +143,9 @@ def build_walk(act: dict) -> dict:
     moving = act.get("moving_time")
     distance = act.get("distance") or 0
     cadence = act.get("average_cadence")
+    max_speed = held_max_speed(load_streams(act["id"]))
+    if max_speed is None:
+        max_speed = speed_kmh(act.get("max_speed"))
 
     splits = []
     for s in act.get("splits_metric") or []:
@@ -121,7 +172,7 @@ def build_walk(act: dict) -> dict:
         "elapsed_time_sec": act.get("elapsed_time"),
         "pace_min_per_km": pace(moving, distance),
         "speed_avg_kmh": speed_kmh(act.get("average_speed")),
-        "speed_max_kmh": speed_kmh(act.get("max_speed")),
+        "speed_max_kmh": max_speed,
         "elevation_gain_m": rnd(act.get("total_elevation_gain")),
         "elevation_high_m": rnd(act.get("elev_high"), 1),
         "elevation_low_m": rnd(act.get("elev_low"), 1),

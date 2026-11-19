@@ -14,8 +14,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/site.css?v=2026-11-19">
-    <link rel="stylesheet" href="css/walks.css?v=2026-11-19">
+    <link rel="stylesheet" href="css/site.css?v=2026-11-19e">
+    <link rel="stylesheet" href="css/walks.css?v=2026-11-19e">
 </head>
 <body>
 <header class="hero">
@@ -174,16 +174,17 @@
                 <button type="button" class="group-btn" data-group="quarter">3 months</button>
                 <button type="button" class="group-btn" data-group="half">6 months</button>
                 <button type="button" class="group-btn" data-group="year">Year</button>
-                <span class="group-sep"></span>
-                <button type="button" class="group-btn toggle" id="delta-toggle" aria-pressed="true">% change</button>
             </div>
-            <label class="trend-show">Show
-                <select id="trend-limit">
-                    <option value="12">12</option>
-                    <option value="24">24</option>
-                    <option value="all">All</option>
-                </select>
-            </label>
+            <div class="trend-controls">
+                <button type="button" class="delta-btn toggle" id="delta-toggle" aria-pressed="true">% change</button>
+                <label class="trend-show">Show
+                    <select id="trend-limit">
+                        <option value="12">12</option>
+                        <option value="24">24</option>
+                        <option value="all">All</option>
+                    </select>
+                </label>
+            </div>
         </div>
         <div class="table-wrap">
             <table class="simple-table trend-table">
@@ -205,9 +206,9 @@
     </div>
     <footer class="page-foot">Synced from Strava every 15 minutes.</footer>
 </main>
-<script src="js/walks.js?v=2026-11-19"></script>
-<script src="js/hero.js?v=2026-11-19"></script>
-<script src="js/name-scroll.js?v=2026-11-19"></script>
-<script src="js/walks-ui.js?v=2026-11-19"></script>
+<script src="js/walks.js?v=2026-11-19e"></script>
+<script src="js/hero.js?v=2026-11-19e"></script>
+<script src="js/name-scroll.js?v=2026-11-19e"></script>
+<script src="js/walks-ui.js?v=2026-11-19e"></script>
 </body>
 </html>
