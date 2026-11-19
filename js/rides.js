@@ -547,45 +547,153 @@ function renderZones(rides) {
 }
 
 /* ---------------- New: Trends view ---------------- */
+/* ---------- Totals by period (week / month / 3 months / 6 months / year) ---------- */
+const GROUPS = {
+  week:    { title: 'Weekly totals',     head: 'Week of', months: 0 },
+  month:   { title: 'Monthly totals',    head: 'Month',   months: 1 },
+  quarter: { title: '3-monthly totals',  head: 'Period',  months: 3 },
+  half:    { title: '6-monthly totals',  head: 'Period',  months: 6 },
+  year:    { title: 'Yearly totals',     head: 'Year',    months: 12 },
+};
+let trendGroup = 'week';
+let showChanges = true;
+try {
+  trendGroup = GROUPS[localStorage.getItem('rideTrendGroup')] ? localStorage.getItem('rideTrendGroup') : 'week';
+  showChanges = localStorage.getItem('rideTrendChanges') !== 'off';
+} catch (e) {}
+
 function getWeekStart(dateStr) {
-  const d = new Date(dateStr);
-  const day = (d.getDay() + 6) % 7; // Monday = 0
-  d.setDate(d.getDate() - day);
-  d.setHours(0, 0, 0, 0);
+  const d = new Date(dateStr + 'T00:00');
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); // back to Monday
   return d;
 }
 
-function computeWeeklyTotals(rides) {
+// First day of the calendar period containing the date.
+function periodStart(dateStr, group) {
+  if (group === 'week') return getWeekStart(dateStr);
+  const d = new Date(dateStr + 'T00:00');
+  const months = GROUPS[group].months;
+  return new Date(d.getFullYear(), Math.floor(d.getMonth() / months) * months, 1);
+}
+
+function previousPeriodStart(start, group) {
+  const d = new Date(start);
+  if (group === 'week') d.setDate(d.getDate() - 7);
+  else d.setMonth(d.getMonth() - GROUPS[group].months);
+  return d;
+}
+
+const dayKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+function periodLabel(start, group) {
+  const short = d => d.toLocaleDateString('en-GB', { month: 'short' });
+  const y = start.getFullYear();
+  if (group === 'week') return start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  if (group === 'month') return start.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  if (group === 'year') return String(y);
+  const end = new Date(start); end.setMonth(end.getMonth() + GROUPS[group].months - 1);
+  return `${short(start)}–${short(end)} ${y}`;
+}
+
+function computePeriodTotals(rides, group) {
   const map = new Map();
   rides.forEach(r => {
     if (!r.date) return;
-    const start = getWeekStart(r.date);
-    const key = start.toISOString().slice(0, 10);
-    if (!map.has(key)) map.set(key, { start, rides: 0, km: 0, secs: 0 });
-    const entry = map.get(key);
-    entry.rides++;
-    entry.km += r.distance_km || 0;
-    entry.secs += parseDuration(r.moving_time);
+    const start = periodStart(r.date, group);
+    const key = dayKey(start);
+    if (!map.has(key)) map.set(key, { key, start, rides: 0, km: 0, secs: 0, wattSecs: 0, powerSecs: 0, maxW: null });
+    const e = map.get(key);
+    const secs = parseDuration(r.moving_time);
+    e.rides++;
+    e.km += r.distance_km || 0;
+    e.secs += secs;
+    if (r.power_avg_w) { e.wattSecs += r.power_avg_w * secs; e.powerSecs += secs; }
+    if (r.power_max_w) e.maxW = Math.max(e.maxW || 0, r.power_max_w);
   });
-  return Array.from(map.values()).sort((a, b) => b.start - a.start);
+  map.forEach(e => { e.avgW = e.powerSecs ? e.wattSecs / e.powerSecs : null; });
+  return map;
+}
+
+// "▲ 12%" / "▼ 8%" against the previous period; blank when there's nothing to compare with.
+// A fall in the current period is grey: the period isn't over yet.
+function changeBadge(cur, prev, inProgress) {
+  if (cur === null || cur === undefined || !prev) return '<span class="delta none"></span>';
+  const pct = (cur - prev) / prev * 100;
+  if (Math.abs(pct) < 0.5) return '<span class="delta flat">0%</span>';
+  const cls = pct > 0 ? 'up' : (inProgress ? 'pending' : 'down');
+  const title = pct < 0 && inProgress ? ' title="This period is still in progress"' : '';
+  return `<span class="delta ${cls}"${title}>${pct > 0 ? '▲' : '▼'} ${Math.abs(Math.round(pct))}%</span>`;
+}
+
+function applyChangeToggle() {
+  const btn = document.getElementById('delta-toggle');
+  btn.classList.toggle('active', showChanges);
+  btn.setAttribute('aria-pressed', String(showChanges));
+  document.getElementById('trends-view').classList.toggle('hide-changes', !showChanges);
 }
 
 function renderWeekly(rides) {
-  const weeks = computeWeeklyTotals(rides);
+  const group = trendGroup;
+  document.getElementById('trend-title').textContent = GROUPS[group].title;
+  document.getElementById('trend-period-head').textContent = GROUPS[group].head;
+  document.querySelectorAll('#group-picker .group-btn[data-group]').forEach(b => b.classList.toggle('active', b.dataset.group === group));
+
+  const totals = computePeriodTotals(rides, group);
+  const periods = [...totals.values()].sort((a, b) => b.start - a.start);
   const body = document.getElementById('weekly-body');
-  if (!weeks.length) {
-    body.innerHTML = `<tr><td colspan="4" class="chart-empty">No data yet.</td></tr>`;
+  if (!periods.length) {
+    body.innerHTML = `<tr><td colspan="6" class="chart-empty">No data yet.</td></tr>`;
     return;
   }
-  body.innerHTML = weeks.map(w => `
-    <tr>
-      <td>${w.start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
-      <td class="num">${w.rides}</td>
-      <td class="num">${w.km.toFixed(1)}</td>
-      <td class="num">${formatDuration(w.secs)}</td>
-    </tr>
-  `).join('');
+  const current = dayKey(periodStart(dayKey(new Date()), group));
+  body.innerHTML = periods.map(p => {
+    const prev = totals.get(dayKey(previousPeriodStart(p.start, group)));
+    const inProgress = p.key === current;
+    const cell = (text, cur, prevVal, cls = '') =>
+      `<td class="num ${cls}"><span class="trend-val">${text}</span>${changeBadge(cur, prevVal, inProgress)}</td>`;
+    return `
+      <tr>
+        <td>${periodLabel(p.start, group)}${p.key === current ? ' <span class="so-far">so far</span>' : ''}</td>
+        ${cell(p.rides, p.rides, prev && prev.rides)}
+        ${cell(p.km.toFixed(1), p.km, prev && prev.km)}
+        ${cell(formatDuration(p.secs), p.secs, prev && prev.secs)}
+        ${cell(p.avgW !== null ? Math.round(p.avgW) + ' W' : '—', p.avgW, prev && prev.avgW, 'power')}
+        ${cell(p.maxW !== null ? p.maxW + ' W' : '—', p.maxW, prev && prev.maxW, 'power')}
+      </tr>`;
+  }).join('');
+  alignTrendValues();
 }
+
+// Give every value in a column the width of the column's widest value, so the
+// ▲▼ percentages line up in a straight column.
+function alignTrendValues() {
+  const rows = [...document.querySelectorAll('#weekly-body tr')];
+  if (!rows.length || !rows[0].offsetParent) return;   // table hidden: nothing to measure
+  const cols = rows[0].children.length;
+  for (let c = 1; c < cols; c++) {
+    const vals = rows.map(r => r.children[c] && r.children[c].querySelector('.trend-val')).filter(Boolean);
+    vals.forEach(v => { v.style.width = ''; });
+    const widest = Math.ceil(Math.max(...vals.map(v => v.getBoundingClientRect().width)));
+    vals.forEach(v => { v.style.width = widest + 'px'; });
+  }
+}
+
+if (document.fonts) document.fonts.ready.then(() => alignTrendValues());   // web font changes widths
+
+document.getElementById('delta-toggle').addEventListener('click', () => {
+  showChanges = !showChanges;
+  try { localStorage.setItem('rideTrendChanges', showChanges ? 'on' : 'off'); } catch (e) {}
+  applyChangeToggle();
+});
+applyChangeToggle();
+
+document.querySelectorAll('#group-picker .group-btn[data-group]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    trendGroup = btn.dataset.group;
+    try { localStorage.setItem('rideTrendGroup', trendGroup); } catch (e) {}
+    renderWeekly(currentRides);
+  });
+});
 
 function computeRouteHistory(rides) {
   const map = new Map();

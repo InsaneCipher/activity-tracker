@@ -471,3 +471,55 @@ td.no-match{text-align:center;color:var(--muted);padding:28px 10px;font-family:v
   .f-range input[type="date"]{flex:1;width:auto;}
   .f-footer{margin-left:0;width:100%;justify-content:space-between;}
 }
+
+/* Trends: totals by period */
+.trend-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+.trend-head .section-title{margin:0;}
+.group-picker{display:flex;gap:4px;flex-wrap:wrap;}
+.group-btn{
+  font-family:var(--display);
+  font-size:0.8rem;
+  color:var(--muted);
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:3px 11px;
+  cursor:pointer;
+}
+.group-btn:hover{color:var(--text);border-color:var(--line-strong);}
+.group-btn.active{color:var(--power);border-color:var(--power);background:var(--panel-hover);}
+.trend-table td.num{white-space:nowrap;}
+.trend-val{display:inline-block;white-space:nowrap;}
+.delta{
+  display:inline-block;
+  min-width:4.2em;
+  margin-left:8px;
+  font-size:0.68rem;
+  text-align:left;
+}
+.delta.up{color:#3DDC84;}
+.delta.down{color:#FF6B6B;}
+.delta.flat{color:var(--muted);}
+.delta.pending{color:var(--muted);}
+.group-sep{width:1px;background:var(--line);margin:2px 4px;}
+.group-btn.toggle.active{color:var(--text);border-color:var(--line-strong);background:var(--panel-hover);}
+.group-btn.toggle:not(.active){text-decoration:line-through;opacity:0.75;}
+.hide-changes .delta,
+.hide-changes .delta-note{display:none;}
+.so-far{
+  font-family:var(--display);
+  font-size:0.66rem;
+  color:var(--muted);
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:0 5px;
+  margin-left:6px;
+}
+.chart-note{color:var(--muted);font-size:0.72rem;margin-top:10px;}

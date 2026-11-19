@@ -156,20 +156,34 @@
     </div>
 
     <div id="trends-view" class="view">
-        <div class="section-title">Weekly totals</div>
+        <div class="trend-head">
+            <div class="section-title" id="trend-title">Weekly totals</div>
+            <div class="group-picker" id="group-picker" role="group" aria-label="Group totals by">
+                <button type="button" class="group-btn active" data-group="week">Week</button>
+                <button type="button" class="group-btn" data-group="month">Month</button>
+                <button type="button" class="group-btn" data-group="quarter">3 months</button>
+                <button type="button" class="group-btn" data-group="half">6 months</button>
+                <button type="button" class="group-btn" data-group="year">Year</button>
+                <span class="group-sep"></span>
+                <button type="button" class="group-btn toggle" id="delta-toggle" aria-pressed="true">% change</button>
+            </div>
+        </div>
         <div class="table-wrap">
-            <table class="simple-table">
+            <table class="simple-table trend-table">
                 <thead>
                 <tr>
-                    <th>Week of</th>
+                    <th id="trend-period-head">Week of</th>
                     <th class="num">Rides</th>
                     <th class="num">Km</th>
                     <th class="num">Time</th>
+                    <th class="num power">Avg watts</th>
+                    <th class="num power">Max watts</th>
                 </tr>
                 </thead>
                 <tbody id="weekly-body"></tbody>
             </table>
         </div>
+        <div class="chart-note"><span class="delta-note">▲▼ compare with the previous period; a fall in the current, unfinished period shows in grey. </span>Avg watts is weighted by ride time.</div>
 
         <div class="section-title">By route</div>
         <div class="table-wrap">
