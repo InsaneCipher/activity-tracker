@@ -271,6 +271,44 @@
       "bike": "Renpho Smart S",
       "app": "Rouvy",
       "device": "Rouvy"
+    },
+    {
+      "date": "2026-11-19",
+      "time": "16:34",
+      "map_name": "Budapest - Capital of Hungary",
+      "distance_km": 13.0,
+      "moving_time": "28:22",
+      "elevation_m": 39,
+      "relative_effort": 45,
+      "weighted_avg_power_w": 145,
+      "total_work_kj": 245,
+      "training_load": 38,
+      "intensity_pct": 91,
+      "speed_avg_kmh": 27.5,
+      "speed_max_kmh": 36.4,
+      "heart_rate_avg_bpm": 159,
+      "heart_rate_max_bpm": 177,
+      "cadence_avg": 68,
+      "cadence_max": 79,
+      "power_avg_w": 144,
+      "power_max_w": 230,
+      "calories": 234,
+      "ftp": 160,
+      "url": "https://www.strava.com/activities/21048861020",
+      "elapsed_time": "28:22",
+      "zones": {
+        "recovery_sec": 21,
+        "endurance_sec": 58,
+        "tempo_sec": 964,
+        "threshold_sec": 485,
+        "vo2max_sec": 136,
+        "anaerobic_sec": 39,
+        "neuromuscular_sec": 0
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Smart S",
+      "app": "Rouvy",
+      "device": "Rouvy"
     }
   ]
 }
