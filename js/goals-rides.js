@@ -56,3 +56,6 @@ window.GOAL_CONFIG = {
   weeklyMetrics: GOAL_METRICS,
   years: RIDE_YEAR_GOALS,
 };
+
+// Also listed by name, so the homepage can show both logs' goals.
+(window.GOAL_CONFIGS ||= {}).rides = window.GOAL_CONFIG;

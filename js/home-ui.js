@@ -19,6 +19,7 @@
   Promise.allSettled([loadAll('ride_data', 'rides'), loadAll('walk_data', 'walks')]).then(([r, w]) => {
     const rides = r.status === 'fulfilled' ? r.value : [];
     const walks = w.status === 'fulfilled' ? w.value : [];
+    if (window.renderHomeGoals) renderHomeGoals(rides, walks);   // js/home-goals.js
     const km = document.getElementById('hero-km');
     const sub = document.getElementById('hero-sub');
     if (!rides.length && !walks.length) {

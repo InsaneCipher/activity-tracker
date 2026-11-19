@@ -31,7 +31,7 @@ function mondayOf(d) {
 }
 const isoDay = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
-function weekTotals(rides) {
+function weekTotals(rides, c = cfg) {
   // Totals for every week from your first activity (or GOAL_WEEKS ago,
   // whichever is earlier) up to this week, keyed by the Monday's date.
   const thisMonday = mondayOf(new Date());
@@ -44,14 +44,14 @@ function weekTotals(rides) {
   const weeks = [];
   for (const d = new Date(first); d <= thisMonday; d.setDate(d.getDate() + 7)) {
     const totals = {};
-    cfg.weeklyMetrics.forEach(m => { totals[m.key] = 0; });
+    c.weeklyMetrics.forEach(m => { totals[m.key] = 0; });
     weeks.push({ start: new Date(d), key: isoDay(d), totals });
   }
   const byKey = new Map(weeks.map(w => [w.key, w]));
   rides.forEach(r => {
     if (!r.date) return;
     const w = byKey.get(isoDay(mondayOf(new Date(r.date + 'T00:00'))));
-    if (w) cfg.weeklyMetrics.forEach(m => { w.totals[m.key] += m.get(r); });
+    if (w) c.weeklyMetrics.forEach(m => { w.totals[m.key] += m.get(r); });
   });
   return weeks;
 }
@@ -330,22 +330,31 @@ function ringSegments(hit, total) {
   return `<svg viewBox="0 0 72 72" aria-hidden="true">${out}</svg>`;
 }
 
+// How many of this week's goals and this year's goals are done, for any
+// page's goals (c), e.g. { weekHit: 2, weekTotal: 5, year: 2026, yearHit: 2, yearTotal: 8 }.
+// The year is the current calendar year's goals, or the latest year before it.
+function goalSummary(items, c = cfg) {
+  const weeks = weekTotals(items, c);
+  const now = weeks[weeks.length - 1];
+  const years = Object.keys(c.years).map(Number).sort();
+  const thisYear = new Date().getFullYear();
+  const year = c.years[thisYear] ? thisYear : (years.filter(y => y <= thisYear).pop() || years[0]);
+  const inYear = yearRides(items, year);
+  const yearGoals = c.years[year].goals;
+  return {
+    weekHit: c.weeklyMetrics.filter(m => now.totals[m.key] >= c.weeklyTargets[m.key]).length,
+    weekTotal: c.weeklyMetrics.length,
+    year,
+    yearHit: yearGoals.filter(g => yearGoalProgress(g, inYear).reached).length,
+    yearTotal: yearGoals.length,
+  };
+}
+
 function renderGoalBadge(rides) {
   const box = document.getElementById('hero-goals');
   if (!box) return;
-
-  // This week
-  const weeks = weekTotals(rides);
-  const now = weeks[weeks.length - 1];
-  const weekHit = cfg.weeklyMetrics.filter(m => now.totals[m.key] >= cfg.weeklyTargets[m.key]).length;
-  const weekTotal = cfg.weeklyMetrics.length;
-
-  // This year (the current calendar year's goals, or the latest year before it)
-  const thisYear = new Date().getFullYear();
-  const year = YEAR_GOALS[thisYear] ? thisYear : (goalYears.filter(y => y <= thisYear).pop() || goalYears[0]);
-  const inYear = yearRides(rides, year);
-  const yearGoals = YEAR_GOALS[year].goals;
-  const yearHit = yearGoals.filter(g => yearGoalProgress(g, inYear).reached).length;
+  const { weekHit, weekTotal, year, yearHit, yearTotal } = goalSummary(rides);
+  const yearGoals = { length: yearTotal };
 
   const item = (hit, total, label, sub, kind) => `
     <button type="button" class="hg-item ${kind}${hit === total ? ' all' : ''}" data-open-goals>

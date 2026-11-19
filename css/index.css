@@ -41,6 +41,17 @@
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .card-last b{color:var(--ink);font-weight:700;}
+/* Goals done, under each card (js/home-goals.js) */
+.card-goals{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;}
+.cg-item{display:inline-flex;align-items:center;gap:8px;padding:5px 12px 5px 6px;border-radius:999px;background:var(--bg-deep);font-size:0.8rem;color:var(--ink-2);}
+.cg-item b{color:var(--ink);font-weight:800;}
+.cg-ring{width:26px;height:26px;flex:none;}
+.cg-ring svg{display:block;width:100%;height:100%;}
+.cg-ring path{fill:none;stroke:#D5DBE4;stroke-width:8;stroke-linecap:round;}
+.cg-item.week .cg-ring path.on{stroke:#F2B705;}
+.cg-item.year .cg-ring path.on{stroke:var(--sprint);}
+.cg-item.week.all{background:rgba(255,207,51,0.22);}
+.cg-item.year.all{background:rgba(30,158,119,0.14);}
 
 /* ---------------- Calendar (sizes match js/index.js) ---------------- */
 .calendar-wrap{
