@@ -233,7 +233,21 @@ a{color:inherit;}
 .yp-bar i{display:block;height:100%;background:var(--sprint);border-radius:999px;}
 .year-goals{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:14px;}
 .yg-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;}
-.yg-card.done{border-color:var(--jersey);box-shadow:0 0 0 2px rgba(255,207,51,0.35);}
+/* Completed year goals: an orange-gold border with a glint of light travelling slowly
+   round it. The border is a rotating conic gradient behind the card's own
+   background; browsers without @property just show it still. */
+@property --glint{syntax:'<angle>';inherits:false;initial-value:0deg;}
+.yg-card.done{
+  border:3px solid transparent;
+  padding:14px 16px;   /* keeps the content in place with the thicker border */
+  background:
+    linear-gradient(160deg, #FFF3D6, #FFFBF0 70%) padding-box,   /* a warm tint inside */
+    conic-gradient(from var(--glint), #C9730A 0deg, #E8901A 25deg, #F2A900 60deg, #FFC400 100deg, #F2A900 140deg, #E8901A 175deg, #C9730A 235deg, #E8901A 300deg, #C9730A 360deg) border-box;
+  box-shadow:0 6px 20px -10px rgba(214,124,10,0.55);
+  animation:glint 6s linear infinite;
+}
+@keyframes glint{to{--glint:360deg;}}
+@media (prefers-reduced-motion: reduce){ .yg-card.done{animation:none;} }
 .yg-head{display:flex;justify-content:space-between;align-items:baseline;}
 .yg-pct{font-weight:800;font-size:0.85rem;color:var(--ink-2);}
 .yg-card.has-note{cursor:help;}
