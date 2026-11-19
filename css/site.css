@@ -237,6 +237,31 @@ td.no-match{text-align:center;color:var(--muted);padding:32px 12px;}
 }
 .f-reset:hover{background:var(--ink);color:#fff;border-color:var(--ink);}
 .filter-bar + .table-wrap{margin-top:14px;}
+/* Columns picker (js/column-picker.js) */
+.col-picker{position:relative;}
+.col-picker-btn{
+  height:36px;padding:0 14px;cursor:pointer;white-space:nowrap;
+  font:600 0.84rem var(--font);color:var(--ink);
+  background:var(--bg-deep);border:1px solid transparent;border-radius:10px;
+}
+.col-picker-btn:hover{border-color:var(--line-strong);}
+.col-picker-btn[aria-expanded="true"]{border-color:var(--ink);background:#fff;}
+.col-picker-count:not(:empty){margin-left:7px;background:var(--jersey);color:var(--ink);padding:1px 7px;border-radius:999px;font-weight:800;font-size:0.78rem;}
+.col-picker-panel{
+  position:absolute;right:0;top:calc(100% + 6px);z-index:20;
+  min-width:190px;max-height:60vh;overflow-y:auto;
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  box-shadow:0 10px 28px rgba(21,35,63,0.16);padding:6px;
+}
+.col-picker-item{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;font-size:0.84rem;color:var(--ink);cursor:pointer;white-space:nowrap;}
+.col-picker-item:hover{background:var(--panel-hover);}
+.col-picker-item input{width:16px;height:16px;margin:0;accent-color:var(--ink);cursor:pointer;}
+.col-picker-reset{
+  display:block;width:100%;margin-top:4px;padding:8px 9px;cursor:pointer;text-align:left;
+  font:600 0.8rem var(--font);color:var(--ink-2);
+  background:none;border:0;border-top:1px solid var(--line);border-radius:0 0 8px 8px;
+}
+.col-picker-reset:hover{color:var(--ink);}
 
 /* ---------------- Graphs ---------------- */
 .metric-picker{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
@@ -337,6 +362,8 @@ td.no-match{text-align:center;color:var(--muted);padding:32px 12px;}
   .totals{grid-template-columns:repeat(3, minmax(0, 1fr));}
 }
 @media (max-width: 640px){
+  .f-footer{flex-wrap:wrap;height:auto;margin-left:0;width:100%;}
+  .f-count{flex-basis:100%;}
   .group-picker{width:100%;}
   .group-btn{flex:1 1 auto;padding:6px 6px;white-space:nowrap;}
   .trend-controls{width:100%;justify-content:space-between;}

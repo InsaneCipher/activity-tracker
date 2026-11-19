@@ -42,4 +42,7 @@
       { animate: !animated, markLongest: true });
     animated = true;
   }
+
+  // Columns button in the filter bar (js/column-picker.js).
+  makeColumnPicker({ table: '#walk-table', mount: '#col-picker', storageKey: 'walkHiddenCols', keep: ['idx', 'date', 'name'] });
 })();

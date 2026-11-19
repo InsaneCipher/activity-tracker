@@ -14,6 +14,8 @@
 .bike-key-count{color:var(--muted);margin-left:5px;}
 .bike-key-sep{width:1px;align-self:stretch;background:var(--line-strong);}
 .bike-icon{width:16px;height:16px;vertical-align:-3px;margin-right:7px;}
+/* Country flags (images/flags/<code>.png) */
+.flag{width:20px;height:14px;object-fit:cover;vertical-align:-2px;margin-right:8px;border-radius:2px;box-shadow:0 0 0 1px rgba(21,35,63,0.14);}
 
 /* ---------------- Ride table ---------------- */
 #ride-table{min-width:1200px;table-layout:fixed;}

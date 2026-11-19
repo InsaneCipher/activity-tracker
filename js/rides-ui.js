@@ -40,4 +40,7 @@
 
   // Long route names slide inside their cell (js/name-scroll.js).
   const scrollLongNames = makeNameScroller('#rides', 'table-view', () => { if (currentRides.length) renderRows(); });
+
+  // Columns button in the filter bar (js/column-picker.js).
+  makeColumnPicker({ table: '#ride-table', mount: '#col-picker', storageKey: 'rideHiddenCols', keep: ['idx', 'date', 'route'] });
 })();

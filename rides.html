@@ -14,8 +14,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/site.css?v=2026-11-19e">
-    <link rel="stylesheet" href="css/rides.css?v=2026-11-19e">
+    <link rel="stylesheet" href="css/site.css?v=2026-11-19k">
+    <link rel="stylesheet" href="css/rides.css?v=2026-11-19k">
 </head>
 <body>
 <header class="hero">
@@ -111,6 +111,7 @@
                         <option value="all">All</option>
                     </select>
                 </label>
+                <div id="col-picker"></div>
                 <button type="button" class="f-reset" id="f-reset">Reset</button>
             </div>
         </div>
@@ -210,13 +211,22 @@
         </div>
         <div class="chart-note"><span class="delta-note">▲▼ compare with the previous period; a fall in the current, unfinished period shows in grey. </span>Avg watts is weighted by ride time.</div>
 
-        <div class="section-title">By route</div>
+        <div class="trend-head">
+            <div class="section-title" id="route-title">By route</div>
+            <div class="group-picker" id="route-picker" role="group" aria-label="Group rides by">
+                <button type="button" class="group-btn active" data-group="route">Route</button>
+                <button type="button" class="group-btn" data-group="country">Country</button>
+                <button type="button" class="group-btn" data-group="continent">Continent</button>
+            </div>
+        </div>
         <div class="table-wrap">
             <table class="simple-table">
                 <thead>
                 <tr>
-                    <th>Route</th>
+                    <th id="route-head-name">Route</th>
+                    <th class="num" id="route-head-routes" hidden>Routes</th>
                     <th class="num">Times ridden</th>
+                    <th class="num">Total km</th>
                     <th class="num">Best avg speed</th>
                     <th>Last ridden</th>
                 </tr>
@@ -228,9 +238,10 @@
 
     <footer class="page-foot">Synced from Strava every 15 minutes.</footer>
 </main>
-<script src="js/rides.js?v=2026-11-19e"></script>
-<script src="js/hero.js?v=2026-11-19e"></script>
-<script src="js/name-scroll.js?v=2026-11-19e"></script>
-<script src="js/rides-ui.js?v=2026-11-19e"></script>
+<script src="js/rides.js?v=2026-11-19k"></script>
+<script src="js/hero.js?v=2026-11-19k"></script>
+<script src="js/name-scroll.js?v=2026-11-19k"></script>
+<script src="js/column-picker.js?v=2026-11-19k"></script>
+<script src="js/rides-ui.js?v=2026-11-19k"></script>
 </body>
 </html>

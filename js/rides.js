@@ -29,7 +29,7 @@ function formatDuration(totalSeconds) {
 function renderTotals(rides) {
   const totalDist = rides.reduce((s, r) => s + (r.distance_km || 0), 0);
   const totalCals = rides.reduce((s, r) => s + (r.calories || 0), 0);
-  const totalKj = rides.reduce((s, r) => s + (r.total_work_kj || 0), 0);
+  const countries = new Set(rides.map(countryOf).filter(Boolean)).size;
   const totalTime = rides.reduce((s, r) => s + parseDuration(r.moving_time), 0);
   const totalElevation = rides.reduce((s, r) => s + (r.elevation_m || 0), 0);
 
@@ -39,7 +39,7 @@ function renderTotals(rides) {
     <div class="total-cell"><div class="num">${formatDuration(totalTime)}</div><div class="label">Time in the saddle</div></div>
     <div class="total-cell"><div class="num">${totalElevation}</div><div class="label">Total elevation (m)</div></div>
     <div class="total-cell"><div class="num">${totalCals}</div><div class="label">Calories burned</div></div>
-    <div class="total-cell"><div class="num">${totalKj}</div><div class="label">Total work (kJ)</div></div>
+    <div class="total-cell"><div class="num">${countries}</div><div class="label">Countries ridden in</div></div>
   `;
 }
 
@@ -153,7 +153,53 @@ function renderBikeKey(rides) {
 /* ---------------- Filters ---------------- */
 // Route names look like "Al Wathba-L (Arabia)": the route is the part before
 // the brackets and the country is the part inside them.
-const countryOf = r => ((r.map_name || '').match(/\(([^()]+)\)\s*$/) || [])[1] || '';
+// MyWhoosh names some worlds after a place or region rather than a country;
+// those are shown under the real country. Add more here if a new one turns up.
+const COUNTRY_RENAMES = {
+  Hudayriyat: 'United Arab Emirates',   // an island in Abu Dhabi
+  Arabia: 'United Arab Emirates',       // MyWhoosh's Arabia world: the UAE's seven emirates (plus one Bahrain route)
+};
+// Routes whose real country differs from their world's - checked first.
+const ROUTE_COUNTRIES = {
+  'Tour Of Hegra': 'Saudi Arabia',      // from the AlUla world, but labelled "(Arabia)"
+  'Bahrain': 'Bahrain',
+};
+const bracketOf = r => ((r.map_name || '').match(/\(([^()]+)\)\s*$/) || [])[1] || '';
+const routeNameOf = r => (r.map_name || '').replace(/\s*\([^()]*\)\s*$/, '').trim();
+const countryOf = r => ROUTE_COUNTRIES[routeNameOf(r)] || COUNTRY_RENAMES[bracketOf(r)] || bracketOf(r);
+
+// Flags: images/flags/<code>.png, named by two-letter country code (ch.png).
+// The browser knows every country's English name, so any country - including
+// ones you haven't ridden yet - finds its flag without a list to keep up.
+// Short or unofficial names the browser wouldn't recognise go in FLAG_ALIASES.
+const FLAG_ALIASES = {
+  uae: 'ae', usa: 'us', us: 'us', uk: 'gb', 'great britain': 'gb', britain: 'gb',
+  england: 'gb-eng', scotland: 'gb-sct', wales: 'gb-wls', 'northern ireland': 'gb-nir',
+  'south korea': 'kr', korea: 'kr', russia: 'ru', 'czech republic': 'cz', holland: 'nl',
+  turkey: 'tr', 'ivory coast': 'ci',
+};
+const FLAG_CODES = (() => {
+  const codes = { ...FLAG_ALIASES };
+  try {
+    const names = new Intl.DisplayNames(['en'], { type: 'region' });
+    const A = 65;
+    for (let i = 0; i < 26; i++) {
+      for (let j = 0; j < 26; j++) {
+        const code = String.fromCharCode(A + i, A + j);
+        let name;
+        try { name = names.of(code); } catch (e) { continue; }
+        if (name && name !== code && !codes[name.toLowerCase()]) codes[name.toLowerCase()] = code.toLowerCase();
+      }
+    }
+  } catch (e) { /* very old browser: aliases only */ }
+  return codes;
+})();
+function flagImg(country) {
+  const code = country && FLAG_CODES[country.toLowerCase()];
+  if (!code) return '';
+  // A missing image just disappears rather than showing a broken icon.
+  return `<img class="flag" src="images/flags/${code}.png" alt="" title="${country}" onerror="this.remove()">`;
+}
 const routeOf = r => (r.map_name || '').replace(/\s*\([^()]*\)\s*$/, '').trim() || '—';
 
 const FILTER_INPUTS = ['f-search', 'f-route', 'f-country', 'f-bike', 'f-app', 'f-km-min', 'f-km-max',
@@ -731,37 +777,84 @@ document.querySelectorAll('#group-picker .group-btn[data-group]').forEach(btn =>
   });
 });
 
-function computeRouteHistory(rides) {
+// Which continent each country (the part in brackets) is in. MyWhoosh names
+// some worlds after a region ("Arabia") or an island ("Hudayriyat"), so those
+// are listed too. Add new countries here as you ride them.
+const CONTINENTS = {
+  Europe: ['Switzerland', 'France', 'Belgium', 'Hungary', 'Ireland', 'Italy', 'Spain', 'Netherlands',
+           'Germany', 'Austria', 'United Kingdom', 'UK', 'England', 'Scotland', 'Wales', 'Norway',
+           'Portugal', 'Denmark', 'Sweden', 'Czechia', 'Poland', 'Croatia', 'Slovenia', 'Monaco', 'Andorra'],
+  Asia: ['Arabia', 'Hudayriyat', 'United Arab Emirates', 'Bahrain', 'Bhutan', 'Japan', 'China', 'India', 'Nepal', 'UAE', 'Oman',
+         'Qatar', 'Saudi Arabia', 'Jordan', 'Thailand', 'Vietnam', 'South Korea', 'Korea', 'Indonesia'],
+  'North America': ['USA', 'United States', 'Canada', 'Mexico'],
+  'South America': ['Brazil', 'Colombia', 'Argentina', 'Chile', 'Peru'],
+  Africa: ['Morocco', 'South Africa', 'Kenya', 'Egypt', 'Rwanda'],
+  Oceania: ['Australia', 'New Zealand'],
+};
+const CONTINENT_OF = Object.fromEntries(
+  Object.entries(CONTINENTS).flatMap(([cont, list]) => list.map(c => [c.toLowerCase(), cont])));
+const continentOf = r => CONTINENT_OF[countryOf(r).toLowerCase()] || (countryOf(r) ? 'Other' : 'Unknown');
+
+const ROUTE_GROUPS = {
+  route:     { title: 'By route',     head: 'Route',     key: r => r.map_name || 'Unknown', flag: r => countryOf(r) },
+  country:   { title: 'By country',   head: 'Country',   key: r => countryOf(r) || 'Unknown', flag: r => countryOf(r) },
+  continent: { title: 'By continent', head: 'Continent', key: continentOf },
+};
+let routeGroup = 'route';
+try { if (ROUTE_GROUPS[localStorage.getItem('rideRouteGroup')]) routeGroup = localStorage.getItem('rideRouteGroup'); } catch (e) {}
+
+function computeRouteHistory(rides, group = routeGroup) {
+  const g = ROUTE_GROUPS[group];
+  const keyOf = g.key;
   const map = new Map();
   rides.forEach(r => {
-    const key = r.map_name || 'Unknown';
-    if (!map.has(key)) map.set(key, { name: key, count: 0, bestSpeed: null, lastDate: null });
+    const key = keyOf(r);
+    if (!map.has(key)) map.set(key, { name: key, flag: g.flag ? g.flag(r) : '', count: 0, km: 0, routes: new Set(), bestSpeed: null, lastDate: null });
     const entry = map.get(key);
     entry.count++;
+    entry.km += r.distance_km || 0;
+    entry.routes.add(r.map_name || 'Unknown');
     if (r.speed_avg_kmh != null && (entry.bestSpeed === null || r.speed_avg_kmh > entry.bestSpeed)) {
       entry.bestSpeed = r.speed_avg_kmh;
     }
     if (r.date && (!entry.lastDate || r.date > entry.lastDate)) entry.lastDate = r.date;
   });
-  return Array.from(map.values()).sort((a, b) => b.count - a.count);
+  return Array.from(map.values()).sort((a, b) => b.count - a.count || b.km - a.km);
 }
 
 function renderRouteHistory(rides) {
+  const g = ROUTE_GROUPS[routeGroup];
+  const grouped = routeGroup !== 'route';
+  document.getElementById('route-title').textContent = g.title;
+  document.getElementById('route-head-name').textContent = g.head;
+  document.getElementById('route-head-routes').hidden = !grouped;
+  document.querySelectorAll('#route-picker .group-btn').forEach(b => b.classList.toggle('active', b.dataset.group === routeGroup));
+
   const routes = computeRouteHistory(rides);
   const body = document.getElementById('route-body');
   if (!routes.length) {
-    body.innerHTML = `<tr><td colspan="4" class="chart-empty">No data yet.</td></tr>`;
+    body.innerHTML = `<tr><td colspan="6" class="chart-empty">No data yet.</td></tr>`;
     return;
   }
   body.innerHTML = routes.map(rt => `
     <tr>
-      <td class="name">${rt.name}</td>
+      <td class="name">${flagImg(rt.flag)}${window.SeasonHero ? SeasonHero.esc(rt.name) : rt.name}</td>
+      ${grouped ? `<td class="num">${rt.routes.size}</td>` : ''}
       <td class="num">${rt.count}</td>
+      <td class="num">${rt.km.toFixed(1)}</td>
       <td class="num">${rt.bestSpeed != null ? rt.bestSpeed.toFixed(1) + ' km/h' : '—'}</td>
       <td class="muted">${rt.lastDate || '—'}</td>
     </tr>
   `).join('');
 }
+
+document.querySelectorAll('#route-picker .group-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    routeGroup = btn.dataset.group;
+    try { localStorage.setItem('rideRouteGroup', routeGroup); } catch (e) {}
+    renderRouteHistory(currentRides);
+  });
+});
 
 /* ---------------- Boot ---------------- */
 // Rides from all monthly files, oldest first.
