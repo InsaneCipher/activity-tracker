@@ -4,30 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Ride Log</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="icon" href="favicon/favicon.ico?v=3" sizes="any">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png?v=3">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png?v=3">
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png?v=3">
     <link rel="manifest" href="favicon/site.webmanifest?v=3">
     <meta name="apple-mobile-web-app-title" content="Activity Log">
-    <meta name="theme-color" content="#281C4A">
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
-          rel="stylesheet">
+    <meta name="theme-color" content="#15233F">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/site.css">
     <link rel="stylesheet" href="css/rides.css">
 </head>
 <body>
-<div class="wrap">
-    <div class="top-row">
-        <h1>Ride Log</h1>
-        <div class="page-links">
-            <a class="page-link" href="index.html">Home</a>
-            <a class="page-link" href="walks.html">Walk Log</a>
+<header class="hero">
+    <div class="hero-inner">
+        <nav class="topbar" aria-label="Pages">
+            <a class="brand" href="index.html"><img src="favicon/favicon-32x32.png?v=3" alt="" width="22" height="22">Activity Log</a>
+            <div class="nav">
+                <a href="index.html">Home</a>
+                <a href="rides.html" aria-current="page">Rides</a>
+                <a href="walks.html">Walks</a>
+            </div>
+        </nav>
+        <div class="hero-text">
+            <h1 class="hero-km" id="hero-km">Ride Log</h1>
+            <p class="hero-sub" id="hero-sub">Loading your season…</p>
         </div>
     </div>
-    <div class="subtitle">Virtual rides — MyWhoosh</div>
-    <div class="finish-line"></div>
+    <div class="hero-profile" id="hero-profile" aria-hidden="true"></div>
+</header>
 
+<main class="wrap">
     <div id="status"></div>
 
     <div id="picker-wrap">
@@ -94,6 +103,14 @@
             </div>
             <div class="f-footer">
                 <span class="f-count" id="f-count"></span>
+                <label class="f-show">Show
+                    <select id="f-limit">
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="all">All</option>
+                    </select>
+                </label>
                 <button type="button" class="f-reset" id="f-reset">Reset</button>
             </div>
         </div>
@@ -101,20 +118,20 @@
         <div class="table-wrap">
             <table id="ride-table">
                 <colgroup>
-                    <col class="col-idx">
-                    <col class="col-date">
-                    <col class="col-route">
-                    <col class="col-km">
-                    <col class="col-time">
-                    <col class="col-elev">
-                    <col class="col-watts">
-                    <col class="col-ftp">
-                    <col class="col-speed">
-                    <col class="col-hr">
-                    <col class="col-cad">
-                    <col class="col-cal">
-                    <col class="col-effort">
-                    <col class="col-zones">
+                    <col class="idx">
+                    <col class="date">
+                    <col class="route">
+                    <col class="km">
+                    <col class="time">
+                    <col class="elev">
+                    <col class="watts">
+                    <col class="ftp">
+                    <col class="speed">
+                    <col class="hr">
+                    <col class="cad">
+                    <col class="cal">
+                    <col class="effort">
+                    <col class="zones">
                 </colgroup>
                 <thead>
                 <tr>
@@ -167,6 +184,13 @@
                 <span class="group-sep"></span>
                 <button type="button" class="group-btn toggle" id="delta-toggle" aria-pressed="true">% change</button>
             </div>
+            <label class="trend-show">Show
+                <select id="trend-limit">
+                    <option value="12">12</option>
+                    <option value="24">24</option>
+                    <option value="all">All</option>
+                </select>
+            </label>
         </div>
         <div class="table-wrap">
             <table class="simple-table trend-table">
@@ -200,8 +224,12 @@
             </table>
         </div>
     </div>
-</div>
 
+    <footer class="page-foot">Synced from Strava every 15 minutes.</footer>
+</main>
 <script src="js/rides.js"></script>
+<script src="js/hero.js"></script>
+<script src="js/name-scroll.js"></script>
+<script src="js/rides-ui.js"></script>
 </body>
 </html>

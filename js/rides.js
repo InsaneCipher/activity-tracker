@@ -1,6 +1,13 @@
 let currentRides = [];
 let sortKey = 'date';
-let sortAsc = true;
+let sortAsc = false;   // newest first, so a row limit shows your latest rides
+
+// How many rows the ride table shows (the "Show" dropdown); remembered per browser.
+let rowLimit = 25;
+try {
+  const saved = localStorage.getItem('rideRowLimit');
+  if (saved) rowLimit = saved === 'all' ? Infinity : Number(saved) || 25;
+} catch (e) {}
 let activeMetric = 'power';
 
 const fmt = (v, unit = '') => (v === null || v === undefined) ? '—' : `${v}${unit}`;
@@ -213,17 +220,27 @@ function buildFilterOptions(rides) {
     .map(([k, n]) => [k, k, n]));
 }
 
-function updateFilterCount(shown) {
+function updateFilterCount(shown, listed) {
   const active = FILTER_INPUTS.some(id => filterValue(id) !== '');
   const km = shown.reduce((s, r) => s + (r.distance_km || 0), 0);
   const secs = shown.reduce((s, r) => s + parseDuration(r.moving_time), 0);
+  const limited = listed < shown.length ? ` (first ${listed} listed)` : '';
   document.getElementById('f-count').innerHTML = active
-    ? `Showing <b>${shown.length}</b> of ${currentRides.length} rides · ${km.toFixed(1)} km · ${formatDuration(secs)}`
-    : `${currentRides.length} rides`;
+    ? `Showing <b>${shown.length}</b> of ${currentRides.length} rides · ${km.toFixed(1)} km · ${formatDuration(secs)}${limited}`
+    : `${currentRides.length} rides${limited}`;
   document.getElementById('filter-bar').classList.toggle('filtering', active);
 }
 
 FILTER_INPUTS.forEach(id => document.getElementById(id).addEventListener('input', () => renderRows()));
+
+const limitSelect = document.getElementById('f-limit');
+limitSelect.value = rowLimit === Infinity ? 'all' : String(rowLimit);
+if (!limitSelect.value) { limitSelect.value = '25'; rowLimit = 25; }
+limitSelect.addEventListener('change', () => {
+  rowLimit = limitSelect.value === 'all' ? Infinity : Number(limitSelect.value);
+  try { localStorage.setItem('rideRowLimit', limitSelect.value); } catch (e) {}
+  renderRows();
+});
 document.getElementById('f-reset').addEventListener('click', () => {
   FILTER_INPUTS.forEach(id => { document.getElementById(id).value = ''; });
   renderRows();
@@ -233,10 +250,10 @@ function renderRows() {
   // Best values stay based on all rides, so a highlight always means an all-time best.
   const best = computeBestValues(currentRides);
   const shown = filteredRides();
-  updateFilterCount(shown);
 
   const sorted = shown.slice().sort((a, b) => {
     let av = a[sortKey], bv = b[sortKey];
+    if (sortKey === 'date') { av = `${a.date} ${a.time || ''}`; bv = `${b.date} ${b.time || ''}`; }
     if (av === null || av === undefined) av = sortAsc ? Infinity : -Infinity;
     if (bv === null || bv === undefined) bv = sortAsc ? Infinity : -Infinity;
     if (typeof av === 'string') return sortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
@@ -250,7 +267,10 @@ function renderRows() {
 
   const pair = (a, b, highlightA, highlightB) => `${val(a, '', highlightA)}<span class="pair-max${highlightB ? ' best-val' : ''}">/${fmt(b)}</span>`;
 
-  document.getElementById('rides').innerHTML = sorted.map((r, i) => `
+  const listed = sorted.slice(0, rowLimit);
+  updateFilterCount(shown, listed.length);
+
+  document.getElementById('rides').innerHTML = listed.map((r, i) => `
     <tr>
       <td class="idx">${i + 1}</td>
       <td class="muted date-cell">${fmt(r.date)}${r.time ? `<span class="ride-time">${r.time}</span>` : ''}</td>
@@ -557,6 +577,11 @@ const GROUPS = {
 };
 let trendGroup = 'week';
 let showChanges = true;
+let trendLimit = 12;     // how many periods the totals table lists (latest first)
+try {
+  const savedLimit = localStorage.getItem('rideTrendLimit');
+  if (savedLimit) trendLimit = savedLimit === 'all' ? Infinity : Number(savedLimit) || 12;
+} catch (e) {}
 try {
   trendGroup = GROUPS[localStorage.getItem('rideTrendGroup')] ? localStorage.getItem('rideTrendGroup') : 'week';
   showChanges = localStorage.getItem('rideTrendChanges') !== 'off';
@@ -646,7 +671,9 @@ function renderWeekly(rides) {
     return;
   }
   const current = dayKey(periodStart(dayKey(new Date()), group));
-  body.innerHTML = periods.map(p => {
+  // Only the latest periods are listed, but changes still compare with the
+  // previous period from the full totals.
+  body.innerHTML = periods.slice(0, trendLimit).map(p => {
     const prev = totals.get(dayKey(previousPeriodStart(p.start, group)));
     const inProgress = p.key === current;
     const cell = (text, cur, prevVal, cls = '') =>
@@ -679,6 +706,15 @@ function alignTrendValues() {
 }
 
 if (document.fonts) document.fonts.ready.then(() => alignTrendValues());   // web font changes widths
+
+const trendLimitSelect = document.getElementById('trend-limit');
+trendLimitSelect.value = trendLimit === Infinity ? 'all' : String(trendLimit);
+if (!trendLimitSelect.value) { trendLimitSelect.value = '12'; trendLimit = 12; }
+trendLimitSelect.addEventListener('change', () => {
+  trendLimit = trendLimitSelect.value === 'all' ? Infinity : Number(trendLimitSelect.value);
+  try { localStorage.setItem('rideTrendLimit', trendLimitSelect.value); } catch (e) {}
+  renderWeekly(currentRides);
+});
 
 document.getElementById('delta-toggle').addEventListener('click', () => {
   showChanges = !showChanges;

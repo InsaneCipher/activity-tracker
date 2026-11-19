@@ -137,7 +137,11 @@ function renderCalendar(all) {
     let days = '';
     const weekStart = new Date(start); weekStart.setDate(start.getDate() + w * 7);
     const m = weekStart.getMonth();
-    days += `<div class="cal-month">${m !== lastMonth && w < CAL_WEEKS - 1 ? weekStart.toLocaleDateString('en-GB', { month: 'short' }) : ''}</div>`;
+    // Label each month at its first week, except a month with fewer than three
+    // weeks showing at the left edge (its label would run into the next one).
+    const in3Weeks = new Date(weekStart); in3Weeks.setDate(weekStart.getDate() + 21);
+    const showLabel = m !== lastMonth && w < CAL_WEEKS - 1 && (w > 0 || in3Weeks.getMonth() === m);
+    days += `<div class="cal-month">${showLabel ? weekStart.toLocaleDateString('en-GB', { month: 'short' }) : ''}</div>`;
     lastMonth = m;
     for (let d = 0; d < 7; d++) {
       const day = new Date(weekStart); day.setDate(weekStart.getDate() + d);

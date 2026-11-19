@@ -1,360 +1,61 @@
+/* Walk Log - page-specific styles on top of site.css */
+
 :root{
-  --bg:#1C4A39;
-  --bg-deep:#17362A;
-  --panel:#12211C;
-  --panel-hover:#182A24;
-  --line:#2E5245;
-  --line-strong:#467262;
-  --text:#E6EEEA;
-  --muted:#87A096;
-  --pace:#4FB6A8;
-  --hr:#C1523B;
-  --speed:#E8B93F;
-  --steps:#9DB86A;
-  --best:#49fc03;
-  --display:'Oswald', sans-serif;
-  --mono:'IBM Plex Mono', monospace;
+  --accent:#3DDC97;       /* trail green: current nav pill and the hero line */
+  --pace:#1E9E77;
+  --speed:#2F6FD6;
+  --steps:#5B45E0;
+  --total-cols:7;
 }
-*{box-sizing:border-box;}
-body{
-  margin:0;
-  min-height:100vh;
-  color:var(--text);
-  font-family:var(--mono);
-  padding:48px 24px 80px;
-  background-color:var(--bg);
-}
-.wrap{max-width:1200px;margin:0 auto;}
+.hero-profile .ridge{stroke:#3DDC97;}
 
-.top-row{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;}
-h1{
-  font-family:var(--display);
-  font-weight:700;
-  font-size:2.4rem;
-  letter-spacing:0.01em;
-  margin:0 0 6px;
-}
-.page-link{
-  font-family:var(--display);
-  font-size:0.9rem;
-  color:var(--muted);
-  text-decoration:none;
-  border:1px solid var(--line);
-  border-radius:6px;
-  padding:2px 9px;
-}
-.page-link:hover{color:var(--text);border-color:var(--line-strong);}
-.page-links{display:flex;gap:8px;}
-.subtitle{color:var(--muted);font-size:0.92rem;margin-bottom:20px;}
-
-/* Signature detail: a trail of footsteps */
-.trail-line{
-  height:9px;
-  background-image: radial-gradient(circle at 4px 3px, var(--muted) 2.5px, transparent 3px),
-                    radial-gradient(circle at 13px 7px, var(--muted) 2.5px, transparent 3px);
-  background-size:18px 9px;
-  opacity:0.5;
-  margin-bottom:28px;
-}
-
-.totals{
-  display:flex;
-  flex-wrap:wrap;
-  border:1px solid var(--line);
-  background:var(--panel);
-  margin-bottom:36px;
-}
-.total-cell{
-  flex:1 1 0;
-  min-width:120px;
-  padding:18px 22px;
-  border-right:1px solid var(--line);
-}
-.total-cell:last-child{border-right:none;}
-.total-cell .num{
-  font-family:var(--mono);
-  font-size:1.55rem;
-  font-weight:600;
-}
-.total-cell .label{
-  font-family:var(--display);
-  font-weight:400;
-  font-size:0.8rem;
-  color:var(--muted);
-  margin-top:3px;
-  letter-spacing:0.01em;
-}
-
-/* Tabs */
-.tabs{
-  display:flex;
-  gap:4px;
-  border-bottom:1px solid var(--line);
-  margin-bottom:22px;
-}
-.tab-btn{
-  background:none;
-  border:none;
-  color:var(--muted);
-  font-family:var(--display);
-  font-weight:500;
-  font-size:0.95rem;
-  padding:10px 16px;
-  cursor:pointer;
-  border-bottom:2px solid transparent;
-  margin-bottom:-1px;
-}
-.tab-btn:hover{color:var(--text);}
-.tab-btn.active{color:var(--pace);border-bottom-color:var(--pace);}
-
-.view{display:none;}
-.view.active{display:block;}
-
-.table-wrap{
-  background:var(--panel);
-  border:1px solid var(--line);
-  overflow-x:auto;
-}
-table{
-  width:100%;
-  min-width:1130px;
-  table-layout:fixed;
-  border-collapse:collapse;
-  font-size:0.74rem;
-  white-space:nowrap;
-}
+/* ---------------- Walk table ---------------- */
+#walk-table{min-width:1300px;table-layout:fixed;}
+/* Column widths, one per column in table order. Keep the total at 100%:
+   if it goes over, the browser shrinks every column to fit. */
 col.idx{width:3%;}
-col.name{width:14%;}
-col.date{width:11%;}
-col.type{width:5%;}
-col.sm{width:6%;}
-col.xs{width:5%;}
-col.pair{width:8%;}
-col.splitcol{width:9%;}
-thead th{
-  text-align:left;
-  font-family:var(--display);
-  font-weight:500;
-  color:var(--muted);
-  font-size:0.72rem;
-  padding:8px 10px;
-  background:var(--panel);
-  border-bottom:1px solid var(--line);
-  position:sticky;
-  top:0;
-  cursor:pointer;
-  user-select:none;
-}
-thead th:hover{color:var(--text);}
-thead th.sorted{color:var(--pace);}
-tbody td{
-  padding:6px 10px;
-  border-bottom:1px solid var(--line);
-  line-height:1.4;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-tbody tr:nth-child(even){background:rgba(255,255,255,0.015);}
-tbody tr:hover{background:rgba(79,182,168,0.05);}
-tbody tr:last-child td{border-bottom:none;}
-td.idx{color:var(--muted);}
-td.date-cell .walk-time{
-  color:var(--muted);
-  font-size:0.85em;
-  margin-left:6px;
-}
-td.name{
-  font-family:var(--display);
-  font-weight:400;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-td.name a,
-td.name a:visited,
-td.name a:hover,
-td.name a:active{
-  color:inherit;
-  text-decoration:none;
-}
-td.num{text-align:left;font-variant-numeric:tabular-nums;}
-td.pace{color:var(--pace);}
-td.hr{color:var(--hr);}
+col.date{width:10%;}
+col.name{width:10%;}
+col.type{width:6%;}
+col.km{width:6%;}
+col.time{width:7%;}
+col.elev{width:5%;}
+col.pace{width:6%;}
+col.speed{width:7.5%;}
+col.hr{width:7.5%;}
+col.spm{width:4.5%;}
+col.steps{width:6%;}
+col.cal{width:5%;}
+col.effort{width:4.5%;}
+col.splits{width:7%;}
+.walk-time{color:var(--muted);font-size:0.9em;margin-left:6px;}
+td.pace{color:var(--pace);font-weight:600;}
+th.steps,th.pace{color:var(--ink-2);}
 td.speed{color:var(--speed);}
 td.steps{color:var(--steps);}
-td.muted{color:var(--muted);}
-.pair-max{color:var(--muted);font-size:0.9em;}
-.best-val{color:var(--best);}
+
 .type-tag{
-  font-family:var(--display);
-  font-size:0.68rem;
-  padding:1px 6px;
-  border:1px solid var(--line);
-  color:var(--muted);
+  display:inline-block;
+  font-size:0.72rem;font-weight:700;
+  padding:2px 9px;border-radius:999px;
+  background:#E1F5EE;color:#0F6E56;
 }
-.type-tag.hike{color:var(--steps);border-color:rgba(157,184,106,0.5);}
+.type-tag.hike{background:#ECE8FD;color:#4733C2;}
 
-/* Mini per-km split chart in the table */
-.mini-splits{
-  display:flex;
-  align-items:flex-end;
-  gap:1px;
-  height:16px;
-  width:100%;
-}
-.mini-split{flex:1 1 0;background:var(--pace);opacity:0.75;min-height:2px;}
-.mini-split.partial{opacity:0.3;}
+/* Speed of each km as a small bar chart */
+.mini-splits{display:flex;align-items:flex-end;gap:1px;height:18px;width:100%;}
+.mini-split{flex:1 1 0;background:var(--pace);min-height:2px;}
+.mini-split.partial{opacity:0.35;}
 
-/* Graph view */
-.metric-picker{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-  margin-bottom:22px;
-}
-.metric-btn{
-  background:var(--panel);
-  border:1px solid var(--line);
-  color:var(--muted);
-  font-family:var(--display);
-  font-weight:500;
-  font-size:0.82rem;
-  padding:6px 14px;
-  cursor:pointer;
-}
-.metric-btn:hover{color:var(--text);border-color:var(--line-strong);}
-.metric-btn.active{font-weight:600;}
+/* ---------------- Records ---------------- */
+/* Longest walk in trail green, most elevation in polka dots, pace and
+   fastest km in blue (order follows computeRecords in walks.js) */
+.record-card:nth-child(1)::before{background:var(--pace);}
+.record-card:nth-child(3)::before{background:radial-gradient(circle, var(--kom) 1.6px, #fff 1.8px) 0 0 / 7px 5px;}
+.record-card:nth-child(4)::before,
+.record-card:nth-child(5)::before{background:var(--speed);}
 
-.chart-wrap{
-  border:1px solid var(--line);
-  background:var(--panel);
-  padding:22px;
-  position:relative;
-}
-.chart-wrap svg{display:block;width:100%;height:auto;}
-.chart-empty{color:var(--muted);font-size:0.9rem;text-align:center;padding:60px 0;font-family:var(--display);}
-.chart-note{color:var(--muted);font-size:0.72rem;margin-top:10px;}
-
-#tooltip{
-  position:absolute;
-  display:none;
-  background:var(--bg-deep);
-  border:1px solid var(--line);
-  padding:6px 10px;
-  font-size:0.72rem;
-  pointer-events:none;
-  white-space:nowrap;
-  z-index:10;
-}
-#tooltip .t-date{color:var(--muted);}
-#tooltip .t-val{font-family:var(--mono);font-weight:700;}
-
-#picker-wrap{
-  display:none;
-  border:1px dashed var(--line);
-  padding:28px;
-  text-align:center;
-  color:var(--muted);
-  margin-bottom:32px;
-  font-size:0.85rem;
-}
-#picker-wrap.show{display:block;}
-#status{color:var(--muted);font-size:0.82rem;margin-bottom:22px;}
-
-@media (max-width: 640px){
-  body{padding:28px 14px 60px;}
-  h1{font-size:1.7rem;}
-  .subtitle{margin-bottom:16px;}
-  .trail-line{margin-bottom:20px;}
-  .totals{margin-bottom:24px;}
-  .total-cell{flex:1 1 45%;border-right:none;border-bottom:1px solid var(--line);padding:14px 16px;}
-  .total-cell .num{font-size:1.3rem;}
-  .total-cell .label{font-size:0.72rem;}
-  .tabs{margin-bottom:16px;}
-  .tab-btn{padding:8px 12px;font-size:0.85rem;}
-  .metric-btn{padding:5px 11px;font-size:0.76rem;}
-  .chart-wrap{padding:12px;}
-}
-
-/* Records view */
-.section-title{
-  font-family:var(--display);
-  font-weight:500;
-  font-size:1.05rem;
-  color:var(--text);
-  margin:36px 0 14px;
-}
-.section-title:first-child{margin-top:0;}
-.records-grid{
-  display:grid;
-  grid-template-columns:repeat(5, 1fr);
-  gap:1px;
-  background:var(--line);
-  border:1px solid var(--line);
-}
-.record-card{
-  background:var(--panel);
-  padding:16px 18px;
-  min-width:0;
-  overflow:hidden;
-}
-.record-value{
-  font-family:var(--mono);
-  font-size:1.3rem;
-  font-weight:600;
-  color:var(--best);
-}
-.record-label{
-  font-family:var(--display);
-  font-size:0.78rem;
-  color:var(--text);
-  margin-top:4px;
-}
-.record-meta{
-  font-size:0.68rem;
-  color:var(--muted);
-  margin-top:4px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  position:relative;
-}
-.record-meta-track{display:inline-block;}
-.record-meta.scrolling{text-overflow:clip;}
-.record-meta.scrolling .record-meta-track{animation:marquee-scroll linear infinite;}
-@keyframes marquee-scroll{
-  from{transform:translateX(0);}
-  to{transform:translateX(-50%);}
-}
-.zone-bar{
-  display:flex;
-  height:26px;
-  border:1px solid var(--line);
-  overflow:hidden;
-}
-.zone-seg{height:100%;}
-.zone-legend{
-  display:flex;
-  flex-wrap:wrap;
-  gap:14px;
-  margin-top:12px;
-  font-size:0.78rem;
-  color:var(--muted);
-}
-.zone-legend-item{display:flex;align-items:center;gap:6px;}
-.zone-dot{width:9px;height:9px;display:inline-block;}
-
-/* Trends view */
-.simple-table{
-  table-layout:auto !important;
-  min-width:auto !important;
-  white-space:normal !important;
-}
-.simple-table th, .simple-table td{white-space:nowrap;}
-
-@media (max-width: 640px){
-  .records-grid{grid-template-columns:repeat(2, 1fr);}
-  .record-card{padding:12px 14px;}
-  .record-value{font-size:1rem;}
-  .record-label{font-size:0.68rem;}
-  .record-meta{font-size:0.6rem;}
+/* Seven stats: the last one takes a full row when they wrap */
+@media (max-width: 900px){
+  .total-cell:nth-child(7){grid-column:1 / -1;}
 }

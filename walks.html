@@ -4,30 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Walk Log</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="icon" href="favicon/favicon.ico?v=3" sizes="any">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png?v=3">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png?v=3">
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png?v=3">
     <link rel="manifest" href="favicon/site.webmanifest?v=3">
     <meta name="apple-mobile-web-app-title" content="Activity Log">
-    <meta name="theme-color" content="#1C4A39">
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
-          rel="stylesheet">
+    <meta name="theme-color" content="#15233F">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/site.css">
     <link rel="stylesheet" href="css/walks.css">
 </head>
 <body>
-<div class="wrap">
-    <div class="top-row">
-        <h1>Walk Log</h1>
-        <div class="page-links">
-            <a class="page-link" href="index.html">Home</a>
-            <a class="page-link" href="rides.html">Ride Log</a>
+<header class="hero">
+    <div class="hero-inner">
+        <nav class="topbar" aria-label="Pages">
+            <a class="brand" href="index.html"><img src="favicon/favicon-32x32.png?v=3" alt="" width="22" height="22">Activity Log</a>
+            <div class="nav">
+                <a href="index.html">Home</a>
+                <a href="rides.html">Rides</a>
+                <a href="walks.html" aria-current="page">Walks</a>
+            </div>
+        </nav>
+        <div class="hero-text">
+            <h1 class="hero-km" id="hero-km">Walk Log</h1>
+            <p class="hero-sub" id="hero-sub">Loading your walks…</p>
         </div>
     </div>
-    <div class="subtitle">Walks &amp; hikes — Strava</div>
-    <div class="trail-line"></div>
+    <div class="hero-profile" id="hero-profile" aria-hidden="true"></div>
+</header>
 
+<main class="wrap">
     <div id="status"></div>
 
     <div id="picker-wrap">
@@ -47,6 +56,52 @@
     </div>
 
     <div id="table-view" class="view active">
+        <div class="filter-bar" id="filter-bar">
+            <div class="f-group f-grow">
+                <label for="f-search">Search</label>
+                <input type="search" id="f-search" placeholder="Walk name">
+            </div>
+            <div class="f-group">
+                <label for="f-type">Type</label>
+                <select id="f-type"><option value="">All types</option></select>
+            </div>
+            <div class="f-group">
+                <label for="f-km-min">Distance (km)</label>
+                <div class="f-range">
+                    <input type="number" id="f-km-min" placeholder="min" min="0" step="1" inputmode="decimal">
+                    <span>–</span>
+                    <input type="number" id="f-km-max" placeholder="max" min="0" step="1" inputmode="decimal">
+                </div>
+            </div>
+            <div class="f-group">
+                <label for="f-min-min">Time (min)</label>
+                <div class="f-range">
+                    <input type="number" id="f-min-min" placeholder="min" min="0" step="5" inputmode="numeric">
+                    <span>–</span>
+                    <input type="number" id="f-min-max" placeholder="max" min="0" step="5" inputmode="numeric">
+                </div>
+            </div>
+            <div class="f-group">
+                <label for="f-from">Date</label>
+                <div class="f-range">
+                    <input type="date" id="f-from">
+                    <span>–</span>
+                    <input type="date" id="f-to">
+                </div>
+            </div>
+            <div class="f-footer">
+                <span class="f-count" id="f-count"></span>
+                <label class="f-show">Show
+                    <select id="f-limit">
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="all">All</option>
+                    </select>
+                </label>
+                <button type="button" class="f-reset" id="f-reset">Reset</button>
+            </div>
+        </div>
         <div class="table-wrap">
             <table id="walk-table">
                 <colgroup>
@@ -54,17 +109,17 @@
                     <col class="date">
                     <col class="name">
                     <col class="type">
-                    <col class="sm">
-                    <col class="sm">
-                    <col class="xs">
-                    <col class="sm">
-                    <col class="pair">
-                    <col class="pair">
-                    <col class="xs">
-                    <col class="sm">
-                    <col class="xs">
-                    <col class="xs">
-                    <col class="splitcol">
+                    <col class="km">
+                    <col class="time">
+                    <col class="elev">
+                    <col class="pace">
+                    <col class="speed">
+                    <col class="hr">
+                    <col class="spm">
+                    <col class="steps">
+                    <col class="cal">
+                    <col class="effort">
+                    <col class="splits">
                 </colgroup>
                 <thead>
                 <tr>
@@ -111,42 +166,48 @@
     </div>
 
     <div id="trends-view" class="view">
-        <div class="section-title">Weekly totals</div>
+        <div class="trend-head">
+            <div class="section-title" id="trend-title">Weekly totals</div>
+            <div class="group-picker" id="group-picker" role="group" aria-label="Group totals by">
+                <button type="button" class="group-btn active" data-group="week">Week</button>
+                <button type="button" class="group-btn" data-group="month">Month</button>
+                <button type="button" class="group-btn" data-group="quarter">3 months</button>
+                <button type="button" class="group-btn" data-group="half">6 months</button>
+                <button type="button" class="group-btn" data-group="year">Year</button>
+                <span class="group-sep"></span>
+                <button type="button" class="group-btn toggle" id="delta-toggle" aria-pressed="true">% change</button>
+            </div>
+            <label class="trend-show">Show
+                <select id="trend-limit">
+                    <option value="12">12</option>
+                    <option value="24">24</option>
+                    <option value="all">All</option>
+                </select>
+            </label>
+        </div>
         <div class="table-wrap">
-            <table class="simple-table">
+            <table class="simple-table trend-table">
                 <thead>
                 <tr>
-                    <th>Week of</th>
+                    <th id="trend-period-head">Week of</th>
                     <th class="num">Walks</th>
                     <th class="num">Km</th>
                     <th class="num">Time</th>
-                    <th class="num">Steps</th>
+                    <th class="num">Elevation</th>
+                    <th class="num steps">Steps</th>
+                    <th class="num pace">Avg pace</th>
                 </tr>
                 </thead>
                 <tbody id="weekly-body"></tbody>
             </table>
         </div>
-
-        <div class="section-title">Monthly totals</div>
-        <div class="table-wrap">
-            <table class="simple-table">
-                <thead>
-                <tr>
-                    <th>Month</th>
-                    <th class="num">Walks</th>
-                    <th class="num">Km</th>
-                    <th class="num">Time</th>
-                    <th class="num">Elevation</th>
-                    <th class="num">Steps</th>
-                    <th class="num">Avg pace</th>
-                </tr>
-                </thead>
-                <tbody id="monthly-body"></tbody>
-            </table>
-        </div>
+        <div class="chart-note"><span class="delta-note">▲▼ compare with the previous period. For pace, a lower number is faster, so a fall shows in green; a fall in a running total during the current, unfinished period shows in grey. </span>Avg pace is total time divided by total distance.</div>
     </div>
-</div>
-
+    <footer class="page-foot">Synced from Strava every 15 minutes.</footer>
+</main>
 <script src="js/walks.js"></script>
+<script src="js/hero.js"></script>
+<script src="js/name-scroll.js"></script>
+<script src="js/walks-ui.js"></script>
 </body>
 </html>

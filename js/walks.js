@@ -1,6 +1,13 @@
 let currentWalks = [];
 let sortKey = 'date';
-let sortAsc = true;
+let sortAsc = false;   // newest first, so a row limit shows your latest walks
+
+// How many rows the walk table shows (the "Show" dropdown); remembered per browser.
+let rowLimit = 25;
+try {
+  const saved = localStorage.getItem('walkRowLimit');
+  if (saved) rowLimit = saved === 'all' ? Infinity : Number(saved) || 25;
+} catch (e) {}
 let activeMetric = 'pace';
 
 const fmt = (v, unit = '') => (v === null || v === undefined) ? '—' : `${v}${unit}`;
@@ -82,10 +89,75 @@ function miniSplits(splits) {
   return `<div class="mini-splits">${bars}</div>`;
 }
 
-function renderRows() {
-  const best = computeBestValues(currentWalks);
+/* ---------------- Filters ---------------- */
+const FILTER_INPUTS = ['f-search', 'f-type', 'f-km-min', 'f-km-max', 'f-min-min', 'f-min-max', 'f-from', 'f-to'];
+const filterValue = id => document.getElementById(id).value.trim();
+const filterNumber = id => { const v = filterValue(id); return v === '' ? null : Number(v); };
+const escapeHtml = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-  const sorted = currentWalks.slice().sort((a, b) => {
+function filteredWalks() {
+  const search = filterValue('f-search').toLowerCase();
+  const type = filterValue('f-type');
+  const kmMin = filterNumber('f-km-min'), kmMax = filterNumber('f-km-max');
+  const minMin = filterNumber('f-min-min'), minMax = filterNumber('f-min-max');
+  const from = filterValue('f-from'), to = filterValue('f-to');
+  return currentWalks.filter(w => {
+    const km = w.distance_km || 0;
+    const mins = movingSecs(w) / 60;
+    if (search && !(w.name || '').toLowerCase().includes(search)) return false;
+    if (type && typeOf(w) !== type) return false;
+    if (kmMin !== null && km < kmMin) return false;
+    if (kmMax !== null && km > kmMax) return false;
+    if (minMin !== null && mins < minMin) return false;
+    if (minMax !== null && mins > minMax) return false;
+    if (from && w.date < from) return false;
+    if (to && w.date > to) return false;
+    return true;
+  });
+}
+
+function buildFilterOptions(walks) {
+  const select = document.getElementById('f-type');
+  const current = select.value;
+  const counts = new Map();
+  walks.forEach(w => counts.set(typeOf(w), (counts.get(typeOf(w)) || 0) + 1));
+  select.innerHTML = '<option value="">All types</option>' + [...counts.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([t, n]) => `<option value="${escapeHtml(t)}">${escapeHtml(t)} (${n})</option>`).join('');
+  if ([...select.options].some(o => o.value === current)) select.value = current;
+}
+
+function updateFilterCount(shown, listed) {
+  const active = FILTER_INPUTS.some(id => filterValue(id) !== '');
+  const km = shown.reduce((s, w) => s + (w.distance_km || 0), 0);
+  const secs = shown.reduce((s, w) => s + movingSecs(w), 0);
+  const limited = listed < shown.length ? ` (first ${listed} listed)` : '';
+  document.getElementById('f-count').innerHTML = active
+    ? `Showing <b>${shown.length}</b> of ${currentWalks.length} walks · ${km.toFixed(1)} km · ${formatDuration(secs)}${limited}`
+    : `${currentWalks.length} walks${limited}`;
+  document.getElementById('filter-bar').classList.toggle('filtering', active);
+}
+
+FILTER_INPUTS.forEach(id => document.getElementById(id).addEventListener('input', () => renderRows()));
+document.getElementById('f-reset').addEventListener('click', () => {
+  FILTER_INPUTS.forEach(id => { document.getElementById(id).value = ''; });
+  renderRows();
+});
+const limitSelect = document.getElementById('f-limit');
+limitSelect.value = rowLimit === Infinity ? 'all' : String(rowLimit);
+if (!limitSelect.value) { limitSelect.value = '25'; rowLimit = 25; }
+limitSelect.addEventListener('change', () => {
+  rowLimit = limitSelect.value === 'all' ? Infinity : Number(limitSelect.value);
+  try { localStorage.setItem('walkRowLimit', limitSelect.value); } catch (e) {}
+  renderRows();
+});
+
+function renderRows() {
+  // Best values stay based on all walks, so a highlight always means an all-time best.
+  const best = computeBestValues(currentWalks);
+  const shown = filteredWalks();
+
+  const sorted = shown.slice().sort((a, b) => {
     let av = a[sortKey], bv = b[sortKey];
     if (sortKey === 'date') { av = `${a.date} ${a.time || ''}`; bv = `${b.date} ${b.time || ''}`; }
     if (av === null || av === undefined) av = sortAsc ? Infinity : -Infinity;
@@ -100,7 +172,10 @@ function renderRows() {
   };
   const pair = (a, b, highlightA, highlightB) => `${val(a, '', highlightA)}<span class="pair-max${highlightB ? ' best-val' : ''}">/${fmt(b)}</span>`;
 
-  document.getElementById('walks').innerHTML = sorted.map((w, i) => `
+  const listed = sorted.slice(0, rowLimit);
+  updateFilterCount(shown, listed.length);
+
+  document.getElementById('walks').innerHTML = listed.map((w, i) => `
     <tr>
       <td class="idx">${i + 1}</td>
       <td class="muted date-cell">${fmt(w.date)}${w.time ? `<span class="walk-time">${w.time}</span>` : ''}</td>
@@ -119,6 +194,10 @@ function renderRows() {
       <td>${miniSplits(w.splits)}</td>
     </tr>
   `).join('');
+  if (!listed.length) {
+    document.getElementById('walks').innerHTML =
+      `<tr><td colspan="15" class="no-match">No walks match these filters.</td></tr>`;
+  }
 
   document.querySelectorAll('#walk-table thead th[data-key]').forEach(th => {
     th.classList.toggle('sorted', th.dataset.key === sortKey);
@@ -130,7 +209,7 @@ function renderActiveView() {
   const active = document.querySelector('.view.active').id;
   if (active === 'graph-view') drawChart();
   if (active === 'records-view') { renderRecords(currentWalks); renderBreakdowns(currentWalks); }
-  if (active === 'trends-view') { renderWeekly(currentWalks); renderMonthly(currentWalks); }
+  if (active === 'trends-view') renderWeekly(currentWalks);
 }
 
 document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -418,20 +497,64 @@ function renderBreakdowns(walks) {
 }
 
 /* ---------------- Trends view ---------------- */
+/* ---------- Totals by period (week / month / 3 months / 6 months / year) ---------- */
+const GROUPS = {
+  week:    { title: 'Weekly totals',     head: 'Week of', months: 0 },
+  month:   { title: 'Monthly totals',    head: 'Month',   months: 1 },
+  quarter: { title: '3-monthly totals',  head: 'Period',  months: 3 },
+  half:    { title: '6-monthly totals',  head: 'Period',  months: 6 },
+  year:    { title: 'Yearly totals',     head: 'Year',    months: 12 },
+};
+let trendGroup = 'week';
+let showChanges = true;
+let trendLimit = 12;     // how many periods the totals table lists (latest first)
+try {
+  trendGroup = GROUPS[localStorage.getItem('walkTrendGroup')] ? localStorage.getItem('walkTrendGroup') : 'week';
+  showChanges = localStorage.getItem('walkTrendChanges') !== 'off';
+  const savedLimit = localStorage.getItem('walkTrendLimit');
+  if (savedLimit) trendLimit = savedLimit === 'all' ? Infinity : Number(savedLimit) || 12;
+} catch (e) {}
+
 function getWeekStart(dateStr) {
-  const d = new Date(dateStr);
-  const day = (d.getDay() + 6) % 7; // Monday = 0
-  d.setDate(d.getDate() - day);
-  d.setHours(0, 0, 0, 0);
+  const d = new Date(dateStr + 'T00:00');
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); // back to Monday
   return d;
 }
 
-function totalsBy(walks, keyOf) {
+// First day of the calendar period containing the date.
+function periodStart(dateStr, group) {
+  if (group === 'week') return getWeekStart(dateStr);
+  const d = new Date(dateStr + 'T00:00');
+  const months = GROUPS[group].months;
+  return new Date(d.getFullYear(), Math.floor(d.getMonth() / months) * months, 1);
+}
+
+function previousPeriodStart(start, group) {
+  const d = new Date(start);
+  if (group === 'week') d.setDate(d.getDate() - 7);
+  else d.setMonth(d.getMonth() - GROUPS[group].months);
+  return d;
+}
+
+const dayKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+function periodLabel(start, group) {
+  const short = d => d.toLocaleDateString('en-GB', { month: 'short' });
+  const y = start.getFullYear();
+  if (group === 'week') return start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  if (group === 'month') return start.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  if (group === 'year') return String(y);
+  const end = new Date(start); end.setMonth(end.getMonth() + GROUPS[group].months - 1);
+  return `${short(start)}–${short(end)} ${y}`;
+}
+
+function computePeriodTotals(walks, group) {
   const map = new Map();
   walks.forEach(w => {
     if (!w.date) return;
-    const key = keyOf(w);
-    if (!map.has(key)) map.set(key, { key, walks: 0, km: 0, secs: 0, elev: 0, steps: 0 });
+    const start = periodStart(w.date, group);
+    const key = dayKey(start);
+    if (!map.has(key)) map.set(key, { key, start, walks: 0, km: 0, secs: 0, elev: 0, steps: 0 });
     const e = map.get(key);
     e.walks++;
     e.km += w.distance_km || 0;
@@ -439,49 +562,104 @@ function totalsBy(walks, keyOf) {
     e.elev += w.elevation_gain_m || 0;
     e.steps += w.steps_estimated || 0;
   });
-  return Array.from(map.values()).sort((a, b) => b.key.localeCompare(a.key));
+  map.forEach(e => { e.pace = e.km ? e.secs / e.km : null; });   // seconds per km
+  return map;
+}
+
+// "▲ 12%" / "▼ 8%" against the previous period; blank when there's nothing to compare with.
+// lowerIsBetter flips the colours (a faster pace is a lower number). A fall in a
+// running total during the current period is grey: the period isn't over yet.
+function changeBadge(cur, prev, { inProgress = false, lowerIsBetter = false } = {}) {
+  if (cur === null || cur === undefined || !prev) return '<span class="delta none"></span>';
+  const pct = (cur - prev) / prev * 100;
+  if (Math.abs(pct) < 0.5) return '<span class="delta flat">0%</span>';
+  const good = lowerIsBetter ? pct < 0 : pct > 0;
+  const cls = good ? 'up' : (inProgress && !lowerIsBetter ? 'pending' : 'down');
+  const title = cls === 'pending' ? ' title="This period is still in progress"' : '';
+  return `<span class="delta ${cls}"${title}>${pct > 0 ? '▲' : '▼'} ${Math.abs(Math.round(pct))}%</span>`;
 }
 
 function renderWeekly(walks) {
-  const weeks = totalsBy(walks, w => {
-    const s = getWeekStart(w.date);
-    return `${s.getFullYear()}-${String(s.getMonth() + 1).padStart(2, '0')}-${String(s.getDate()).padStart(2, '0')}`;
-  });
-  const body = document.getElementById('weekly-body');
-  if (!weeks.length) {
-    body.innerHTML = `<tr><td colspan="5" class="chart-empty">No data yet.</td></tr>`;
-    return;
-  }
-  body.innerHTML = weeks.map(w => `
-    <tr>
-      <td>${new Date(w.key).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
-      <td class="num">${w.walks}</td>
-      <td class="num">${w.km.toFixed(1)}</td>
-      <td class="num">${formatDuration(w.secs)}</td>
-      <td class="num">${Math.round(w.steps).toLocaleString('en-GB')}</td>
-    </tr>
-  `).join('');
-}
+  const group = trendGroup;
+  document.getElementById('trend-title').textContent = GROUPS[group].title;
+  document.getElementById('trend-period-head').textContent = GROUPS[group].head;
+  document.querySelectorAll('#group-picker .group-btn[data-group]').forEach(b => b.classList.toggle('active', b.dataset.group === group));
 
-function renderMonthly(walks) {
-  const months = totalsBy(walks, w => w.date.slice(0, 7));
-  const body = document.getElementById('monthly-body');
-  if (!months.length) {
+  const totals = computePeriodTotals(walks, group);
+  const periods = [...totals.values()].sort((a, b) => b.start - a.start);
+  const body = document.getElementById('weekly-body');
+  if (!periods.length) {
     body.innerHTML = `<tr><td colspan="7" class="chart-empty">No data yet.</td></tr>`;
     return;
   }
-  body.innerHTML = months.map(m => `
-    <tr>
-      <td>${new Date(m.key + '-01').toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</td>
-      <td class="num">${m.walks}</td>
-      <td class="num">${m.km.toFixed(1)}</td>
-      <td class="num">${formatDuration(m.secs)}</td>
-      <td class="num">${Math.round(m.elev)} m</td>
-      <td class="num">${Math.round(m.steps).toLocaleString('en-GB')}</td>
-      <td class="num">${m.km ? formatPace(m.secs / m.km) + ' /km' : '—'}</td>
-    </tr>
-  `).join('');
+  const current = dayKey(periodStart(dayKey(new Date()), group));
+  // Only the latest periods are listed, but changes still compare with the
+  // previous period from the full totals.
+  body.innerHTML = periods.slice(0, trendLimit).map(p => {
+    const prev = totals.get(dayKey(previousPeriodStart(p.start, group)));
+    const inProgress = p.key === current;
+    const cell = (text, cur, prevVal, opts = {}) =>
+      `<td class="num ${opts.cls || ''}"><span class="trend-val">${text}</span>${changeBadge(cur, prevVal, { inProgress, ...opts })}</td>`;
+    return `
+      <tr>
+        <td>${periodLabel(p.start, group)}${inProgress ? ' <span class="so-far">so far</span>' : ''}</td>
+        ${cell(p.walks, p.walks, prev && prev.walks)}
+        ${cell(p.km.toFixed(1), p.km, prev && prev.km)}
+        ${cell(formatDuration(p.secs), p.secs, prev && prev.secs)}
+        ${cell(Math.round(p.elev) + ' m', p.elev, prev && prev.elev)}
+        ${cell(Math.round(p.steps).toLocaleString('en-GB'), p.steps || null, prev && prev.steps)}
+        ${cell(p.pace ? formatPace(p.pace) + ' /km' : '—', p.pace, prev && prev.pace, { cls: 'pace', lowerIsBetter: true })}
+      </tr>`;
+  }).join('');
+  alignTrendValues();
 }
+
+// Give every value in a column the width of the column's widest value, so the
+// ▲▼ percentages line up in a straight column.
+function alignTrendValues() {
+  const rows = [...document.querySelectorAll('#weekly-body tr')];
+  if (!rows.length || !rows[0].offsetParent) return;
+  const cols = rows[0].children.length;
+  for (let c = 1; c < cols; c++) {
+    const vals = rows.map(r => r.children[c] && r.children[c].querySelector('.trend-val')).filter(Boolean);
+    vals.forEach(v => { v.style.width = ''; });
+    const widest = Math.ceil(Math.max(...vals.map(v => v.getBoundingClientRect().width)));
+    vals.forEach(v => { v.style.width = widest + 'px'; });
+  }
+}
+
+function applyChangeToggle() {
+  const btn = document.getElementById('delta-toggle');
+  btn.classList.toggle('active', showChanges);
+  btn.setAttribute('aria-pressed', String(showChanges));
+  document.getElementById('trends-view').classList.toggle('hide-changes', !showChanges);
+}
+
+if (document.fonts) document.fonts.ready.then(() => alignTrendValues());
+
+document.getElementById('delta-toggle').addEventListener('click', () => {
+  showChanges = !showChanges;
+  try { localStorage.setItem('walkTrendChanges', showChanges ? 'on' : 'off'); } catch (e) {}
+  applyChangeToggle();
+});
+applyChangeToggle();
+
+const trendLimitSelect = document.getElementById('trend-limit');
+trendLimitSelect.value = trendLimit === Infinity ? 'all' : String(trendLimit);
+if (!trendLimitSelect.value) { trendLimitSelect.value = '12'; trendLimit = 12; }
+trendLimitSelect.addEventListener('change', () => {
+  trendLimit = trendLimitSelect.value === 'all' ? Infinity : Number(trendLimitSelect.value);
+  try { localStorage.setItem('walkTrendLimit', trendLimitSelect.value); } catch (e) {}
+  renderWeekly(currentWalks);
+});
+
+document.querySelectorAll('#group-picker .group-btn[data-group]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    trendGroup = btn.dataset.group;
+    try { localStorage.setItem('walkTrendGroup', trendGroup); } catch (e) {}
+    renderWeekly(currentWalks);
+  });
+});
 
 /* ---------------- Boot ---------------- */
 // Walks from all monthly files, oldest first.
@@ -494,6 +672,7 @@ function combineWalks(files) {
 
 function render(walks, sourceText) {
   currentWalks = walks;
+  buildFilterOptions(currentWalks);
   renderTotals(currentWalks);
   renderRows();
   renderActiveView();

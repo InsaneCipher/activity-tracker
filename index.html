@@ -4,24 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Activity Log</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="icon" href="favicon/favicon.ico?v=3" sizes="any">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png?v=3">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png?v=3">
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png?v=3">
     <link rel="manifest" href="favicon/site.webmanifest?v=3">
     <meta name="apple-mobile-web-app-title" content="Activity Log">
-    <meta name="theme-color" content="#1C314A">
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
-          rel="stylesheet">
+    <meta name="theme-color" content="#15233F">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/site.css">
     <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
-<div class="wrap">
-    <h1>Activity Log</h1>
-    <div class="subtitle">Rides &amp; walks, synced from Strava</div>
-    <div class="route-line"><div class="checker"></div><div class="steps"></div></div>
+<header class="hero">
+    <div class="hero-inner">
+        <nav class="topbar" aria-label="Pages">
+            <a class="brand" href="index.html"><img src="favicon/favicon-32x32.png?v=3" alt="" width="22" height="22">Activity Log</a>
+            <div class="nav">
+                <a href="index.html" aria-current="page">Home</a>
+                <a href="rides.html">Rides</a>
+                <a href="walks.html">Walks</a>
+            </div>
+        </nav>
+        <div class="hero-text">
+            <h1 class="hero-km" id="hero-km">Activity Log</h1>
+            <p class="hero-sub" id="hero-sub">Loading your rides and walks…</p>
+        </div>
+    </div>
+    <div class="hero-profile" id="hero-profile" aria-hidden="true"></div>
+</header>
 
+<main class="wrap">
     <div id="status"></div>
     <div class="notice" id="notice">
         Couldn't load the activity data. Browsers block this when the page is opened directly from disk,
@@ -31,12 +46,12 @@
 
     <div id="totals" class="totals"></div>
 
-    <div class="section-title">Choose an activity</div>
+    <div class="section-title">Pick a log</div>
     <div class="type-cards">
         <a class="type-card ride" href="rides.html" id="ride-card">
             <div class="card-head">
                 <div class="card-title">Rides</div>
-                <div class="card-open">Open Ride Log →</div>
+                <div class="card-open">Open the Ride Log</div>
             </div>
             <div class="card-sub">Power, speed, zones &amp; route history</div>
             <div class="card-stats" id="ride-stats"></div>
@@ -46,7 +61,7 @@
         <a class="type-card walk" href="walks.html" id="walk-card">
             <div class="card-head">
                 <div class="card-title">Walks</div>
-                <div class="card-open">Open Walk Log →</div>
+                <div class="card-open">Open the Walk Log</div>
             </div>
             <div class="card-sub">Pace, steps, km splits &amp; hikes</div>
             <div class="card-stats" id="walk-stats"></div>
@@ -86,9 +101,10 @@
         </table>
     </div>
 
-    <footer id="footer"></footer>
-</div>
-
+    <footer class="page-foot" id="footer"></footer>
+</main>
 <script src="js/index.js"></script>
+<script src="js/hero.js"></script>
+<script src="js/home-ui.js"></script>
 </body>
 </html>

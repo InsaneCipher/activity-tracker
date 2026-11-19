@@ -1,0 +1,351 @@
+/* Activity Log - shared "road book" design for every page.
+   One family (Archivo, variable width) and a stage-race palette: navy team kit,
+   leader's-jersey yellow for highlights, KOM red and sprint green only where
+   they carry meaning. Page files (rides.css, walks.css, index.css) add the rest. */
+
+:root{
+  --page:#F2F4F7;
+  --ink:#15233F;          /* navy: text and the hero band */
+  --ink-2:#4A5872;
+  --muted:#7A869C;
+  --line:#DCE1E9;
+  --line-strong:#B9C2D0;
+  --panel:#FFFFFF;
+  --panel-hover:#F4F6F9;
+  --bg-deep:#EEF1F5;
+  --jersey:#FFCF33;       /* leader's yellow */
+  --kom:#E5383B;          /* king of the mountains red */
+  --sprint:#1E9E77;       /* points green */
+  --navy-2:#1F3157;
+  --accent:var(--jersey); /* the page's highlight: current nav pill, hero ridge */
+
+  /* names used by the page scripts for chart colours */
+  --text:#15233F;
+  --hr:#E5383B;
+  --best:#15233F;
+
+  --font:'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  margin:0;
+  background:var(--page);
+  color:var(--ink);
+  font-family:var(--font);
+  font-size:15px;
+  line-height:1.45;
+  font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;}
+:focus-visible{outline:3px solid var(--jersey);outline-offset:2px;border-radius:6px;}
+
+/* ---------------- Hero: the season as a stage profile ---------------- */
+.hero{background:var(--ink);color:#fff;position:relative;overflow:hidden;}
+.hero-inner{max-width:1340px;margin:0 auto;padding:18px 28px 0;position:relative;z-index:2;}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+.brand{
+  display:inline-flex;align-items:center;gap:10px;
+  font-weight:800;font-stretch:112%;font-size:1.05rem;
+  color:#fff;text-decoration:none;
+}
+.brand img{border-radius:6px;}
+.nav{display:flex;gap:4px;background:rgba(255,255,255,0.08);padding:4px;border-radius:999px;}
+.nav a{
+  color:rgba(255,255,255,0.75);text-decoration:none;
+  font-weight:600;font-size:0.88rem;
+  padding:6px 16px;border-radius:999px;
+}
+.nav a:hover{color:#fff;background:rgba(255,255,255,0.08);}
+.nav a[aria-current="page"]{background:var(--accent);color:var(--ink);}
+
+.hero-text{padding:52px 0 0;max-width:780px;}
+.hero-km{
+  margin:0;
+  font-size:clamp(3.4rem, 10vw, 8rem);
+  font-weight:900;
+  font-stretch:125%;
+  font-style:italic;
+  line-height:0.88;
+  letter-spacing:-0.015em;
+}
+.hero-km .unit{font-size:0.36em;font-weight:600;font-style:normal;font-stretch:100%;letter-spacing:0;margin-left:0.25em;opacity:0.8;}
+.hero-sub{margin:16px 0 0;font-size:1.06rem;color:rgba(255,255,255,0.78);max-width:56ch;}
+.hero-sub b{color:#fff;font-weight:700;}
+
+.hero-profile{height:clamp(150px, 20vw, 230px);margin-top:-8px;position:relative;}
+.hero-profile svg{display:block;width:100%;height:100%;}
+.hero-profile .area{fill:var(--navy-2);}
+.hero-profile .area.second{fill:rgba(61,220,151,0.10);}
+.hero-profile .ridge{fill:none;stroke:var(--accent);stroke-width:3;stroke-linejoin:round;stroke-linecap:round;}
+.hero-profile .ridge.ride{stroke:var(--jersey);}
+.hero-profile .ridge.walk{stroke:#3DDC97;}
+.hero-profile .tick{stroke:rgba(255,255,255,0.12);stroke-width:1;}
+.hero-profile .tick-label{fill:rgba(255,255,255,0.55);font:600 12px var(--font);}
+.hero-profile .series-label{font:700 12px var(--font);}
+.hero-profile .series-label.ride{fill:var(--jersey);}
+.hero-profile .series-label.walk{fill:#3DDC97;}
+.hero-profile .marker{fill:var(--kom);stroke:#fff;stroke-width:2;}
+.hero-profile .marker-label{fill:#fff;font:700 12px var(--font);}
+.hero-profile .flag{stroke:#fff;stroke-width:2;}
+.hero-profile .flag-cloth{fill:var(--accent);}
+.hero-profile.animate .ridge{animation:draw 1.6s cubic-bezier(.22,.8,.3,1) forwards;}
+.hero-profile.animate .area{animation:rise 1.6s ease-out forwards;}
+@keyframes draw{from{stroke-dashoffset:var(--len);}to{stroke-dashoffset:0;}}
+@keyframes rise{from{opacity:0;}to{opacity:1;}}
+
+/* ---------------- Page ---------------- */
+.wrap{max-width:1340px;margin:0 auto;padding:0 28px 64px;}
+
+/* Stats strip, overlapping the bottom of the hero. 1px gaps on a line-coloured
+   background draw the dividers, so they stay right at any column count. */
+.totals{
+  position:relative;z-index:3;
+  margin-top:-38px;
+  display:grid;
+  grid-template-columns:repeat(var(--total-cols, 6), minmax(0, 1fr));
+  gap:1px;
+  background:var(--line);
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 18px 40px -22px rgba(21,35,63,0.55);
+}
+.total-cell{padding:18px 22px;background:var(--panel);min-width:0;}
+.total-cell .num{font-size:1.65rem;font-weight:800;font-stretch:112%;line-height:1.1;white-space:nowrap;}
+.total-cell .label{font-size:0.78rem;color:var(--ink-2);margin-top:4px;}
+
+#status{color:var(--muted);font-size:0.8rem;margin:14px 2px 0;min-height:1em;}
+#picker-wrap,.notice{
+  display:none;margin-top:18px;padding:24px;text-align:center;
+  background:var(--panel);border:2px dashed var(--line-strong);border-radius:16px;color:var(--ink-2);
+}
+#picker-wrap.show,.notice.show{display:block;}
+
+.tabs{
+  display:inline-flex;gap:2px;margin:26px 0 18px;
+  background:#E3E7EE;padding:4px;border-radius:999px;
+  max-width:100%;overflow-x:auto;
+}
+.tab-btn{
+  border:0;background:none;cursor:pointer;
+  font:600 0.92rem var(--font);color:var(--ink-2);
+  padding:8px 20px;border-radius:999px;white-space:nowrap;
+}
+.tab-btn:hover{color:var(--ink);}
+.tab-btn.active{background:var(--ink);color:#fff;}
+
+.view{display:none;}
+.view.active{display:block;}
+
+.section-title{font-weight:800;font-stretch:112%;font-size:1.3rem;margin:36px 0 14px;}
+.view > .section-title:first-child{margin-top:4px;}
+.section-title .hint{font-size:0.8rem;font-weight:500;font-stretch:100%;color:var(--muted);margin-left:10px;}
+
+/* ---------------- Tables ---------------- */
+.table-wrap{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:0.84rem;}
+thead th{
+  position:sticky;top:0;z-index:1;
+  background:#F7F9FB;
+  text-align:left;font-weight:600;font-size:0.75rem;color:var(--ink-2);
+  padding:12px 10px;border-bottom:1px solid var(--line);
+  white-space:nowrap;user-select:none;
+}
+thead th[data-key]{cursor:pointer;}
+thead th[data-key]:hover{color:var(--ink);}
+thead th.sorted{color:var(--ink);box-shadow:inset 0 -3px 0 var(--jersey);}
+tbody td{
+  padding:10px;border-bottom:1px solid #EEF1F5;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:#FAFBFD;}
+td.idx{color:var(--muted);text-overflow:clip;}
+td.date-cell{color:var(--ink-2);}
+td.name{font-weight:600;}
+td.name a{text-decoration:none;}
+td.name a:hover{text-decoration:underline;text-decoration-color:var(--jersey);text-decoration-thickness:3px;text-underline-offset:3px;}
+/* Long names slide to their end and back inside the cell (js/name-scroll.js).
+   Moved with margin-left, not transform: transforms turn the text into a
+   bitmap layer, which looks blurry on Windows. */
+.name-clip{display:inline-block;vertical-align:bottom;overflow:hidden;}
+.name-track{display:inline-block;white-space:nowrap;animation:name-scroll var(--dur, 8s) ease-in-out infinite;}
+td.name.scrolling{text-overflow:clip;}
+td.name.scrolling:hover .name-track{animation-play-state:paused;}
+@keyframes name-scroll{
+  0%, 18%{margin-left:0;}
+  50%, 68%{margin-left:var(--shift);}
+  100%{margin-left:0;}
+}
+td.muted{color:var(--ink-2);}
+td.hr{color:#C0262B;}
+.pair-max{color:var(--muted);font-size:0.88em;}
+/* all-time bests: a soft leader's-yellow tag behind the value */
+.best-val{
+  color:var(--ink);font-weight:700;
+  background:#FFEEB0;
+  box-shadow:inset 0 0 0 1px #FFD95C;
+  border-radius:6px;
+  padding:1px 6px;
+  margin:0 -2px;
+}
+.pair-max.best-val{font-size:0.88em;margin-left:2px;}
+td.no-match{text-align:center;color:var(--muted);padding:32px 12px;}
+.simple-table{table-layout:auto !important;min-width:0 !important;}
+.simple-table td,.simple-table th{white-space:nowrap;}
+
+/* ---------------- Filter bar ---------------- */
+.filter-bar{
+  display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 16px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:16px 18px;
+}
+.f-group{display:flex;flex-direction:column;gap:5px;min-width:0;}
+.f-grow{flex:1 1 180px;}
+.f-group label{font-size:0.74rem;font-weight:600;color:var(--ink-2);}
+.filter-bar input,
+.filter-bar select{
+  height:36px;min-width:0;
+  font:500 0.86rem var(--font);color:var(--ink);
+  background:var(--bg-deep);
+  border:1px solid transparent;border-radius:10px;
+  padding:0 10px;
+}
+.filter-bar select{max-width:200px;cursor:pointer;}
+.filter-bar input:hover,.filter-bar select:hover{border-color:var(--line-strong);}
+.filter-bar input:focus,.filter-bar select:focus{outline:none;border-color:var(--ink);background:#fff;box-shadow:0 0 0 3px rgba(255,207,51,0.55);}
+.filter-bar input::placeholder{color:var(--muted);}
+.f-range{display:flex;align-items:center;gap:6px;}
+.f-range span{color:var(--muted);}
+.f-range input[type="number"]{width:72px;}
+.f-range input[type="date"]{width:142px;}
+.f-footer{display:flex;align-items:center;gap:12px;margin-left:auto;height:36px;}
+.f-count{font-size:0.8rem;color:var(--ink-2);white-space:nowrap;}
+.f-count b{background:var(--jersey);color:var(--ink);padding:1px 7px;border-radius:999px;font-weight:800;}
+.f-show{display:inline-flex;align-items:center;gap:7px;font-size:0.8rem;font-weight:600;color:var(--ink-2);}
+.f-show select{width:auto;max-width:none;padding-right:6px;}
+.f-reset{
+  height:36px;padding:0 16px;cursor:pointer;
+  font:600 0.84rem var(--font);color:var(--ink);
+  background:none;border:1px solid var(--line-strong);border-radius:999px;
+}
+.f-reset:hover{background:var(--ink);color:#fff;border-color:var(--ink);}
+.filter-bar + .table-wrap{margin-top:14px;}
+
+/* ---------------- Graphs ---------------- */
+.metric-picker{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+.metric-btn{
+  cursor:pointer;
+  font:600 0.84rem var(--font);color:var(--ink-2);
+  background:var(--panel);border:1px solid var(--line);border-radius:999px;
+  padding:6px 15px;
+}
+.metric-btn:hover{border-color:var(--line-strong);color:var(--ink);}
+.metric-btn.active{font-weight:700;}
+.chart-wrap{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;}
+.chart-wrap svg{display:block;width:100%;height:auto;}
+.chart-empty{color:var(--muted);text-align:center;padding:48px 0;}
+.chart-note{color:var(--muted);font-size:0.78rem;margin-top:10px;}
+#tooltip{
+  position:absolute;display:none;pointer-events:none;z-index:10;
+  background:var(--ink);color:#fff;border-radius:10px;
+  padding:7px 11px;font-size:0.78rem;white-space:nowrap;
+  box-shadow:0 10px 24px -12px rgba(21,35,63,0.6);
+}
+#tooltip .t-date{opacity:0.7;}
+#tooltip .t-val{font-weight:800;}
+
+/* ---------------- Records ---------------- */
+.records-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(214px, 1fr));gap:12px;}
+.record-card{
+  position:relative;overflow:hidden;min-width:0;
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  padding:18px 18px 16px;
+}
+.record-card::before{content:"";position:absolute;inset:0 0 auto 0;height:5px;background:var(--line);}
+.record-value{font-size:1.75rem;font-weight:900;font-stretch:118%;font-style:italic;line-height:1.1;}
+.record-label{font-weight:600;font-size:0.88rem;margin-top:4px;}
+.record-meta{
+  position:relative;margin-top:8px;
+  color:var(--muted);font-size:0.76rem;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.record-meta-track{display:inline-block;}
+.record-meta.scrolling{text-overflow:clip;}
+.record-meta.scrolling .record-meta-track{animation:marquee-scroll linear infinite;}
+@keyframes marquee-scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* Stacked bars (training zones, walks vs hikes, time of day) */
+.zone-bar{display:flex;height:22px;overflow:hidden;background:var(--bg-deep);border:1px solid var(--ink);}
+.zone-seg{height:100%;}
+.zone-legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:14px;font-size:0.82rem;color:var(--ink-2);}
+.zone-legend-item{display:flex;align-items:center;gap:7px;}
+.zone-dot{width:10px;height:10px;display:inline-block;box-shadow:inset 0 0 0 1px var(--ink);}
+
+/* ---------------- Trends ---------------- */
+.trend-head{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:4px 0 14px;}
+.trend-head .section-title{margin:0 auto 0 0;}
+.group-picker{display:flex;gap:2px;flex-wrap:wrap;background:#E3E7EE;padding:4px;border-radius:999px;}
+.group-btn{
+  cursor:pointer;border:0;background:none;
+  font:600 0.84rem var(--font);color:var(--ink-2);
+  padding:6px 14px;border-radius:999px;
+}
+.group-btn:hover{color:var(--ink);}
+.group-btn.active{background:var(--ink);color:#fff;}
+.group-sep{width:1px;background:var(--line-strong);margin:4px 4px;}
+.group-btn.toggle.active{background:var(--jersey);color:var(--ink);}
+.group-btn.toggle:not(.active){text-decoration:line-through;}
+.trend-show{display:inline-flex;align-items:center;gap:7px;font-size:0.84rem;font-weight:600;color:var(--ink-2);}
+.trend-show select{
+  height:34px;padding:0 8px;cursor:pointer;
+  font:600 0.84rem var(--font);color:var(--ink);
+  background:#E3E7EE;border:1px solid transparent;border-radius:999px;
+}
+.trend-show select:hover{border-color:var(--line-strong);}
+.trend-show select:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(255,207,51,0.55);}
+.trend-table td.num{white-space:nowrap;}
+.trend-val{display:inline-block;white-space:nowrap;}
+.delta{display:inline-block;min-width:4.4em;margin-left:9px;font-size:0.74rem;font-weight:700;}
+.delta.up{color:#128A63;}
+.delta.down{color:#D62F33;}
+.delta.flat,.delta.pending{color:var(--muted);}
+.so-far{
+  font-size:0.7rem;font-weight:700;color:var(--ink);
+  background:var(--jersey);border-radius:999px;padding:1px 8px;margin-left:8px;
+}
+.hide-changes .delta,
+.hide-changes .delta-note{display:none;}
+
+.page-foot{margin-top:48px;color:var(--muted);font-size:0.8rem;text-align:center;}
+
+/* ---------------- Small screens ---------------- */
+@media (max-width: 900px){
+  .totals{grid-template-columns:repeat(3, minmax(0, 1fr));}
+}
+@media (max-width: 640px){
+  .hero-inner{padding:14px 16px 0;}
+  .hero-text{padding-top:34px;}
+  .wrap{padding:0 14px 48px;}
+  .nav a{padding:6px 11px;}
+  .totals{grid-template-columns:repeat(2, minmax(0, 1fr));margin-top:-28px;}
+  .total-cell{padding:14px 16px;}
+  .total-cell .num{font-size:1.3rem;}
+  .tabs{display:flex;}
+  .tab-btn{flex:1;padding:8px 10px;}
+  .f-group{flex:1 1 45%;}
+  .filter-bar select{max-width:none;}
+  .f-range input[type="number"],.f-range input[type="date"]{flex:1;width:auto;}
+  .f-footer{margin-left:0;width:100%;justify-content:space-between;}
+  .chart-wrap{padding:12px;}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .name-track{animation:none;}
+  .hero-profile.animate .ridge,.hero-profile.animate .area{animation:none;}
+  .record-meta.scrolling .record-meta-track{animation:none;}
+}
