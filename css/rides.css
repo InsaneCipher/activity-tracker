@@ -80,7 +80,7 @@ td.speed{color:#127A5C;}
 
 /* ---------------- Goals ---------------- */
 .goals-week{font-size:0.86rem;color:var(--ink-2);font-weight:600;}
-.goals-grid{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:14px;}
+.goals-grid{display:grid;grid-template-columns:repeat(5, minmax(0, 1fr));gap:14px;}
 .goal-card{
   background:var(--panel);border:1px solid var(--line);border-radius:16px;
   padding:16px 16px 14px;display:flex;flex-direction:column;align-items:center;
@@ -88,7 +88,7 @@ td.speed{color:#127A5C;}
 .goal-card.done{border-color:var(--jersey);box-shadow:0 0 0 2px rgba(255,207,51,0.35);}
 .goal-head{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:22px;}
 .goal-label{font-weight:700;font-size:0.92rem;color:var(--ink);}
-.goal-streak{font-size:0.72rem;font-weight:700;color:var(--ink);background:var(--jersey);padding:2px 8px;border-radius:999px;}
+.goal-streak{white-space:nowrap;font-size:0.72rem;font-weight:700;color:var(--ink);background:var(--jersey);padding:2px 8px;border-radius:999px;}
 .goal-dial{position:relative;width:100%;max-width:190px;margin:6px 0 2px;}
 .goal-ring{display:block;width:100%;height:auto;}
 .goal-track{fill:none;stroke:#E6EAF0;stroke-width:11;stroke-linecap:round;}
@@ -98,6 +98,7 @@ td.speed{color:#127A5C;}
 .goals-grid.animate .goal-card:nth-child(2) .goal-fill{animation-delay:.08s;}
 .goals-grid.animate .goal-card:nth-child(3) .goal-fill{animation-delay:.16s;}
 .goals-grid.animate .goal-card:nth-child(4) .goal-fill{animation-delay:.24s;}
+.goals-grid.animate .goal-card:nth-child(5) .goal-fill{animation-delay:.32s;}
 @keyframes goal-fill{from{stroke-dasharray:0 400;}}
 .goal-centre{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:6%;}
 .goal-value{font-weight:800;font-style:italic;font-size:1.55rem;letter-spacing:-0.02em;color:var(--ink);line-height:1.1;font-stretch:115%;}
@@ -111,7 +112,36 @@ td.speed{color:#127A5C;}
 .goal-bar i{display:block;width:100%;opacity:0.55;}
 .goal-bar.hit i{opacity:1;}
 .goal-bar.now{box-shadow:0 0 0 1.5px var(--ink);}
-@media (max-width: 980px){ .goals-grid{grid-template-columns:repeat(2, minmax(0, 1fr));} }
+.goal-best{width:100%;display:flex;justify-content:space-between;margin-top:9px;font-size:0.78rem;color:var(--ink-2);}
+.goal-best b{color:var(--ink);font-weight:700;}
+/* Year goals */
+.year-goals-head{margin-top:30px;}
+.year-goals{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:14px;}
+.yg-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;}
+.yg-card.done{border-color:var(--jersey);box-shadow:0 0 0 2px rgba(255,207,51,0.35);}
+.yg-head{display:flex;justify-content:space-between;align-items:baseline;}
+.yg-pct{font-weight:800;font-size:0.85rem;color:var(--ink-2);}
+.yg-card.has-note{cursor:help;}
+.hover-tip{
+  position:fixed;z-index:50;pointer-events:none;max-width:240px;
+  background:var(--ink);color:#fff;font-size:0.8rem;padding:6px 10px;border-radius:8px;
+  box-shadow:0 6px 18px rgba(21,35,63,0.25);
+}
+.yg-value{font-weight:800;font-style:italic;font-stretch:115%;font-size:1.45rem;letter-spacing:-0.02em;color:var(--ink);line-height:1.15;}
+.yg-value span{font-style:normal;font-weight:600;font-size:0.8rem;letter-spacing:0;color:var(--muted);margin-left:4px;font-stretch:100%;}
+.yg-bar{position:relative;height:12px;background:#E6EAF0;border-radius:999px;margin:4px 0 2px;}
+.yg-bar i{display:block;height:100%;border-radius:999px;min-width:12px;}
+.yg-marker{position:absolute;top:-4px;bottom:-4px;width:3px;margin-left:-1.5px;background:var(--ink);border-radius:2px;}
+.yg-status{font-size:0.8rem;color:var(--ink-2);line-height:1.45;}
+.yg-status b{color:var(--ink);}
+.yg-done{font-weight:700;color:var(--ink);}
+@media (max-width: 1100px){ .year-goals{grid-template-columns:repeat(2, minmax(0, 1fr));} }
+@media (max-width: 560px){ .year-goals{grid-template-columns:1fr;} }
+@media (max-width: 1100px){ .goals-grid{grid-template-columns:repeat(3, minmax(0, 1fr));} }
+@media (max-width: 700px){
+  .goals-grid{grid-template-columns:repeat(2, minmax(0, 1fr));}
+  .goal-card:first-child{grid-column:1 / -1;}   /* rides on its own row, the other four in pairs */
+}
 @media (prefers-reduced-motion: reduce){ .goals-grid.animate .goal-fill{animation:none;} }
 
 @media (max-width: 640px){
