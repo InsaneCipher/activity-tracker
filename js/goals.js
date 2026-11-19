@@ -1,18 +1,20 @@
-// Goals tab on the Ride Log: weekly targets for rides, distance, time, climbing
-// and calories, each shown as a ring for the current week (Monday to Sunday) with
-// the last 8 weeks underneath.
+// Goals tab and hero badges, shared by the Ride Log and the Walk Log.
 //
-// To change a goal, edit GOALS below.
+// The goals themselves live in each page's own file, loaded just before this
+// one: js/goals-rides.js and js/goals-walks.js. That file sets GOAL_CONFIG:
+//   items         function returning the page's activities (rides or walks)
+//   noun          { one: 'ride', many: 'rides' }
+//   nameOf        function giving an activity's name, for "Best so far on ..."
+//   yearKey       where the chosen year is remembered in the browser
+//   weeklyTargets { key: target } for the weekly goals
+//   weeklyMetrics the weekly goals: key, label, unit, color, get, fmt
+//   years         the year goals, one entry per year
+//   hookTabs      true if this file should redraw when the Goals tab opens
 
-const GOALS = { rides: 3, km: 50, hours: 2.5, elev: 200, kcal: 1000 };
+const cfg = window.GOAL_CONFIG;
+// Count units, for "3 rides", "1 walk", "1 ride every 3 weeks".
+const COUNT_WORDS = { rides: ['ride', 'rides'], walks: ['walk', 'walks'], hikes: ['hike', 'hikes'] };
 
-const GOAL_METRICS = [
-  { key: 'rides', label: 'Rides',     unit: v => (v === 1 ? 'ride' : 'rides'), color: 'var(--power)', get: () => 1, fmt: v => String(Math.round(v)) },
-  { key: 'km',    label: 'Distance',  unit: 'km',   color: 'var(--jersey)', get: r => r.distance_km || 0,              fmt: v => String(+v.toFixed(v >= 100 ? 0 : 1)) },
-  { key: 'hours', label: 'Time',      unit: 'h',    color: 'var(--speed)',  get: r => parseDuration(r.moving_time) / 3600, fmt: v => hoursText(v), noUnit: true },
-  { key: 'elev',  label: 'Climbing',  unit: 'm',    color: 'var(--kom)',    get: r => r.elevation_m || 0,              fmt: v => Math.round(v).toLocaleString('en-GB') },
-  { key: 'kcal',  label: 'Calories',  unit: 'kcal', color: 'var(--burn)',   get: r => r.calories || 0,                 fmt: v => Math.round(v).toLocaleString('en-GB') },
-];
 // 2.5 -> "2h 30m", 3 -> "3h"
 function hoursText(v) {
   const mins = Math.round(v * 60), h = Math.floor(mins / 60), m = mins % 60;
@@ -30,8 +32,8 @@ function mondayOf(d) {
 const isoDay = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
 function weekTotals(rides) {
-  // Totals for every week from your first ride (or GOAL_WEEKS ago, whichever is
-  // earlier) up to this week, keyed by the Monday's date.
+  // Totals for every week from your first activity (or GOAL_WEEKS ago,
+  // whichever is earlier) up to this week, keyed by the Monday's date.
   const thisMonday = mondayOf(new Date());
   let first = new Date(thisMonday); first.setDate(first.getDate() - 7 * (GOAL_WEEKS - 1));
   rides.forEach(r => {
@@ -41,13 +43,15 @@ function weekTotals(rides) {
   });
   const weeks = [];
   for (const d = new Date(first); d <= thisMonday; d.setDate(d.getDate() + 7)) {
-    weeks.push({ start: new Date(d), key: isoDay(d), totals: { rides: 0, km: 0, hours: 0, elev: 0, kcal: 0 } });
+    const totals = {};
+    cfg.weeklyMetrics.forEach(m => { totals[m.key] = 0; });
+    weeks.push({ start: new Date(d), key: isoDay(d), totals });
   }
   const byKey = new Map(weeks.map(w => [w.key, w]));
   rides.forEach(r => {
     if (!r.date) return;
     const w = byKey.get(isoDay(mondayOf(new Date(r.date + 'T00:00'))));
-    if (w) GOAL_METRICS.forEach(m => { w.totals[m.key] += m.get(r); });
+    if (w) cfg.weeklyMetrics.forEach(m => { w.totals[m.key] += m.get(r); });
   });
   return weeks;
 }
@@ -81,7 +85,7 @@ function ringSvg(pct, color) {
 function renderGoals(rides) {
   const box = document.getElementById('goals-grid');
   if (!box) return;
-  const goals = GOALS;
+  const goals = cfg.weeklyTargets;
   const weeks = weekTotals(rides);
   const now = weeks[weeks.length - 1];
 
@@ -93,7 +97,9 @@ function renderGoals(rides) {
   document.getElementById('goals-week').textContent =
     `${fmtDay(now.start)} – ${fmtDay(end)} · ${daysLeft === 0 ? 'last day' : `${daysLeft} day${daysLeft === 1 ? '' : 's'} left`}`;
 
-  box.innerHTML = GOAL_METRICS.map(m => {
+  box.dataset.count = cfg.weeklyMetrics.length;
+  box.style.setProperty('--n', cfg.weeklyMetrics.length);
+  box.innerHTML = cfg.weeklyMetrics.map(m => {
     const target = goals[m.key];
     const value = now.totals[m.key];
     const pct = target ? value / target : 0;
@@ -137,52 +143,79 @@ function renderGoals(rides) {
 }
 
 // ---- Year goals ----
-// Totals for the year, plus one "longest single ride" goal. Each shows the date
-// it was reached, or what's needed per week for the rest of the year. Pace is
-// measured from your first ride of the year: the marker on each bar is where
-// you'd be today riding at an even pace from that day to 31 December.
+// Each year's goals (from GOAL_CONFIG.years) show the date they were reached,
+// or what's needed per week for the rest of the year. The marker on each bar
+// is where you'd be today at an even pace from the goals' start to 31 December.
+// Goal types: totals add up each activity's value (get); `single` goals look
+// for one activity reaching the target; `count` goals count the activities that
+// pass a test. `note` shows next to the cursor when you hover the card;
+// `noPace` goals don't show the pace marker or a weekly amount needed.
 
-const YEAR_GOALS = {
-  year: 2026,
-  goals: [
-    { key: 'km',      label: 'Distance',       target: 1000, unit: 'km', color: 'var(--jersey)', get: r => r.distance_km || 0 },
-    { key: 'hours',   label: 'Time',           target: 50,   unit: 'h',  color: 'var(--speed)',  get: r => parseDuration(r.moving_time) / 3600 },
-    { key: 'elev',    label: 'Climbing',       target: 4000, unit: 'm',  color: 'var(--kom)',    get: r => r.elevation_m || 0 },
-    { key: 'longest', label: 'Longest ride',   target: 100,  unit: 'km', color: 'var(--power)',  get: r => r.distance_km || 0, single: true },
-    { key: 'rides',   label: 'Rides',          target: 60,   unit: 'rides', color: 'var(--ink)', count: () => true },
-    { key: 'long50',  label: '50 km+ rides',   target: 5,    unit: 'rides', color: 'var(--jersey)', count: r => (r.distance_km || 0) >= 50, noPace: true },
-    { key: 'w150',    label: '150 W+ avg rides', target: 5,  unit: 'rides', color: 'var(--power)',
-      count: r => (r.power_avg_w || 0) >= 150 && (r.distance_km || 0) > 10, note: 'Rides over 10 km', noPace: true },
-    { key: 'w180',    label: 'Best avg power', target: 180,  unit: 'W',  color: 'var(--power)',  get: r => r.power_avg_w || 0, single: true, note: 'On any ride' },
-  ],
-};
-// Goal types: totals add up each ride's value (get); `single` goals look for
-// one ride reaching the target; `count` goals count the rides that pass a test.
-// `note` explains the goal; it shows next to the cursor when you hover the card. `noPace` goals don't
-// show the pace marker or a weekly amount needed.
-
+const YEAR_GOALS = cfg.years;
+const goalYears = Object.keys(YEAR_GOALS).map(Number).sort();
+let goalYear = (() => {
+  try { const saved = Number(localStorage.getItem(cfg.yearKey)); if (YEAR_GOALS[saved]) return saved; } catch (e) {}
+  const now = new Date().getFullYear();
+  return YEAR_GOALS[now] ? now : goalYears.filter(y => y <= now).pop() || goalYears[0];
+})();
 function yearGoalValue(g, v) {
   if (g.key === 'hours') return hoursText(v);
-  if (g.unit === 'rides') {
+  if (g.unit === 'steps' && v >= 10000) {   // 422,985 -> "423k", 1,000,000 -> "1M"
+    return `${new Intl.NumberFormat('en-GB', { notation: 'compact', maximumFractionDigits: v >= 1e6 ? 1 : 0 }).format(v).replace('K', 'k').replace(/m$/, 'M')} steps`;
+  }
+  if (COUNT_WORDS[g.unit]) {
     const n = Number.isInteger(v) ? v : +v.toFixed(1);
-    return `${n.toLocaleString('en-GB')} ${n === 1 ? 'ride' : 'rides'}`;
+    return `${n.toLocaleString('en-GB')} ${COUNT_WORDS[g.unit][n === 1 ? 0 : 1]}`;
   }
   const rounded = g.unit === 'km' ? +v.toFixed(v >= 100 ? 0 : 1) : Math.round(v);
   return `${rounded.toLocaleString('en-GB')} ${g.unit}`;
 }
 
+// Activities in a year, oldest first.
+function yearRides(rides, year) {
+  return rides
+    .filter(r => r.date && r.date.startsWith(String(year)))
+    .sort((a, b) => `${a.date} ${a.time || ''}`.localeCompare(`${b.date} ${b.time || ''}`));
+}
+
+// How far a year goal has got: its value, the date it was reached (if it has
+// been) and, for single-activity goals, the best one.
+function yearGoalProgress(g, inYear) {
+  let value = 0, reached = null, best = null;
+  inYear.forEach(r => {
+    if (g.count) {
+      if (g.count(r)) { value++; if (!reached && value >= g.target) reached = r.date; }
+      return;
+    }
+    const v = g.get(r);
+    if (g.single) {
+      if (v > value) { value = v; best = r; }
+      if (!reached && v >= g.target) reached = r.date;
+    } else {
+      value += v;
+      if (!reached && value >= g.target) reached = r.date;
+    }
+  });
+  return { value, reached, best };
+}
+
 function renderYearGoals(rides) {
   const box = document.getElementById('year-goals');
   if (!box) return;
-  const year = YEAR_GOALS.year;
+  const year = goalYear;
+  const plan = YEAR_GOALS[year];
   document.getElementById('year-goals-title').textContent = `${year} goals`;
+  const picker = document.getElementById('year-picker');
+  picker.innerHTML = goalYears.map(y =>
+    `<button type="button" class="group-btn${y === year ? ' active' : ''}" data-year="${y}">${y}</button>`).join('');
 
-  const inYear = rides
-    .filter(r => r.date && r.date.startsWith(String(year)))
-    .sort((a, b) => `${a.date} ${a.time || ''}`.localeCompare(`${b.date} ${b.time || ''}`));
+  const inYear = yearRides(rides, year);
 
-  // The goals run from your first ride of the year to 31 December.
-  const start = inYear.length ? new Date(inYear[0].date + 'T00:00') : new Date(year, 0, 1);
+  // The goals run from their start date to 31 December.
+  const fromFirst = plan.start === 'first' || plan.start === 'first ride';
+  const start = fromFirst
+    ? (inYear.length ? new Date(inYear[0].date + 'T00:00') : new Date(year, 0, 1))
+    : new Date(plan.start + 'T00:00');
   const end = new Date(year + 1, 0, 1);
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const spanDays = (end - start) / 86400000;
@@ -190,27 +223,25 @@ function renderYearGoals(rides) {
   const daysLeft = spanDays - daysGone;
   const weeksLeft = daysLeft / 7;
   const pace = daysGone / spanDays;   // share of the goal period that's gone
-  document.getElementById('year-goals-left').textContent =
-    today >= end ? 'Year finished'
-    : `${Math.round(daysLeft)} day${Math.round(daysLeft) === 1 ? '' : 's'} left`;
   const fmtDate = d => new Date(d + 'T00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
-  box.innerHTML = YEAR_GOALS.goals.map(g => {
-    let value = 0, reached = null, best = null;
-    inYear.forEach(r => {
-      if (g.count) {
-        if (g.count(r)) { value++; if (!reached && value >= g.target) reached = r.date; }
-        return;
-      }
-      const v = g.get(r);
-      if (g.single) {
-        if (v > value) { value = v; best = r; }
-        if (!reached && v >= g.target) reached = r.date;
-      } else {
-        value += v;
-        if (!reached && value >= g.target) reached = r.date;
-      }
-    });
+  // Under the title: the dates the goals run, e.g. "29 August – 31 December".
+  const longDay = d => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
+  document.getElementById('year-goals-range').textContent = `${longDay(start)} – 31 December`;
+
+  document.getElementById('year-goals-left').textContent =
+    today >= end ? 'Year finished'
+    : today < start ? `Starts ${fmtDate(fromFirst ? `${year}-01-01` : plan.start)}`
+    : `${Math.round(daysLeft)} day${Math.round(daysLeft) === 1 ? '' : 's'} left`;
+
+  // How far through the goal period we are, from its start to 31 December.
+  const passed = Math.round(pace * 100);
+  document.getElementById('year-progress').innerHTML = `
+    <div class="yp-labels"><span>${longDay(start)}</span><b>${passed}% of the way through</b><span>31 December</span></div>
+    <div class="yp-bar"><i style="width:${pace * 100}%"></i></div>`;
+
+  box.innerHTML = plan.goals.map(g => {
+    const { value, reached, best } = yearGoalProgress(g, inYear);
     const pct = Math.min(value / g.target, 1);
     const left = Math.max(g.target - value, 0);
 
@@ -218,13 +249,13 @@ function renderYearGoals(rides) {
     if (reached) {
       status = `<span class="yg-done">Achieved ${fmtDate(reached)}</span>`;
     } else if (g.single) {
-      status = best ? `Best so far on ${SeasonHero.esc(routeOf(best))}, ${fmtDate(best.date)}` : 'No rides yet this year';
+      status = best ? `Best so far on ${SeasonHero.esc(cfg.nameOf(best))}, ${fmtDate(best.date)}` : `No ${cfg.noun.many} yet this year`;
     } else if (g.noPace) {
       status = `${yearGoalValue(g, left)} to go`;
     } else if (weeksLeft > 0) {
       const perWeek = left / Math.max(weeksLeft, 1 / 7);
-      const needed = g.unit === 'rides' && perWeek < 1
-        ? `1 ride every ${Math.round(1 / perWeek)} weeks`
+      const needed = COUNT_WORDS[g.unit] && perWeek < 1
+        ? `1 ${COUNT_WORDS[g.unit][0]} every ${Math.round(1 / perWeek)} weeks`
         : `${yearGoalValue(g, perWeek)} a week`;
       status = `${yearGoalValue(g, left)} to go · <b>${needed}</b> needed`;
     } else {
@@ -239,7 +270,7 @@ function renderYearGoals(rides) {
           <span class="yg-pct">${Math.round((value / g.target) * 100)}%</span>
         </div>
 
-        <div class="yg-value">${yearGoalValue(g, value)}<span> of ${yearGoalValue(g, g.target)}${g.single && g.unit === 'km' ? ' in one ride' : ''}</span></div>
+        <div class="yg-value">${yearGoalValue(g, value)}<span> of ${yearGoalValue(g, g.target)}${g.single && g.unit === 'km' ? ` in one ${cfg.noun.one}` : ''}</span></div>
         <div class="yg-bar">
           <i style="width:${pct * 100}%;background:${g.color}"></i>
           ${showPace ? `<b class="yg-marker" style="left:${pace * 100}%" title="Where you'd be today on an even pace: ${yearGoalValue(g, g.target * pace)}"></b>` : ''}
@@ -268,3 +299,76 @@ function renderYearGoals(rides) {
   });
   box.addEventListener('pointerleave', () => { tip.hidden = true; });
 })();
+
+// Year buttons above the year goals.
+document.getElementById('year-picker')?.addEventListener('click', e => {
+  const btn = e.target.closest('[data-year]');
+  if (!btn) return;
+  goalYear = Number(btn.dataset.year);
+  try { localStorage.setItem(cfg.yearKey, String(goalYear)); } catch (err) { /* not saved */ }
+  renderYearGoals(cfg.items());
+});
+
+// ---- Goals badge in the hero ----
+// Two rings at the top of the page: this week's goals (yellow) and this year's
+// (green), with one segment per goal that lights up once it's hit. Clicking
+// either opens the Goals tab.
+
+function ringSegments(hit, total) {
+  const r = 30, gap = total > 1 ? 18 : 0;          // degrees between segments (the round caps fill some of it)
+  const each = 360 / total;
+  const arc = (a0, a1) => {
+    const p = a => [36 + r * Math.sin(a * Math.PI / 180), 36 - r * Math.cos(a * Math.PI / 180)];
+    const [x0, y0] = p(a0), [x1, y1] = p(a1);
+    return `M${x0.toFixed(2)} ${y0.toFixed(2)} A${r} ${r} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
+  };
+  let out = '';
+  for (let i = 0; i < total; i++) {
+    const a0 = i * each + gap / 2, a1 = (i + 1) * each - gap / 2;
+    out += `<path class="${i < hit ? 'on' : ''}" style="--i:${i}" d="${arc(a0, a1)}"/>`;
+  }
+  return `<svg viewBox="0 0 72 72" aria-hidden="true">${out}</svg>`;
+}
+
+function renderGoalBadge(rides) {
+  const box = document.getElementById('hero-goals');
+  if (!box) return;
+
+  // This week
+  const weeks = weekTotals(rides);
+  const now = weeks[weeks.length - 1];
+  const weekHit = cfg.weeklyMetrics.filter(m => now.totals[m.key] >= cfg.weeklyTargets[m.key]).length;
+  const weekTotal = cfg.weeklyMetrics.length;
+
+  // This year (the current calendar year's goals, or the latest year before it)
+  const thisYear = new Date().getFullYear();
+  const year = YEAR_GOALS[thisYear] ? thisYear : (goalYears.filter(y => y <= thisYear).pop() || goalYears[0]);
+  const inYear = yearRides(rides, year);
+  const yearGoals = YEAR_GOALS[year].goals;
+  const yearHit = yearGoals.filter(g => yearGoalProgress(g, inYear).reached).length;
+
+  const item = (hit, total, label, sub, kind) => `
+    <button type="button" class="hg-item ${kind}${hit === total ? ' all' : ''}" data-open-goals>
+      <span class="hg-ring">${ringSegments(hit, total)}<span class="hg-count"><b>${hit}</b>/${total}</span></span>
+      <span class="hg-text"><span class="hg-label">${label}</span><span class="hg-sub">${sub}</span></span>
+    </button>`;
+  box.innerHTML =
+    item(weekHit, weekTotal, 'Weekly goals', weekHit === weekTotal ? 'All hit this week' : 'hit this week', 'week') +
+    item(yearHit, yearGoals.length, `${year} goals`, yearHit === yearGoals.length ? 'All done' : 'achieved', 'year');
+  box.hidden = false;
+}
+
+document.getElementById('hero-goals')?.addEventListener('click', e => {
+  if (!e.target.closest('[data-open-goals]')) return;
+  const tab = document.querySelector('.tab-btn[data-view="goals-view"]');
+  if (!tab) return;
+  tab.click();
+  document.querySelector('.tabs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+// Pages whose own script doesn't redraw the Goals tab (the Walk Log) let this
+// file do it when the tab opens.
+if (cfg.hookTabs) {
+  document.querySelector('.tab-btn[data-view="goals-view"]')
+    ?.addEventListener('click', () => renderGoals(cfg.items()));
+}

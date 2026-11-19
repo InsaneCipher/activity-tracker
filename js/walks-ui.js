@@ -9,6 +9,9 @@
   render = function (walks, sourceText) {
     originalRender(walks, sourceText);
     drawHero(currentWalks);
+    // Goals (js/goals.js): the hero badges, and the Goals tab if it's open.
+    if (window.renderGoalBadge) renderGoalBadge(currentWalks);
+    if (window.renderGoals && document.getElementById('goals-view').classList.contains('active')) renderGoals(currentWalks);
   };
 
   // Long walk names slide inside their cell (js/name-scroll.js).

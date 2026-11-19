@@ -10,6 +10,7 @@
   render = function (data, sourceText) {
     originalRender(data, sourceText);
     drawHero(currentRides);
+    if (window.renderGoalBadge) renderGoalBadge(currentRides);   // js/goals.js
   };
 
   renderRows = function () {

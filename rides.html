@@ -14,8 +14,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/site.css?v=2026-11-19z">
-    <link rel="stylesheet" href="css/rides.css?v=2026-11-19z">
+    <link rel="stylesheet" href="css/site.css?v=2026-11-19-13">
+    <link rel="stylesheet" href="css/rides.css?v=2026-11-19-13">
 </head>
 <body>
 <header class="hero">
@@ -32,6 +32,7 @@
             <h1 class="hero-km" id="hero-km">Ride Log</h1>
             <p class="hero-sub" id="hero-sub">Loading your season…</p>
         </div>
+        <div class="hero-goals" id="hero-goals" hidden></div>
     </div>
     <div class="hero-profile" id="hero-profile" aria-hidden="true"></div>
 </header>
@@ -260,20 +261,26 @@
         <div class="chart-note">Weeks run Monday to Sunday.</div>
 
         <div class="trend-head year-goals-head">
-            <div class="section-title" id="year-goals-title">Year goals</div>
-            <span class="goals-week" id="year-goals-left"></span>
+            <div class="yg-titles">
+                <div class="section-title" id="year-goals-title">Year goals</div>
+                <div class="yg-range" id="year-goals-range"></div>
+                <div class="yg-left" id="year-goals-left"></div>
+            </div>
+            <div class="group-picker" id="year-picker" role="group" aria-label="Goals for year"></div>
         </div>
+        <div class="year-progress" id="year-progress"></div>
         <div class="year-goals" id="year-goals"></div>
-        <div class="chart-note">The marker on each bar shows where you'd be today riding at an even pace from your first ride of the year to 31 December.</div>
+        <div class="chart-note">The marker on each bar shows where you'd be today riding at an even pace from the goals' start (your first ride in 2026, 1 January from 2027) to 31 December.</div>
     </div>
 
     <footer class="page-foot">Synced from Strava every 15 minutes.</footer>
 </main>
-<script src="js/rides.js?v=2026-11-19z"></script>
-<script src="js/goals.js?v=2026-11-19z"></script>
-<script src="js/hero.js?v=2026-11-19z"></script>
-<script src="js/name-scroll.js?v=2026-11-19z"></script>
-<script src="js/column-picker.js?v=2026-11-19z"></script>
-<script src="js/rides-ui.js?v=2026-11-19z"></script>
+<script src="js/rides.js?v=2026-11-19-13"></script>
+<script src="js/goals-rides.js?v=2026-11-19-13"></script>
+<script src="js/goals.js?v=2026-11-19-13"></script>
+<script src="js/hero.js?v=2026-11-19-13"></script>
+<script src="js/name-scroll.js?v=2026-11-19-13"></script>
+<script src="js/column-picker.js?v=2026-11-19-13"></script>
+<script src="js/rides-ui.js?v=2026-11-19-13"></script>
 </body>
 </html>

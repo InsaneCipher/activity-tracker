@@ -64,6 +64,7 @@ window.makeColumnPicker = function ({ table, mount, storageKey, keep = [] }) {
     }
     panel.querySelectorAll('input').forEach(box => { box.checked = !hidden.has(box.value); });
     count.textContent = hidden.size || '';
+    btn.classList.toggle('has-hidden', hidden.size > 0);   // swaps the dropdown arrow for the count
     btn.title = hidden.size ? `${hidden.size} column${hidden.size === 1 ? '' : 's'} hidden` : '';
     try { localStorage.setItem(storageKey, JSON.stringify([...hidden])); } catch (e) { /* not saved */ }
     // Cells changed width: let the long-name scroller measure again.
