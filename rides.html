@@ -14,8 +14,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/site.css?v=2026-11-19o">
-    <link rel="stylesheet" href="css/rides.css?v=2026-11-19o">
+    <link rel="stylesheet" href="css/site.css?v=2026-11-19r">
+    <link rel="stylesheet" href="css/rides.css?v=2026-11-19r">
 </head>
 <body>
 <header class="hero">
@@ -54,6 +54,7 @@
         <button class="tab-btn" data-view="records-view">Records</button>
         <button class="tab-btn" data-view="trends-view">Trends</button>
         <button class="tab-btn" data-view="routes-view">Routes</button>
+        <button class="tab-btn" data-view="goals-view">Goals</button>
     </div>
 
     <div id="table-view" class="view active">
@@ -250,12 +251,22 @@
         </div>
     </div>
 
+    <div id="goals-view" class="view">
+        <div class="trend-head">
+            <div class="section-title">Weekly goals</div>
+            <span class="goals-week" id="goals-week"></span>
+        </div>
+        <div class="goals-grid" id="goals-grid"></div>
+        <div class="chart-note">Weeks run Monday to Sunday. The bars under each ring are the last 8 weeks; a full bar means the goal was hit.</div>
+    </div>
+
     <footer class="page-foot">Synced from Strava every 15 minutes.</footer>
 </main>
-<script src="js/rides.js?v=2026-11-19o"></script>
-<script src="js/hero.js?v=2026-11-19o"></script>
-<script src="js/name-scroll.js?v=2026-11-19o"></script>
-<script src="js/column-picker.js?v=2026-11-19o"></script>
-<script src="js/rides-ui.js?v=2026-11-19o"></script>
+<script src="js/rides.js?v=2026-11-19r"></script>
+<script src="js/goals.js?v=2026-11-19r"></script>
+<script src="js/hero.js?v=2026-11-19r"></script>
+<script src="js/name-scroll.js?v=2026-11-19r"></script>
+<script src="js/column-picker.js?v=2026-11-19r"></script>
+<script src="js/rides-ui.js?v=2026-11-19r"></script>
 </body>
 </html>

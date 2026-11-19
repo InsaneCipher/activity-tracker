@@ -143,6 +143,9 @@ a{color:inherit;}
 .view > .section-title:first-child{margin-top:4px;}
 .section-title .hint{font-size:0.8rem;font-weight:500;font-stretch:100%;color:var(--muted);margin-left:10px;}
 
+/* Anything marked hidden stays hidden, even if its class sets a display. */
+[hidden]{display:none !important;}
+
 /* ---------------- Tables ---------------- */
 .table-wrap{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:0.84rem;}
@@ -375,12 +378,16 @@ td.no-match{text-align:center;color:var(--muted);padding:32px 12px;}
   .total-cell{padding:14px 16px;}
   .total-cell .num{font-size:1.3rem;}
   .tabs{display:flex;}
-  .tab-btn{flex:1;padding:8px 10px;}
+  .tab-btn{flex:1 1 auto;padding:8px 7px;font-size:0.84rem;}
   .f-group{flex:1 1 45%;}
   .filter-bar select{max-width:none;}
   .f-range input[type="number"],.f-range input[type="date"]{flex:1;width:auto;}
   .f-footer{margin-left:0;width:100%;justify-content:space-between;}
   .chart-wrap{padding:12px;}
+}
+@media (max-width: 400px){
+  .tabs{padding:3px;}
+  .tab-btn{padding:7px 5px;font-size:0.8rem;}
 }
 
 @media (prefers-reduced-motion: reduce){

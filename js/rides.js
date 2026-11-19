@@ -395,6 +395,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     if (btn.dataset.view === 'records-view') { renderRecords(currentRides); renderZones(currentRides); }
     if (btn.dataset.view === 'trends-view') renderWeekly(currentRides);
     if (btn.dataset.view === 'routes-view') { renderWorldMap(currentRides); renderRouteHistory(currentRides); }
+    if (btn.dataset.view === 'goals-view' && window.renderGoals) renderGoals(currentRides);
   });
 });
 
@@ -995,6 +996,7 @@ function render(data, sourceText) {
   if (document.getElementById('records-view').classList.contains('active')) { renderRecords(currentRides); renderZones(currentRides); }
   if (document.getElementById('trends-view').classList.contains('active')) renderWeekly(currentRides);
   if (document.getElementById('routes-view').classList.contains('active')) { renderWorldMap(currentRides); renderRouteHistory(currentRides); }
+  if (document.getElementById('goals-view').classList.contains('active') && window.renderGoals) renderGoals(currentRides);
   document.getElementById('status').textContent = `Loaded ${currentRides.length} ride(s) from ${sourceText}`;
 }
 
