@@ -14,8 +14,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/site.css?v=2026-11-19k">
-    <link rel="stylesheet" href="css/rides.css?v=2026-11-19k">
+    <link rel="stylesheet" href="css/site.css?v=2026-11-19o">
+    <link rel="stylesheet" href="css/rides.css?v=2026-11-19o">
 </head>
 <body>
 <header class="hero">
@@ -53,6 +53,7 @@
         <button class="tab-btn" data-view="graph-view">Graphs</button>
         <button class="tab-btn" data-view="records-view">Records</button>
         <button class="tab-btn" data-view="trends-view">Trends</button>
+        <button class="tab-btn" data-view="routes-view">Routes</button>
     </div>
 
     <div id="table-view" class="view active">
@@ -211,6 +212,19 @@
         </div>
         <div class="chart-note"><span class="delta-note">▲▼ compare with the previous period; a fall in the current, unfinished period shows in grey. </span>Avg watts is weighted by ride time.</div>
 
+    </div>
+
+    <div id="routes-view" class="view">
+        <div class="section-title">Where you've ridden</div>
+        <div class="map-card">
+            <div class="world-map-box" id="world-map"></div>
+            <div class="map-tip" id="map-tip" hidden></div>
+            <div class="map-legend">
+                <span><i class="key ridden"></i>Ridden in <b id="map-count"></b></span>
+                <span><i class="key"></i>Not yet</span>
+            </div>
+        </div>
+
         <div class="trend-head">
             <div class="section-title" id="route-title">By route</div>
             <div class="group-picker" id="route-picker" role="group" aria-label="Group rides by">
@@ -238,10 +252,10 @@
 
     <footer class="page-foot">Synced from Strava every 15 minutes.</footer>
 </main>
-<script src="js/rides.js?v=2026-11-19k"></script>
-<script src="js/hero.js?v=2026-11-19k"></script>
-<script src="js/name-scroll.js?v=2026-11-19k"></script>
-<script src="js/column-picker.js?v=2026-11-19k"></script>
-<script src="js/rides-ui.js?v=2026-11-19k"></script>
+<script src="js/rides.js?v=2026-11-19o"></script>
+<script src="js/hero.js?v=2026-11-19o"></script>
+<script src="js/name-scroll.js?v=2026-11-19o"></script>
+<script src="js/column-picker.js?v=2026-11-19o"></script>
+<script src="js/rides-ui.js?v=2026-11-19o"></script>
 </body>
 </html>

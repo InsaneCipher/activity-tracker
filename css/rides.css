@@ -22,8 +22,8 @@
 /* Column widths, one per column in table order. Keep the total at 100%:
    if it goes over, the browser shrinks every column to fit. */
 col.idx{width:3%;}
-col.date{width:12%;}
-col.route{width:16%;}
+col.date{width:10%;}
+col.route{width:17%;}
 col.km{width:6%;}
 col.time{width:6.5%;}
 col.elev{width:5%;}
@@ -55,6 +55,28 @@ td.speed{color:#127A5C;}
 .record-card:nth-child(8)::before{background:var(--sprint);}
 .record-card:nth-child(9)::before,
 .record-card:nth-child(10)::before{background:var(--burn);}
+
+/* ---------------- Routes: world map ---------------- */
+.map-card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 14px 10px;margin-bottom:8px;}
+.world-map-box{position:relative;}
+.world-map-box .world-base{display:block;width:100%;height:auto;}
+.world-map-box .world-overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+.world-overlay .ridden{fill:var(--jersey);stroke:#9A7400;stroke-width:0.6;pointer-events:auto;}
+.world-overlay circle.ridden{stroke-width:0.8;}
+.world-overlay .ridden:hover{fill:#F2B705;}
+.map-tip{
+  position:absolute;z-index:5;pointer-events:none;
+  display:flex;align-items:center;gap:0 6px;flex-wrap:wrap;max-width:240px;
+  background:var(--ink);color:#fff;font-size:0.8rem;padding:7px 10px;border-radius:8px;
+  box-shadow:0 6px 18px rgba(21,35,63,0.25);
+}
+.map-tip[hidden]{display:none;}
+.map-tip .flag{margin-right:2px;box-shadow:none;}
+.map-tip span{flex-basis:100%;color:#C8D1E0;}
+.map-legend{display:flex;gap:18px;justify-content:center;font-size:0.8rem;color:var(--ink-2);margin-top:8px;}
+.map-legend .key{display:inline-block;width:12px;height:12px;border-radius:3px;background:#4FAF7A;margin-right:6px;vertical-align:-1px;}
+.map-legend .key.ridden{background:var(--jersey);box-shadow:inset 0 0 0 1px #9A7400;}
+#routes-view .trend-head{margin-top:26px;}
 
 @media (max-width: 640px){
   .bike-key{justify-content:flex-start;}

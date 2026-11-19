@@ -28,14 +28,14 @@ window.makeNameScroller = function (tbodySelector, viewId, rerender) {
     document.querySelectorAll(`${tbodySelector} td.name`).forEach(td => {
       const label = td.querySelector('a') || td.lastChild;
       if (!label) return;
-      // Room for the name: the cell minus its padding and any icon in front.
-      const icon = td.querySelector('.bike-icon');
-      const style = getComputedStyle(td);
-      const room = td.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)
-                   - (icon ? icon.getBoundingClientRect().width + parseFloat(getComputedStyle(icon).marginRight) : 0);
+      // Room for the name: from where the name starts (after any bike icon or
+      // flag in front of it) to the cell's right padding.
       const range = document.createRange();
       range.selectNodeContents(label);
-      const textWidth = range.getBoundingClientRect().width;
+      const textBox = range.getBoundingClientRect();
+      const tdBox = td.getBoundingClientRect();
+      const room = tdBox.right - parseFloat(getComputedStyle(td).paddingRight) - textBox.left;
+      const textWidth = textBox.width;
       if (textWidth <= room + 0.5) return;   // fits: leave it alone
 
       const clip = document.createElement('span');

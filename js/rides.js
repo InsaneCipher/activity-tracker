@@ -169,31 +169,71 @@ const routeNameOf = r => (r.map_name || '').replace(/\s*\([^()]*\)\s*$/, '').tri
 const countryOf = r => ROUTE_COUNTRIES[routeNameOf(r)] || COUNTRY_RENAMES[bracketOf(r)] || bracketOf(r);
 
 // Flags: images/flags/<code>.png, named by two-letter country code (ch.png).
-// The browser knows every country's English name, so any country - including
-// ones you haven't ridden yet - finds its flag without a list to keep up.
-// Short or unofficial names the browser wouldn't recognise go in FLAG_ALIASES.
+// COUNTRY_CODES lists every country with a flag file, by its English name, so
+// any country - including ones you haven't ridden yet - finds its flag in every
+// browser. Other spellings (short or unofficial names) go in FLAG_ALIASES.
 const FLAG_ALIASES = {
   uae: 'ae', usa: 'us', us: 'us', uk: 'gb', 'great britain': 'gb', britain: 'gb',
   england: 'gb-eng', scotland: 'gb-sct', wales: 'gb-wls', 'northern ireland': 'gb-nir',
-  'south korea': 'kr', korea: 'kr', russia: 'ru', 'czech republic': 'cz', holland: 'nl',
-  turkey: 'tr', 'ivory coast': 'ci',
+  'south korea': 'kr', korea: 'kr', russia: 'ru', holland: 'nl', turkey: 'tr',
 };
-const FLAG_CODES = (() => {
-  const codes = { ...FLAG_ALIASES };
-  try {
-    const names = new Intl.DisplayNames(['en'], { type: 'region' });
-    const A = 65;
-    for (let i = 0; i < 26; i++) {
-      for (let j = 0; j < 26; j++) {
-        const code = String.fromCharCode(A + i, A + j);
-        let name;
-        try { name = names.of(code); } catch (e) { continue; }
-        if (name && name !== code && !codes[name.toLowerCase()]) codes[name.toLowerCase()] = code.toLowerCase();
-      }
-    }
-  } catch (e) { /* very old browser: aliases only */ }
-  return codes;
-})();
+const COUNTRY_CODES = {
+  'afghanistan':'af', 'albania':'al', 'algeria':'dz', 'american samoa':'as', 'andorra':'ad', 'angola':'ao',
+  'anguilla':'ai', 'antarctica':'aq', 'antigua & barbuda':'ag', 'antigua and barbuda':'ag', 'argentina':'ar',
+  'armenia':'am', 'aruba':'aw', 'australia':'au', 'austria':'at', 'azerbaijan':'az', 'bahamas':'bs',
+  'bahrain':'bh', 'bangladesh':'bd', 'barbados':'bb', 'belarus':'by', 'belgium':'be', 'belize':'bz',
+  'benin':'bj', 'bermuda':'bm', 'bhutan':'bt', 'bolivia':'bo', 'bosnia & herzegovina':'ba',
+  'bosnia and herzegovina':'ba', 'botswana':'bw', 'bouvet island':'bv', 'brazil':'br',
+  'british indian ocean territory':'io', 'british virgin islands':'vg', 'brunei':'bn', 'bulgaria':'bg',
+  'burkina faso':'bf', 'burma':'mm', 'burundi':'bi', 'cambodia':'kh', 'cameroon':'cm', 'canada':'ca',
+  'cape verde':'cv', 'caribbean netherlands':'bq', 'cayman islands':'ky', 'central african republic':'cf',
+  'chad':'td', 'chile':'cl', 'china':'cn', 'christmas island':'cx', 'cocos (keeling) islands':'cc',
+  'colombia':'co', 'comoros':'km', 'congo - brazzaville':'cg', 'congo - kinshasa':'cd', 'congo':'cg',
+  'cook islands':'ck', 'costa rica':'cr', "cote d'ivoire":'ci', 'croatia':'hr', 'cuba':'cu', 'curaçao':'cw',
+  'cyprus':'cy', 'czech republic':'cz', 'czechia':'cz', "côte d'ivoire":'ci', 'côte d’ivoire':'ci',
+  'democratic republic of the congo':'cd', 'denmark':'dk', 'djibouti':'dj', 'dominica':'dm',
+  'dominican republic':'do', 'dr congo':'cd', 'east timor':'tl', 'ecuador':'ec', 'egypt':'eg',
+  'el salvador':'sv', 'equatorial guinea':'gq', 'eritrea':'er', 'estonia':'ee', 'eswatini':'sz',
+  'ethiopia':'et', 'falkland islands':'fk', 'faroe islands':'fo', 'fiji':'fj', 'finland':'fi', 'france':'fr',
+  'french guiana':'gf', 'french polynesia':'pf', 'french southern territories':'tf', 'gabon':'ga',
+  'gambia':'gm', 'georgia':'ge', 'germany':'de', 'ghana':'gh', 'gibraltar':'gi', 'greece':'gr',
+  'greenland':'gl', 'grenada':'gd', 'guadeloupe':'gp', 'guam':'gu', 'guatemala':'gt', 'guernsey':'gg',
+  'guinea':'gn', 'guinea-bissau':'gw', 'guyana':'gy', 'haiti':'ht', 'heard & mcdonald islands':'hm',
+  'honduras':'hn', 'hong kong sar china':'hk', 'hong kong':'hk', 'hungary':'hu', 'iceland':'is', 'india':'in',
+  'indonesia':'id', 'iran':'ir', 'iraq':'iq', 'ireland':'ie', 'isle of man':'im', 'israel':'il', 'italy':'it',
+  'ivory coast':'ci', 'jamaica':'jm', 'japan':'jp', 'jersey':'je', 'jordan':'jo', 'kazakhstan':'kz',
+  'kenya':'ke', 'kiribati':'ki', 'kosovo':'xk', 'kuwait':'kw', 'kyrgyzstan':'kg', 'laos':'la', 'latvia':'lv',
+  'lebanon':'lb', 'lesotho':'ls', 'liberia':'lr', 'libya':'ly', 'liechtenstein':'li', 'lithuania':'lt',
+  'luxembourg':'lu', 'macao sar china':'mo', 'macao':'mo', 'macau':'mo', 'madagascar':'mg', 'malawi':'mw',
+  'malaysia':'my', 'maldives':'mv', 'mali':'ml', 'malta':'mt', 'marshall islands':'mh', 'martinique':'mq',
+  'mauritania':'mr', 'mauritius':'mu', 'mayotte':'yt', 'mexico':'mx', 'micronesia':'fm', 'moldova':'md',
+  'monaco':'mc', 'mongolia':'mn', 'montenegro':'me', 'montserrat':'ms', 'morocco':'ma', 'mozambique':'mz',
+  'myanmar (burma)':'mm', 'myanmar':'mm', 'namibia':'na', 'nauru':'nr', 'nepal':'np', 'netherlands':'nl',
+  'new caledonia':'nc', 'new zealand':'nz', 'nicaragua':'ni', 'niger':'ne', 'nigeria':'ng', 'niue':'nu',
+  'norfolk island':'nf', 'north korea':'kp', 'north macedonia':'mk', 'northern mariana islands':'mp',
+  'norway':'no', 'oman':'om', 'pakistan':'pk', 'palau':'pw', 'palestine':'ps', 'palestinian territories':'ps',
+  'panama':'pa', 'papua new guinea':'pg', 'paraguay':'py', 'peru':'pe', 'philippines':'ph',
+  'pitcairn islands':'pn', 'poland':'pl', 'portugal':'pt', 'puerto rico':'pr', 'qatar':'qa', 'romania':'ro',
+  'russia':'ru', 'rwanda':'rw', 'réunion':'re', 'saint kitts and nevis':'kn', 'saint lucia':'lc',
+  'saint vincent and the grenadines':'vc', 'samoa':'ws', 'san marino':'sm', 'sao tome and principe':'st',
+  'saudi arabia':'sa', 'senegal':'sn', 'serbia':'rs', 'seychelles':'sc', 'sierra leone':'sl',
+  'singapore':'sg', 'sint maarten':'sx', 'slovakia':'sk', 'slovenia':'si', 'solomon islands':'sb',
+  'somalia':'so', 'south africa':'za', 'south georgia & south sandwich islands':'gs', 'south korea':'kr',
+  'south sudan':'ss', 'spain':'es', 'sri lanka':'lk', 'st. barthélemy':'bl', 'st. helena':'sh',
+  'st. kitts & nevis':'kn', 'st. lucia':'lc', 'st. martin':'mf', 'st. pierre & miquelon':'pm',
+  'st. vincent & grenadines':'vc', 'sudan':'sd', 'suriname':'sr', 'svalbard & jan mayen':'sj',
+  'swaziland':'sz', 'sweden':'se', 'switzerland':'ch', 'syria':'sy', 'são tomé & príncipe':'st',
+  'são tomé and príncipe':'st', 'taiwan':'tw', 'tajikistan':'tj', 'tanzania':'tz', 'thailand':'th',
+  'the bahamas':'bs', 'the gambia':'gm', 'the netherlands':'nl', 'timor-leste':'tl', 'togo':'tg',
+  'tokelau':'tk', 'tonga':'to', 'trinidad & tobago':'tt', 'trinidad and tobago':'tt', 'tunisia':'tn',
+  'turkmenistan':'tm', 'turks & caicos islands':'tc', 'turks and caicos islands':'tc', 'tuvalu':'tv',
+  'türkiye':'tr', 'u.s. outlying islands':'um', 'u.s. virgin islands':'vi', 'uganda':'ug', 'ukraine':'ua',
+  'united arab emirates':'ae', 'united kingdom':'gb', 'united states':'us', 'uruguay':'uy',
+  'us virgin islands':'vi', 'uzbekistan':'uz', 'vanuatu':'vu', 'vatican city':'va', 'vatican':'va',
+  'venezuela':'ve', 'vietnam':'vn', 'wallis & futuna':'wf', 'western sahara':'eh', 'yemen':'ye',
+  'zambia':'zm', 'zimbabwe':'zw', 'åland islands':'ax'
+};
+const FLAG_CODES = { ...COUNTRY_CODES, ...FLAG_ALIASES };
 function flagImg(country) {
   const code = country && FLAG_CODES[country.toLowerCase()];
   if (!code) return '';
@@ -320,7 +360,7 @@ function renderRows() {
     <tr>
       <td class="idx">${i + 1}</td>
       <td class="muted date-cell">${fmt(r.date)}${r.time ? `<span class="ride-time">${r.time}</span>` : ''}</td>
-      <td class="name" title="${escapeHtml(r.map_name)}${r.bike_id ? ' · ' + escapeHtml(bikeLabel(r)) : ''}">${bikeIcon(r)}${r.url ? `<a href="${r.url}" target="_blank" rel="noopener">${r.map_name || '—'}</a>` : (r.map_name || '—')}</td>
+      <td class="name" title="${escapeHtml(routeOf(r))}${countryOf(r) ? ' · ' + escapeHtml(countryOf(r)) : ''}${r.bike_id ? ' · ' + escapeHtml(bikeLabel(r)) : ''}">${bikeIcon(r)}${flagImg(countryOf(r))}${r.url ? `<a href="${r.url}" target="_blank" rel="noopener">${escapeHtml(routeOf(r))}</a>` : escapeHtml(routeOf(r))}</td>
       <td class="num">${val(r.distance_km, '', isBest(best, 'distance_km', r.distance_km))}</td>
       <td class="num muted">${val(r.moving_time, '', isBest(best, 'moving_time_seconds', parseDuration(r.moving_time)))}</td>
       <td class="num muted">${val(r.elevation_m, '', isBest(best, 'elevation_m', r.elevation_m))}</td>
@@ -353,7 +393,8 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     document.getElementById(btn.dataset.view).classList.add('active');
     if (btn.dataset.view === 'graph-view') drawChart();
     if (btn.dataset.view === 'records-view') { renderRecords(currentRides); renderZones(currentRides); }
-    if (btn.dataset.view === 'trends-view') { renderWeekly(currentRides); renderRouteHistory(currentRides); }
+    if (btn.dataset.view === 'trends-view') renderWeekly(currentRides);
+    if (btn.dataset.view === 'routes-view') { renderWorldMap(currentRides); renderRouteHistory(currentRides); }
   });
 });
 
@@ -838,7 +879,7 @@ function renderRouteHistory(rides) {
   }
   body.innerHTML = routes.map(rt => `
     <tr>
-      <td class="name">${flagImg(rt.flag)}${window.SeasonHero ? SeasonHero.esc(rt.name) : rt.name}</td>
+      <td class="name"${grouped ? '' : ` title="${escapeHtml(rt.name)}"`}>${flagImg(rt.flag)}${escapeHtml(grouped ? rt.name : rt.name.replace(/\s*\([^()]*\)\s*$/, ''))}</td>
       ${grouped ? `<td class="num">${rt.routes.size}</td>` : ''}
       <td class="num">${rt.count}</td>
       <td class="num">${rt.km.toFixed(1)}</td>
@@ -855,6 +896,85 @@ document.querySelectorAll('#route-picker .group-btn').forEach(btn => {
     renderRouteHistory(currentRides);
   });
 });
+
+/* ---------------- World map ---------------- */
+// The map is a plain picture of the world (images/world-base.png, every
+// country green) with only the countries you've ridden in drawn on top in
+// yellow, so the browser has a handful of shapes to deal with, not 240.
+// Their outlines come from images/world-map.svg (one shape per country,
+// tagged with its two-letter code), which is read but never put on the page.
+let worldShapes = null;   // code -> [shape elements], loaded on first visit to the Routes tab
+
+const flagCodeOf = country => (FLAG_CODES[(country || '').toLowerCase()] || '').split('-')[0];  // gb-eng -> gb
+
+async function loadWorldShapes() {
+  const res = await fetch('images/world-map.svg?v=1');
+  if (!res.ok) throw new Error(res.status);
+  const doc = new DOMParser().parseFromString(await res.text(), 'image/svg+xml');
+  const shapes = {};
+  doc.querySelectorAll('[data-cc]').forEach(el => { (shapes[el.dataset.cc] ||= []).push(el); });
+  return shapes;
+}
+
+async function renderWorldMap(rides) {
+  const box = document.getElementById('world-map');
+  if (!box.firstChild) {
+    box.innerHTML = '<img class="world-base" src="images/world-base.png?v=1" alt="World map" width="1920" height="1000">' +
+      '<svg class="world-overlay" viewBox="0 0 960 500" aria-hidden="true"></svg>';
+    wireMapTips(box);
+  }
+  if (!worldShapes) {
+    try { worldShapes = await loadWorldShapes(); }
+    catch (e) { worldShapes = {}; }
+  }
+
+  // Rides and km per map country.
+  const ridden = new Map();
+  rides.forEach(r => {
+    const country = countryOf(r);
+    const cc = flagCodeOf(country);
+    if (!cc) return;
+    const e = ridden.get(cc) || { name: country, rides: 0, km: 0 };
+    e.rides++;
+    e.km += r.distance_km || 0;
+    ridden.set(cc, e);
+  });
+
+  const overlay = box.querySelector('.world-overlay');
+  overlay.replaceChildren();
+  ridden.forEach((e, cc) => {
+    (worldShapes[cc] || []).forEach(src => {
+      const el = document.importNode(src, true);
+      el.classList.add('ridden');
+      el.dataset.label = e.name;
+      el.dataset.rides = e.rides;
+      el.dataset.km = e.km.toFixed(1);
+      overlay.appendChild(el);
+    });
+  });
+  document.getElementById('map-count').textContent = `(${ridden.size})`;
+}
+
+function wireMapTips(box) {
+  const tip = document.getElementById('map-tip');
+  const card = box.parentElement;
+  function show(el, x, y) {
+    const name = el.dataset.label || el.dataset.name;
+    const rides = Number(el.dataset.rides);
+    tip.innerHTML = `${flagImg(name) || flagImg(el.dataset.name)}<b>${name}</b>` +
+      (rides ? `<span>${rides} ride${rides === 1 ? '' : 's'} · ${el.dataset.km} km</span>` : '<span>Not ridden yet</span>');
+    tip.hidden = false;
+    const c = card.getBoundingClientRect();
+    const left = Math.min(Math.max(x - c.left + 12, 6), c.width - tip.offsetWidth - 6);
+    tip.style.left = `${left}px`;
+    tip.style.top = `${y - c.top + 14}px`;
+  }
+  box.addEventListener('pointermove', e => {
+    const el = e.target.closest('[data-cc]');
+    if (el) show(el, e.clientX, e.clientY); else tip.hidden = true;
+  });
+  box.addEventListener('pointerleave', () => { tip.hidden = true; });
+}
 
 /* ---------------- Boot ---------------- */
 // Rides from all monthly files, oldest first.
@@ -873,7 +993,8 @@ function render(data, sourceText) {
   renderRows();
   if (document.getElementById('graph-view').classList.contains('active')) drawChart();
   if (document.getElementById('records-view').classList.contains('active')) { renderRecords(currentRides); renderZones(currentRides); }
-  if (document.getElementById('trends-view').classList.contains('active')) { renderWeekly(currentRides); renderRouteHistory(currentRides); }
+  if (document.getElementById('trends-view').classList.contains('active')) renderWeekly(currentRides);
+  if (document.getElementById('routes-view').classList.contains('active')) { renderWorldMap(currentRides); renderRouteHistory(currentRides); }
   document.getElementById('status').textContent = `Loaded ${currentRides.length} ride(s) from ${sourceText}`;
 }
 
