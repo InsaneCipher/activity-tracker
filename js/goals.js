@@ -117,7 +117,7 @@ function renderGoals(rides) {
     return `
       <div class="goal-card${done ? ' done' : ''}">
         <div class="goal-head"><span class="goal-label">${m.label}</span>
-          ${streak > 1 ? `<span class="goal-streak" title="Goal hit ${streak} weeks in a row">${streak} wk streak</span>` : ''}</div>
+          ${streak > 1 ? `<span class="goal-streak" title="Goal hit ${streak} weeks in a row">${streak} wk<span class="gs-long"> streak</span></span>` : ''}</div>
         <div class="goal-dial">
           ${ringSvg(pct, m.color)}
           <div class="goal-centre">

@@ -268,7 +268,15 @@ a{color:inherit;}
 @media (max-width: 560px){ .year-goals{grid-template-columns:1fr;} }
 @media (max-width: 1100px){ .goals-grid[data-count="5"]{grid-template-columns:repeat(3, minmax(0, 1fr));} }
 @media (max-width: 700px){
-  .goals-grid{grid-template-columns:repeat(2, minmax(0, 1fr));}
+  .goals-grid, .goals-grid[data-count]{grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px;}
+  .goal-card{padding:14px 12px 12px;}
+  .goal-head{flex-wrap:wrap;gap:4px 6px;}
+  .goal-label{font-size:0.86rem;}
+  .goal-streak{font-size:0.64rem;padding:2px 6px;}
+  .goal-value{font-size:1.3rem;white-space:nowrap;}
+  .goal-of{font-size:0.72rem;white-space:nowrap;}
+  .goal-best{font-size:0.74rem;gap:6px;}
+  .goal-best b{white-space:nowrap;}
   .goals-grid[data-count="5"] .goal-card:first-child{grid-column:1 / -1;}   /* first goal on its own row, the rest in pairs */
 }
 @media (prefers-reduced-motion: reduce){ .goals-grid.animate .goal-fill{animation:none;} }
@@ -523,6 +531,7 @@ td.no-match{text-align:center;color:var(--muted);padding:32px 12px;}
   .chart-wrap{padding:12px;}
 }
 @media (max-width: 400px){
+  .gs-long{display:none;}   /* streak badge reads "3 wk" on the narrowest phones */
   .tabs{padding:3px;}
   .tab-btn{padding:7px 5px;font-size:0.8rem;}
 }
