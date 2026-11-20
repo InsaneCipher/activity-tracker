@@ -347,6 +347,44 @@
       "bike": "Renpho Smart S",
       "app": "Rouvy",
       "device": "Rouvy"
+    },
+    {
+      "date": "2026-11-20",
+      "time": "19:25",
+      "map_name": "Las Vegas at Night (USA)",
+      "distance_km": 11.15,
+      "moving_time": "21:43",
+      "elevation_m": 1,
+      "relative_effort": 14,
+      "weighted_avg_power_w": 125,
+      "total_work_kj": 165,
+      "training_load": 22,
+      "intensity_pct": 78,
+      "speed_avg_kmh": 30.8,
+      "speed_max_kmh": 38.2,
+      "heart_rate_avg_bpm": 143,
+      "heart_rate_max_bpm": 156,
+      "cadence_avg": 69,
+      "cadence_max": 75,
+      "power_avg_w": 126,
+      "power_max_w": 148,
+      "calories": 157,
+      "ftp": 160,
+      "url": "https://www.strava.com/activities/21062373119",
+      "elapsed_time": "21:58",
+      "zones": {
+        "recovery_sec": 19,
+        "endurance_sec": 125,
+        "tempo_sec": 1158,
+        "threshold_sec": 3,
+        "vo2max_sec": 0,
+        "anaerobic_sec": 0,
+        "neuromuscular_sec": 0
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Smart S",
+      "app": "Rouvy",
+      "device": "Rouvy"
     }
   ]
 }
