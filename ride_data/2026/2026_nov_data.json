@@ -385,6 +385,44 @@
       "bike": "Renpho Smart S",
       "app": "Rouvy",
       "device": "Rouvy"
+    },
+    {
+      "date": "2026-11-22",
+      "time": "17:08",
+      "map_name": "Death Road | Yungas (Bolivia)",
+      "distance_km": 24.33,
+      "moving_time": "29:58",
+      "elevation_m": 4,
+      "relative_effort": 38,
+      "weighted_avg_power_w": 125,
+      "total_work_kj": 222,
+      "training_load": 30,
+      "intensity_pct": 78,
+      "speed_avg_kmh": 48.7,
+      "speed_max_kmh": 75.5,
+      "heart_rate_avg_bpm": 153,
+      "heart_rate_max_bpm": 168,
+      "cadence_avg": 70,
+      "cadence_max": 97,
+      "power_avg_w": 124,
+      "power_max_w": 208,
+      "calories": 213,
+      "ftp": 160,
+      "url": "https://www.strava.com/activities/21086856974",
+      "elapsed_time": "30:18",
+      "zones": {
+        "recovery_sec": 110,
+        "endurance_sec": 517,
+        "tempo_sec": 954,
+        "threshold_sec": 205,
+        "vo2max_sec": 12,
+        "anaerobic_sec": 3,
+        "neuromuscular_sec": 0
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Smart S",
+      "app": "Rouvy",
+      "device": "Rouvy"
     }
   ]
 }
