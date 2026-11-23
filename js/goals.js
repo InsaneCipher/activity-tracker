@@ -106,6 +106,8 @@ function renderGoals(rides) {
     const done = pct >= 1;
     const left = Math.max(target - value, 0);
     const { longest, current: streak } = streaks(weeks, m.key, target);
+    // The best week ever for this goal (the highest weekly total).
+    const bestWeek = weeks.reduce((best, w) => (w.totals[m.key] > (best ? best.totals[m.key] : 0) ? w : best), null);
     const recent = weeks.slice(-GOAL_WEEKS);
     const bars = recent.map((w, i) => {
       const p = target ? Math.min(w.totals[m.key] / target, 1) : 0;
@@ -129,6 +131,7 @@ function renderGoals(rides) {
         <div class="goal-status">${done ? 'Goal hit this week' : `${withUnit(m, left)} to go`}</div>
         <div class="goal-history" aria-label="Last ${GOAL_WEEKS} weeks">${bars}</div>
         <div class="goal-best">Longest streak <b>${longest ? `${longest} week${longest === 1 ? '' : 's'}` : '—'}</b></div>
+        <div class="goal-best" title="${bestWeek ? `Week of ${fmtDay(bestWeek.start)}` : ''}">Best week <b>${bestWeek ? withUnit(m, bestWeek.totals[m.key]) : '—'}</b></div>
       </div>`;
   }).join('');
 

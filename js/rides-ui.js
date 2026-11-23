@@ -11,6 +11,7 @@
     originalRender(data, sourceText);
     drawHero(currentRides);
     if (window.renderGoalBadge) renderGoalBadge(currentRides);   // js/goals.js
+    if (window.renderKitStats && document.getElementById('trends-view').classList.contains('active')) renderKitStats(currentRides);   // js/kit-stats.js
   };
 
   renderRows = function () {

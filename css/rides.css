@@ -41,6 +41,29 @@ td.speed{color:#127A5C;}
 .mini-zone-bar{display:flex;height:10px;overflow:hidden;background:var(--bg-deep);border:1px solid var(--ink);}
 .mini-zone-seg{height:100%;}
 
+/* ---------------- Trends: by app / by bike (js/kit-stats.js) ---------------- */
+.kit-head{margin-top:30px;}
+.kit-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px 16px;}
+.kit-metrics{display:inline-flex;margin-bottom:14px;}
+.kit-bars{display:flex;flex-direction:column;gap:2px;}
+.kit-row{display:grid;grid-template-columns:minmax(120px, 210px) 1fr 96px;align-items:center;gap:14px;padding:7px 4px;border-radius:8px;cursor:default;}
+.kit-row:hover{background:var(--panel-hover);}
+.kit-name{display:flex;align-items:center;gap:8px;font-weight:600;font-size:0.86rem;color:var(--ink);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.kit-name img{width:16px;height:16px;flex:none;}
+.kit-track{height:14px;}
+.kit-track i{display:block;height:100%;border-radius:0 4px 4px 0;}
+.kit-val{text-align:right;font-weight:700;font-size:0.86rem;color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums;}
+.kit-tip{display:grid;grid-template-columns:auto auto;gap:3px 14px;}
+.kit-tip b{grid-column:1 / -1;margin-bottom:2px;}
+.kit-tip span{display:contents;}
+.kit-tip em{font-style:normal;color:#C8D1E0;}
+@media (max-width: 640px){
+  .kit-card{padding:12px;}
+  .kit-metrics{display:flex;width:100%;}
+  .kit-row{grid-template-columns:minmax(0, 110px) 1fr 74px;gap:8px;}
+  .kit-name,.kit-val{font-size:0.8rem;}
+}
+
 /* ---------------- Records: the classification jerseys ---------------- */
 /* Card order follows computeRecords in rides.js:
    1 longest ride, 2 longest time, 3 most elevation, 4 avg power, 5 max power,

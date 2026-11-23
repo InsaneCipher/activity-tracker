@@ -14,8 +14,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/site.css?v=2026-11-19-24">
-    <link rel="stylesheet" href="css/rides.css?v=2026-11-19-24">
+    <link rel="stylesheet" href="css/site.css?v=2026-11-23-2">
+    <link rel="stylesheet" href="css/rides.css?v=2026-11-23-2">
 </head>
 <body>
 <header class="hero">
@@ -214,6 +214,26 @@
         </div>
         <div class="chart-note"><span class="delta-note">▲▼ compare with the previous period; a fall in the current, unfinished period shows in grey. </span>Avg watts is weighted by ride time.</div>
 
+        <div class="trend-head kit-head">
+            <div class="section-title" id="kit-title">By app</div>
+            <div class="group-picker" id="kit-group" role="group" aria-label="Compare by">
+                <button type="button" class="group-btn active" data-group="app">App</button>
+                <button type="button" class="group-btn" data-group="bike">Bike</button>
+            </div>
+        </div>
+        <div class="kit-card">
+            <div class="group-picker kit-metrics" id="kit-metric" role="group" aria-label="Stat">
+                <button type="button" class="group-btn active" data-metric="km">Distance</button>
+                <button type="button" class="group-btn" data-metric="rides">Rides</button>
+                <button type="button" class="group-btn" data-metric="secs">Time</button>
+                <button type="button" class="group-btn" data-metric="avgW">Avg power</button>
+                <button type="button" class="group-btn" data-metric="maxW">Max power</button>
+                <button type="button" class="group-btn" data-metric="speed">Avg speed</button>
+            </div>
+            <div class="kit-bars" id="kit-bars"></div>
+        </div>
+        <div class="chart-note">Hover a bar for all its stats. Avg power and avg speed are weighted by ride time.</div>
+
     </div>
 
     <div id="routes-view" class="view">
@@ -275,12 +295,14 @@
 
     <footer class="page-foot">Synced from Strava every 15 minutes.</footer>
 </main>
-<script src="js/rides.js?v=2026-11-19-24"></script>
-<script src="js/goals-rides.js?v=2026-11-19-24"></script>
-<script src="js/goals.js?v=2026-11-19-24"></script>
-<script src="js/hero.js?v=2026-11-19-24"></script>
-<script src="js/name-scroll.js?v=2026-11-19-24"></script>
-<script src="js/column-picker.js?v=2026-11-19-24"></script>
-<script src="js/rides-ui.js?v=2026-11-19-24"></script>
+<script src="js/rides.js?v=2026-11-23-2"></script>
+<script src="js/goals-rides.js?v=2026-11-23-2"></script>
+<script src="js/goals.js?v=2026-11-23-2"></script>
+<script src="js/hero.js?v=2026-11-23-2"></script>
+<script src="js/name-scroll.js?v=2026-11-23-2"></script>
+<script src="js/column-picker.js?v=2026-11-23-2"></script>
+<script src="js/filter-toggle.js?v=2026-11-23-2"></script>
+<script src="js/kit-stats.js?v=2026-11-23-2"></script>
+<script src="js/rides-ui.js?v=2026-11-23-2"></script>
 </body>
 </html>
