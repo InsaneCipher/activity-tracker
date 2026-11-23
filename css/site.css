@@ -195,6 +195,7 @@ a{color:inherit;}
 .goal-head{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:22px;}
 .goal-label{font-weight:700;font-size:0.92rem;color:var(--ink);}
 .goal-streak{white-space:nowrap;font-size:0.72rem;font-weight:700;color:var(--ink);background:var(--jersey);padding:2px 8px;border-radius:999px;}
+.title-streak{display:inline-block;vertical-align:middle;margin-left:10px;font-size:0.8rem;font-style:normal;letter-spacing:0;padding:3px 10px;position:relative;top:-2px;}
 .goal-dial{position:relative;width:100%;max-width:190px;margin:6px 0 2px;}
 .goal-ring{display:block;width:100%;height:auto;}
 .goal-track{fill:none;stroke:#E6EAF0;stroke-width:11;stroke-linecap:round;}
@@ -226,6 +227,8 @@ a{color:inherit;}
 .yg-titles{margin-right:auto;}
 .yg-titles .section-title{margin:0;}
 .yg-range{font-size:0.84rem;color:var(--ink-2);margin-top:3px;}
+.goals-sum{font-size:0.84rem;color:var(--ink-2);margin-top:3px;}
+.goals-sum b{color:var(--ink);font-weight:800;}
 .yg-left{font-size:0.84rem;font-weight:700;color:var(--sprint);margin-top:2px;}
 .year-progress{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px 18px 14px;margin-bottom:14px;}
 .yp-labels{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:0.78rem;color:var(--ink-2);margin-bottom:8px;}
@@ -382,8 +385,12 @@ td.no-match{text-align:center;color:var(--muted);padding:32px 12px;}
 /* Filters button (js/filter-toggle.js): the filter fields start hidden */
 .filter-bar.collapsed .f-group{display:none;}
 .filter-bar.collapsed .f-reset{display:none;}
-.filter-bar.collapsed{padding:12px 18px;}
-.filter-bar.collapsed .f-footer{margin-left:0;width:100%;}
+/* The button row sits at the top, open or closed; the filter fields open
+   underneath it, so Filters, Show and Columns never move. */
+.filter-bar{padding:12px 18px;}
+.filter-bar .f-footer{order:-1;margin-left:0;width:100%;}
+.filter-bar:not(.collapsed) .f-footer{height:auto;min-height:36px;padding-bottom:12px;margin-bottom:2px;border-bottom:1px solid var(--line);}
+.filter-bar:not(.collapsed){padding-bottom:16px;}
 .f-toggle{
   display:inline-flex;align-items:center;height:36px;padding:0 14px;cursor:pointer;white-space:nowrap;
   font:600 0.84rem var(--font);color:var(--ink);
@@ -398,6 +405,13 @@ td.no-match{text-align:center;color:var(--muted);padding:32px 12px;}
 .f-toggle[aria-expanded="true"]::after{transform:rotate(180deg);}
 .f-toggle-count:not(:empty){margin-left:7px;background:var(--jersey);color:var(--ink);padding:1px 7px;border-radius:999px;font-weight:800;font-size:0.78rem;}
 .f-footer .f-count{margin-right:auto;}
+/* Order in the button row: Filters, count, then Reset (only while the filters
+   are open) in the space before Show and Columns, so those two never move. */
+.f-footer .f-toggle{order:0;}
+.f-footer .f-count{order:1;}
+.f-footer .f-reset{order:2;}
+.f-footer .f-show{order:3;}
+.f-footer .col-picker{order:4;}
 
 /* Columns picker (js/column-picker.js) */
 .col-picker{position:relative;}
@@ -532,10 +546,12 @@ td.no-match{text-align:center;color:var(--muted);padding:32px 12px;}
 }
 @media (max-width: 640px){
   .f-footer{flex-wrap:wrap;height:auto;margin-left:0;width:100%;}
-  .f-count{flex-basis:100%;order:-1;}   /* count on top, the buttons in one row below */
+  .f-footer .f-count{flex-basis:100%;order:-1;}   /* count on top, the buttons in one row below */
+  .f-footer .f-reset{order:5;}   /* Reset on its own line, below the others */
   .f-footer{gap:8px;}
   .f-toggle,.col-picker-btn{padding:0 10px;}
-  .filter-bar.collapsed{padding:12px 14px;}
+  .filter-bar{padding:12px 14px;}
+  .filter-bar:not(.collapsed){padding-bottom:14px;}
   .group-picker{width:100%;}
   .group-btn{flex:1 1 auto;padding:6px 6px;white-space:nowrap;}
   .trend-controls{width:100%;justify-content:space-between;}

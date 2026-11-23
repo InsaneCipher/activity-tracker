@@ -97,6 +97,36 @@ function renderGoals(rides) {
   document.getElementById('goals-week').textContent =
     `${fmtDay(now.start)} – ${fmtDay(end)} · ${daysLeft === 0 ? 'last day' : `${daysLeft} day${daysLeft === 1 ? '' : 's'} left`}`;
 
+  // Under the title: this year's finished weeks, from your first activity of
+  // the year. How many had every goal hit, and how many goals were met in all.
+  const sum = document.getElementById('goals-sum');
+  if (sum) {
+    const year = now.start.getFullYear();
+    const done = weeks.slice(0, -1).filter(w => w.start.getFullYear() === year);
+    const firstActive = done.findIndex(w => cfg.weeklyMetrics.some(m => w.totals[m.key] > 0));
+    const counted = firstActive < 0 ? [] : done.slice(firstActive);
+    const n = cfg.weeklyMetrics.length;
+    const hitsIn = w => cfg.weeklyMetrics.filter(m => w.totals[m.key] >= goals[m.key]).length;
+    const allHit = counted.filter(w => hitsIn(w) === n).length;
+    const met = counted.reduce((t, w) => t + hitsIn(w), 0);
+    sum.innerHTML = counted.length
+      ? `Every goal hit in <b>${allHit}/${counted.length}</b> weeks · <b>${met}/${counted.length * n}</b> weekly goals met in ${year}`
+      : `Your ${year} totals start once your first week is finished.`;
+    sum.title = 'Finished weeks only; this week counts once it\'s over';
+  }
+
+  // Next to the title: weeks in a row with every goal hit, counting back from
+  // last week (this week joins in once every goal is hit).
+  const badge = document.getElementById('goals-all-streak');
+  if (badge) {
+    const allHitWeek = w => cfg.weeklyMetrics.every(m => w.totals[m.key] >= goals[m.key]);
+    let run = allHitWeek(now) ? 1 : 0;
+    for (let i = weeks.length - 2; i >= 0 && allHitWeek(weeks[i]); i--) run++;
+    badge.innerHTML = `${run} wk<span class="gs-long"> streak</span>`;
+    badge.title = `Every weekly goal hit ${run} week${run === 1 ? '' : 's'} in a row`;
+    badge.hidden = run < 1;
+  }
+
   box.dataset.count = cfg.weeklyMetrics.length;
   box.style.setProperty('--n', cfg.weeklyMetrics.length);
   box.innerHTML = cfg.weeklyMetrics.map(m => {
