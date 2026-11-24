@@ -25,6 +25,13 @@ To join a ride that was split in two (e.g. the app crashed mid-ride), add
 one ride: distances, times and totals are added up, averages are weighted by
 time, and power zones and max cadence come from all parts' data.
 
+Rides split into parts by the app are joined automatically: two or more rides
+on the same day whose titles are the same apart from "(Part 1)", "(Part 2)"...
+e.g. "Bike Ride (Part 1) - IRONMAN Texas North American Championship (USA)"
+and  "Bike Ride (Part 2) - IRONMAN Texas North American Championship (USA)"
+become one ride named "Bike Ride - IRONMAN Texas ... (USA)", in part order.
+To keep a part separate, add "no_auto_merge": true to it in ride_overrides.json.
+
 Run:
   python scripts/extract_rides.py
 """
@@ -164,6 +171,44 @@ def load_merged_streams(activity_ids: list) -> dict:
         if times:
             offset += times[-1] + 1
     return dict(joined)
+
+
+# "(Part 2)" in a title (any case, brackets optional), for auto-merging.
+PART_RE = re.compile(r"\s*\(?\s*\bpart\s*(\d+)\s*\)?", re.I)
+
+
+def part_number(name: str):
+    """2 for "Bike Ride (Part 2) - ...", or None if the title has no part."""
+    m = PART_RE.search(name or "")
+    return int(m.group(1)) if m else None
+
+
+def without_part(name: str) -> str:
+    """The title with its "(Part N)" taken out: "Bike Ride - IRONMAN ..."."""
+    return re.sub(r"\s{2,}", " ", PART_RE.sub("", name or "", count=1)).strip()
+
+
+def auto_merge_groups(rides: list[dict], overrides: dict, taken: set) -> dict:
+    """Rides split into parts, grouped: {first part's id: [the other parts' ids]}.
+    Parts are matched by day and by title without the part number. Rides
+    already in a manual merge_with, excluded, or marked no_auto_merge are left
+    alone."""
+    groups = defaultdict(list)
+    for act in rides:
+        rid = str(act["id"])
+        fixes = overrides.get(rid) or {}
+        num = part_number(act.get("name"))
+        if num is None or rid in taken or fixes.get("exclude") or fixes.get("no_auto_merge"):
+            continue
+        day = (act.get("start_date_local") or "")[:10]
+        groups[(day, without_part(act["name"]).lower())].append((num, act.get("start_date_local") or "", rid))
+    merged = {}
+    for parts in groups.values():
+        if len(parts) < 2:
+            continue   # the other part may not be uploaded yet
+        parts.sort()
+        merged[parts[0][2]] = [rid for _, _, rid in parts[1:]]
+    return merged
 
 
 def merge_activities(parts: list[dict]) -> dict:
@@ -336,6 +381,10 @@ def main() -> None:
     for main_id, fixes in overrides.items():
         if main_id in by_id and isinstance(fixes, dict) and fixes.get("merge_with"):
             merge_parts[main_id] = [str(i) for i in fixes["merge_with"] if str(i) in by_id]
+    # Rides the app split into "(Part 1)", "(Part 2)"... are joined too.
+    taken = set(merge_parts) | {i for ids in merge_parts.values() for i in ids}
+    auto_parts = auto_merge_groups(rides, overrides, taken)
+    merge_parts.update(auto_parts)
     merged_away = {i for ids in merge_parts.values() for i in ids}
 
     by_month: dict[tuple[str, int], list[dict]] = defaultdict(list)
@@ -348,6 +397,8 @@ def main() -> None:
             continue
         if merge_parts.get(str(act["id"])):
             act = merge_activities([act] + [by_id[i] for i in merge_parts[str(act["id"])]])
+            if str(act["id"]) in auto_parts:
+                act["name"] = without_part(act.get("name"))
         date = (act.get("start_date_local") or "")[:10]
         ride = build_ride(act, ftp_for_date(ftp_history, date))
         gear_id = act.get("gear_id")
@@ -357,7 +408,7 @@ def main() -> None:
         ride["device"] = act.get("device_name")
         if fixes:
             ride.update({k: v for k, v in fixes.items()
-                         if not k.startswith("_") and k not in ("exclude", "merge_with")})
+                         if not k.startswith("_") and k not in ("exclude", "merge_with", "no_auto_merge")})
             applied += 1
         by_month[(date[:4], int(date[5:7]))].append(ride)
 
@@ -388,7 +439,8 @@ def main() -> None:
     if excluded:
         print(f"Excluded {excluded} ride(s) marked in {OVERRIDES_FILE.name}")
     if merged_away:
-        print(f"Merged {len(merged_away)} ride part(s) into {len(merge_parts)} ride(s)")
+        print(f"Merged {len(merged_away)} ride part(s) into {len(merge_parts)} ride(s)"
+              + (f" ({len(auto_parts)} joined automatically from \"(Part N)\" titles)" if auto_parts else ""))
     print(f"\nDone - {len(rides) - excluded - len(merged_away)} rides written to ride_data.")
 
 
