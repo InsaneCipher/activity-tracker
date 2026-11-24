@@ -461,6 +461,44 @@
       "bike": "Renpho Smart S",
       "app": "Rouvy",
       "device": "Rouvy"
+    },
+    {
+      "date": "2026-11-24",
+      "time": "11:06",
+      "map_name": "IRONMAN Texas North American Championship (USA)",
+      "distance_km": 101.05,
+      "moving_time": "3:31:02",
+      "elevation_m": 353,
+      "relative_effort": 350,
+      "weighted_avg_power_w": 136,
+      "total_work_kj": 1765,
+      "training_load": 254,
+      "intensity_pct": 85,
+      "speed_avg_kmh": 28.7,
+      "speed_max_kmh": 43.3,
+      "heart_rate_avg_bpm": 160,
+      "heart_rate_max_bpm": 177,
+      "cadence_avg": 69,
+      "cadence_max": 91,
+      "power_avg_w": 139,
+      "power_max_w": 270,
+      "calories": 1968,
+      "ftp": 160,
+      "url": "https://www.strava.com/activities/21112861072",
+      "elapsed_time": "4:01:33",
+      "zones": {
+        "recovery_sec": 198,
+        "endurance_sec": 414,
+        "tempo_sec": 8665,
+        "threshold_sec": 3316,
+        "vo2max_sec": 53,
+        "anaerobic_sec": 34,
+        "neuromuscular_sec": 9
+      },
+      "bike_id": "b18660663",
+      "bike": "Renpho Smart S",
+      "app": "Outdoor",
+      "device": null
     }
   ]
 }
