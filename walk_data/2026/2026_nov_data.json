@@ -2274,6 +2274,59 @@
           "heart_rate_avg_bpm": 100
         }
       ]
+    },
+    {
+      "id": 21119678183,
+      "url": "https://www.strava.com/activities/21119678183",
+      "name": "Lunch Walk",
+      "type": "Walk",
+      "date": "2026-11-25",
+      "time": "12:52",
+      "distance_km": 2.22,
+      "moving_time": "26:35",
+      "moving_time_sec": 1595,
+      "elapsed_time": "26:52",
+      "elapsed_time_sec": 1612,
+      "pace_min_per_km": "11:58",
+      "speed_avg_kmh": 5.0,
+      "speed_max_kmh": 5.9,
+      "elevation_gain_m": 20,
+      "elevation_high_m": 76.2,
+      "elevation_low_m": 57.8,
+      "heart_rate_avg_bpm": 116,
+      "heart_rate_max_bpm": 136,
+      "cadence_avg_spm": 107,
+      "steps_estimated": 2834,
+      "calories": 162,
+      "relative_effort": 5,
+      "device": "Garmin Venu 4",
+      "description": null,
+      "splits": [
+        {
+          "km": 1,
+          "distance_m": 1001,
+          "moving_time": "12:02",
+          "pace_min_per_km": "12:01",
+          "elevation_change_m": 17.8,
+          "heart_rate_avg_bpm": 120
+        },
+        {
+          "km": 2,
+          "distance_m": 1000,
+          "moving_time": "11:49",
+          "pace_min_per_km": "11:49",
+          "elevation_change_m": -6.6,
+          "heart_rate_avg_bpm": 112
+        },
+        {
+          "km": 3,
+          "distance_m": 222,
+          "moving_time": "2:44",
+          "pace_min_per_km": "12:18",
+          "elevation_change_m": -3.0,
+          "heart_rate_avg_bpm": 111
+        }
+      ]
     }
   ]
 }
