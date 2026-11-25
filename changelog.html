@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Changelog · Activity Log</title>
+    <link rel="icon" href="favicon/favicon.ico?v=3" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png?v=3">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png?v=3">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png?v=3">
+    <link rel="manifest" href="favicon/site.webmanifest?v=3">
+    <meta name="apple-mobile-web-app-title" content="Activity Log">
+    <meta name="theme-color" content="#15233F">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/site.css?v=2026-11-24-1">
+    <link rel="stylesheet" href="css/changelog.css?v=2026-11-24-1">
+</head>
+<body>
+<header class="hero cl-hero">
+    <div class="hero-inner">
+        <nav class="topbar" aria-label="Pages">
+            <a class="brand" href="index.html"><img src="favicon/favicon-32x32.png?v=3" alt="" width="22" height="22">Activity Log</a>
+            <div class="nav">
+                <a href="index.html">Home</a>
+                <a href="rides.html">Rides</a>
+                <a href="walks.html">Walks</a>
+            </div>
+        </nav>
+        <div class="hero-text">
+            <h1 class="hero-km cl-title">Changelog</h1>
+            <p class="hero-sub" id="cl-current">Loading…</p>
+        </div>
+    </div>
+</header>
+
+<main class="wrap cl-wrap">
+    <div class="cl-list" id="cl-list"></div>
+    <footer class="page-foot">Every day with changes is one update. Days that only added activity data aren't listed.</footer>
+</main>
+<script src="js/changelog.js?v=2026-11-24-1"></script>
+<script src="js/version.js?v=2026-11-24-1"></script>
+</body>
+</html>

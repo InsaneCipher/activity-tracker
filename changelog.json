@@ -1,0 +1,170 @@
+{
+  "_about": "The site's changelog: one entry per day with changes, newest first. The first entry's version is the one shown in every page's footer. Version numbers: major for a redesign or rebuild, minor for days that add something new, patch for fix-only days. Each change is \"new\", \"improved\" or \"fixed\".",
+  "entries": [
+    {
+      "version": "2.2.0",
+      "date": "2026-11-24",
+      "title": "Split rides join themselves, and a changelog",
+      "changes": [
+        { "type": "new", "text": "Rides the app splits into parts, like \"Bike Ride (Part 1)\" and \"(Part 2)\" on the same day, are joined into one ride automatically, in part order." },
+        { "type": "new", "text": "A version number in every page's footer, linking to this changelog." }
+      ]
+    },
+    {
+      "version": "2.1.0",
+      "date": "2026-11-23",
+      "title": "Tidier filters, best weeks and app comparisons",
+      "changes": [
+        { "type": "new", "text": "Filters are tucked behind a Filters button and start hidden; a small count shows how many are set. The Filters, Show and Columns buttons stay put when the filters open." },
+        { "type": "new", "text": "Each weekly goal shows your best week ever under its longest streak." },
+        { "type": "new", "text": "Weekly goals summary: how many weeks every goal was hit and how many goals were met this year, plus a streak badge for weeks with every goal hit." },
+        { "type": "new", "text": "By app / By bike chart on the Ride Log's Trends tab: distance, rides, time, average and max power and average speed, with every stat on hover." },
+        { "type": "fixed", "text": "The filter bar fits on two rows on phones when closed." }
+      ]
+    },
+    {
+      "version": "2.0.0",
+      "date": "2026-11-19",
+      "title": "The road book redesign: goals, routes and a world map",
+      "changes": [
+        { "type": "new", "text": "A new look for every page: a light layout with a dark header showing your cumulative distance as a route profile, and a stats strip underneath." },
+        { "type": "new", "text": "Goals tab on both logs: weekly goals as progress rings with the last 8 weeks, streaks and longest streak, and year goals with progress bars, a pace marker, the weekly amount needed and the date each was reached." },
+        { "type": "new", "text": "Year goals for 2026 and 2027 with a switcher, a progress bar for the year, and a gold glint on completed goals." },
+        { "type": "new", "text": "Goal badges in each log's header and on the homepage cards, showing this week's and this year's goals hit." },
+        { "type": "new", "text": "Routes tab on the Ride Log: a world map with the countries you've ridden in, and a table by route, country or continent with flags." },
+        { "type": "new", "text": "Country flags next to route names; \"Countries ridden in\" replaces total work in the Ride Log's totals." },
+        { "type": "new", "text": "Trends can be grouped by week, month, 3 months, 6 months or year, with % change from the previous period and a Show menu; the Ride Log's trends add average and max power." },
+        { "type": "new", "text": "Columns button to hide table columns, and a Show menu for 25, 50, 100 or all rows." },
+        { "type": "new", "text": "The Walk Log gets the same filters, Show menu and trends as the Ride Log." },
+        { "type": "improved", "text": "Long names scroll inside their cell so they can be read in full; every other table row is shaded." },
+        { "type": "improved", "text": "Personal record cards get coloured stripes by type, and power records use the same purple as the table." },
+        { "type": "fixed", "text": "Walk max speeds no longer jump to impossible values from GPS glitches: max speed is now the fastest speed held for 30 seconds." },
+        { "type": "fixed", "text": "Updates show up straight away instead of browsers mixing old and new files." }
+      ]
+    },
+    {
+      "version": "1.4.0",
+      "date": "2026-11-17",
+      "title": "Which app each ride came from",
+      "changes": [
+        { "type": "new", "text": "Each ride records the app it came from (MyWhoosh, Rouvy, Zwift, or outdoor), worked out from the device Strava reports." },
+        { "type": "new", "text": "Bike icons next to route names show the bike by colour and the app by a coloured ring, with a key above the table." },
+        { "type": "new", "text": "Filter rides by app." }
+      ]
+    },
+    {
+      "version": "1.3.0",
+      "date": "2026-11-16",
+      "title": "Ride filters and bikes",
+      "changes": [
+        { "type": "new", "text": "A filter bar for the Ride Log: search, route, country, bike, distance, time and date range, with a count of matching rides and a Reset button." },
+        { "type": "new", "text": "The bike used is shown as a small coloured dot on each ride." },
+        { "type": "improved", "text": "Renaming a bike on Strava, or changing the bike on a ride, updates it here." },
+        { "type": "improved", "text": "Each table column can have its own width." }
+      ]
+    },
+    {
+      "version": "1.2.0",
+      "date": "2026-11-15",
+      "title": "Joining split rides",
+      "changes": [
+        { "type": "new", "text": "A ride split in two (for example when the app closed mid-ride) can be joined back into one ride, with totals added up and averages weighted by time." },
+        { "type": "fixed", "text": "The site no longer rebuilds twice after each sync." },
+        { "type": "fixed", "text": "A narrow column in the Ride Log table was cutting off values." }
+      ]
+    },
+    {
+      "version": "1.1.0",
+      "date": "2026-11-10",
+      "title": "Strava edits come through",
+      "changes": [
+        { "type": "improved", "text": "Changing a title, sport type or bike on Strava now updates the site; a cropped activity is downloaded again." },
+        { "type": "improved", "text": "Syncing runs reliably every 15 minutes." },
+        { "type": "fixed", "text": "A sync that gets an empty list back from Strava can no longer wipe your saved activities." }
+      ]
+    },
+    {
+      "version": "1.0.0",
+      "date": "2026-11-08",
+      "title": "Activity Log",
+      "changes": [
+        { "type": "new", "text": "The site becomes the Activity Log, with a homepage for picking a log and a list of recent rides and walks together." },
+        { "type": "new", "text": "The Ride Log moves to its own page, next to the Walk Log." },
+        { "type": "new", "text": "Rides and walks sync from Strava automatically every 15 minutes, with no computer needed." },
+        { "type": "new", "text": "A footsteps icon for browser tabs and phone home screens." },
+        { "type": "improved", "text": "A colour theme for each page: slate for the homepage, purple for rides and green for walks." }
+      ]
+    },
+    {
+      "version": "0.6.0",
+      "date": "2026-11-01",
+      "title": "Strava sync and the Walk Log",
+      "changes": [
+        { "type": "new", "text": "Rides now come straight from Strava instead of being typed in by hand, including power zones, heart rate and splits." },
+        { "type": "new", "text": "Walk Log: a page for walks and hikes with a table, graphs, records, walks vs hikes, time of day and weekly totals." },
+        { "type": "new", "text": "Rides can be hidden from the site, and missing details (like heart rate) filled in by hand." },
+        { "type": "improved", "text": "Activities deleted on Strava are removed from the site." }
+      ]
+    },
+    {
+      "version": "0.5.0",
+      "date": "2026-09-27",
+      "title": "More graphs",
+      "changes": [
+        { "type": "new", "text": "Graphs for ride start time and running total distance." }
+      ]
+    },
+    {
+      "version": "0.4.0",
+      "date": "2026-09-16",
+      "title": "Links to Strava",
+      "changes": [
+        { "type": "new", "text": "Route names link to the ride on Strava." }
+      ]
+    },
+    {
+      "version": "0.3.1",
+      "date": "2026-09-13",
+      "title": "Zone colour tweak",
+      "changes": [
+        { "type": "fixed", "text": "The threshold zone colour is easier to tell apart from its neighbours." }
+      ]
+    },
+    {
+      "version": "0.3.0",
+      "date": "2026-09-12",
+      "title": "Records and trends",
+      "changes": [
+        { "type": "new", "text": "Records tab: personal record cards and your time in each training zone." },
+        { "type": "new", "text": "Trends tab: weekly totals and a table of every route ridden." },
+        { "type": "new", "text": "A small zone bar on each ride in the table." }
+      ]
+    },
+    {
+      "version": "0.2.0",
+      "date": "2026-09-08",
+      "title": "All-time bests",
+      "changes": [
+        { "type": "new", "text": "All-time bests are highlighted in the table." },
+        { "type": "new", "text": "Each ride shows its start time next to the date." }
+      ]
+    },
+    {
+      "version": "0.1.1",
+      "date": "2026-09-02",
+      "title": "Tidy-up",
+      "changes": [
+        { "type": "fixed", "text": "Removed the old script for printing rides; everything is in the web page now." }
+      ]
+    },
+    {
+      "version": "0.1.0",
+      "date": "2026-09-01",
+      "title": "The first Ride Log",
+      "changes": [
+        { "type": "new", "text": "A web page listing your rides: distance, time, elevation, power, FTP, speed, heart rate, cadence, calories and effort, sortable by any column, with totals at the top." },
+        { "type": "new", "text": "Graphs tab with a graph for any stat over time." }
+      ]
+    }
+  ]
+}

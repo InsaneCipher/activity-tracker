@@ -539,6 +539,9 @@ td.no-match{text-align:center;color:var(--muted);padding:32px 12px;}
 .hide-changes .delta-note{display:none;}
 
 .page-foot{margin-top:48px;color:var(--muted);font-size:0.8rem;text-align:center;}
+/* Version link under each page's footer (js/version.js) */
+.version-link{display:block;width:max-content;margin:6px auto 0;font-size:0.76rem;font-weight:700;color:var(--muted);text-decoration:none;}
+.version-link:hover{color:var(--ink);text-decoration:underline;text-decoration-color:var(--jersey);text-decoration-thickness:3px;text-underline-offset:3px;}
 
 /* ---------------- Small screens ---------------- */
 @media (max-width: 900px){
